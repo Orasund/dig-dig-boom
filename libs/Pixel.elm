@@ -59,7 +59,7 @@ image :
 image attrs args =
     Html.img
         ([ pixelated
-         , Html.Attributes.style "src" args.url
+         , Html.Attributes.src args.url
          , Html.Attributes.style "width" (String.fromFloat args.width ++ "px")
          , Html.Attributes.style "height" (String.fromFloat args.height ++ "px")
          ]

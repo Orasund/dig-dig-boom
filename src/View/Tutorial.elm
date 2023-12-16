@@ -2,13 +2,11 @@ module View.Tutorial exposing (view)
 
 import Cell exposing (Cell(..), EnemyType(..), ItemType(..), SolidType(..))
 import Dict exposing (Dict)
-import PixelEngine exposing (Area)
-import PixelEngine.Options exposing (Options)
+import Html exposing (Html)
 import PixelEngine.Tile exposing (Tile)
 import Player exposing (PlayerData)
 import View.Screen as Screen
 import View.Tile as TileView
-import View.Transition as Transition
 
 
 viewHint : Int -> List ( ( Int, Int ), Tile msg )
@@ -83,7 +81,7 @@ viewHint num =
                 ]
 
 
-view : Maybe (List (Area msg)) -> PlayerData -> Dict ( Int, Int ) Cell -> Int -> ( Options msg -> Options msg, List (Area msg) )
+view : Maybe (Html msg) -> PlayerData -> Dict ( Int, Int ) Cell -> Int -> Html msg
 view oldScreen player map num =
     let
         tutorialWorldScreen =
@@ -96,19 +94,12 @@ view oldScreen player map num =
                 )
     in
     case oldScreen of
-        Just justOldScreen ->
-            ( Transition.nextLevel justOldScreen
-            , tutorialWorldScreen
-            )
+        Just _ ->
+            tutorialWorldScreen
 
         Nothing ->
             if player.lifes > 0 then
-                ( identity
-                , tutorialWorldScreen
-                )
+                tutorialWorldScreen
 
             else
-                ( Transition.death
-                    tutorialWorldScreen
-                , Screen.death
-                )
+                Screen.death

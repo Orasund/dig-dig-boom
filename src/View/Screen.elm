@@ -3,9 +3,15 @@ module View.Screen exposing (death, menu, world)
 import Cell exposing (Cell(..), EnemyType(..), ItemType(..), SolidType(..))
 import Color
 import Component.Inventory as Inventory
+import Config
 import Dict exposing (Dict)
-import PixelEngine exposing (Area)
+import Html exposing (Html)
+import Html.Attributes
+import Layout
+import Pixel
+import PixelEngine
 import PixelEngine.Image as Image
+import PixelEngine.Options as Options
 import PixelEngine.Tile as Tile exposing (Tile, Tileset)
 import Player exposing (PlayerData)
 import View.Tile as TileView
@@ -16,7 +22,7 @@ logo =
     Tile.tileset { source = "title_image.png", spriteHeight = 128, spriteWidth = 128 }
 
 
-death : List (Area msg)
+death : Html msg
 death =
     let
         width : Int
@@ -64,9 +70,16 @@ death =
         }
         []
     ]
+        |> PixelEngine.toHtml
+            { width = toFloat <| TileView.tileset.spriteWidth * width
+            , options =
+                Options.default
+                    |> Options.withScale 2
+                    |> Just
+            }
 
 
-menu : List (Area msg)
+menu : Html msg
 menu =
     let
         width : Int
@@ -126,11 +139,40 @@ menu =
         }
         []
     ]
+        |> PixelEngine.toHtml
+            { width = toFloat <| TileView.tileset.spriteWidth * width
+            , options =
+                Options.default
+                    |> Options.withScale 2
+                    |> Just
+            }
 
 
-world : Int -> Dict ( Int, Int ) Cell -> PlayerData -> List ( ( Int, Int ), Tile msg ) -> List (Area msg)
+world : Int -> Dict ( Int, Int ) Cell -> PlayerData -> List ( ( Int, Int ), Tile msg ) -> Html msg
 world worldSeed map player hints =
-    [ PixelEngine.tiledArea
+    [ [ "Score:"
+            ++ (if (worldSeed // abs worldSeed) == -1 then
+                    "-"
+
+                else
+                    " "
+               )
+            ++ String.fromInt (modBy 100 (abs worldSeed) // 10)
+            ++ String.fromInt (modBy 10 (abs worldSeed))
+            |> Layout.text [ Html.Attributes.style "font-size" "32px" ]
+      , List.range 0 (player.lifes - 1)
+            |> List.map
+                (\_ ->
+                    Pixel.image [ Pixel.pixelated ]
+                        { url = "heart.png"
+                        , width = 32
+                        , height = 32
+                        }
+                )
+            |> Layout.row []
+      ]
+        |> Layout.row [ Layout.contentWithSpaceBetween ]
+    , PixelEngine.tiledArea
         { rows = 1
         , background = PixelEngine.colorBackground (Color.rgb255 20 12 28)
         , tileset = TileView.tileset
@@ -149,6 +191,14 @@ world worldSeed map player hints =
                 )
                 TileView.colorWhite
         )
+        |> List.singleton
+        |> PixelEngine.toHtml
+            { width = toFloat <| TileView.tileset.spriteWidth * Config.mapSize
+            , options =
+                Options.default
+                    |> Options.withScale 2
+                    |> Just
+            }
     , PixelEngine.tiledArea
         { rows = 16
         , background =
@@ -164,28 +214,33 @@ world worldSeed map player hints =
                         (\( pos, cell ) -> ( pos, Cell.getImage cell ))
                 )
         )
+        |> List.singleton
+        |> PixelEngine.toHtml
+            { width = toFloat <| TileView.tileset.spriteWidth * Config.mapSize
+            , options =
+                Options.default
+                    |> Options.withScale 2
+                    |> Just
+            }
     , PixelEngine.tiledArea
         { rows = 3
         , background = PixelEngine.colorBackground (Color.rgb255 20 12 28)
         , tileset = TileView.tileset
         }
-        (List.concat
-            [ [ ( ( 4, 2 ), TileView.arrow_up TileView.colorWhite ) ]
-            , ( 5, 2 ) |> TileView.text "SPACE-use" TileView.colorWhite
-            , [ ( ( 0, 0 ), TileView.arrow_down TileView.colorWhite ) ]
-            , ( 1, 0 ) |> TileView.text "floor" TileView.colorWhite
-            , ( 2, 1 ) |> TileView.text "Q" TileView.colorWhite
-            , [ ( ( 3, 1 ), TileView.arrow_left TileView.colorWhite ) ]
-            , [ ( ( 12, 1 ), TileView.arrow_right TileView.colorWhite ) ]
-            , ( 13, 1 ) |> TileView.text "E" TileView.colorWhite
-            , List.range 0 (player.lifes - 1)
-                |> List.map (\i -> ( ( 15 - i, 0 ), TileView.heart TileView.colorRed ))
-            , player.inventory
-                |> Inventory.get
-                |> List.indexedMap
-                    (\i a ->
-                        ( ( 4 + i, 1 ), Cell.getImage (Item a) )
-                    )
-            ]
+        (player.inventory
+            |> Inventory.get
+            |> List.indexedMap
+                (\i a ->
+                    ( ( 4 + i, 1 ), Cell.getImage (Item a) )
+                )
         )
+        |> List.singleton
+        |> PixelEngine.toHtml
+            { width = toFloat <| TileView.tileset.spriteWidth * Config.mapSize
+            , options =
+                Options.default
+                    |> Options.withScale 2
+                    |> Just
+            }
     ]
+        |> Layout.column []

@@ -1,5 +1,7 @@
 module Main exposing (main)
 
+import Browser
+import Browser.Events
 import Cell
     exposing
         ( Cell(..)
@@ -8,16 +10,16 @@ import Cell
         , SolidType(..)
         )
 import Component.Map as Map exposing (Actor)
+import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import Game
-import PixelEngine exposing (Area, Input(..), PixelEngine, game)
-import PixelEngine.Options as Options exposing (Options)
+import Html exposing (Html)
+import Json.Decode as Decode
+import PixelEngine exposing (Input(..), game)
 import Player exposing (PlayerData)
 import Random
 import View.Screen as Screen
-import View.Tile as TileView
-import View.Transition as Transition
 import View.Tutorial as Tutorial
 
 
@@ -37,7 +39,7 @@ type GameType
 
 type alias ModelContent =
     { map : Dict ( Int, Int ) Cell
-    , oldScreen : Maybe (List (Area Msg))
+    , oldScreen : Maybe (Html Msg)
     , player : PlayerData
     , gameType : GameType
     }
@@ -59,7 +61,7 @@ type Msg
 
 worldSize : Int
 worldSize =
-    16
+    Config.mapSize
 
 
 
@@ -113,7 +115,7 @@ createNewMap worldSeed =
                 (Map.generator worldSize Cell.generator)
                 (Random.initialSeed worldSeed)
                 |> Tuple.mapFirst
-                    (Dict.update ( 7, 7 ) <| always <| Just <| Player Down)
+                    (Dict.update ( 3, 3 ) <| always <| Just <| Player Down)
     in
     { map = currentMap
     , oldScreen = Nothing
@@ -353,9 +355,42 @@ update msg model =
 -------------------------------
 
 
+keyDecoder : Decode.Decoder Msg
+keyDecoder =
+    Decode.map toDirection (Decode.field "key" Decode.string)
+
+
+toDirection : String -> Msg
+toDirection string =
+    case string of
+        "a" ->
+            Input InputLeft
+
+        "d" ->
+            Input InputRight
+
+        "w" ->
+            Input InputUp
+
+        "s" ->
+            Input InputDown
+
+        "q" ->
+            Input InputX
+
+        "e" ->
+            Input InputY
+
+        " " ->
+            Input InputA
+
+        _ ->
+            Input InputB
+
+
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Sub.none
+    Browser.Events.onKeyDown keyDecoder
 
 
 
@@ -364,35 +399,24 @@ subscriptions _ =
 -------------------------------
 
 
-viewRogue : ModelContent -> Int -> ( Options Msg -> Options Msg, List (Area Msg) )
+viewRogue : ModelContent -> Int -> Html Msg
 viewRogue { oldScreen, player, map } worldSeed =
     case oldScreen of
-        Just justOldScreen ->
-            ( Transition.nextLevel justOldScreen
-            , Screen.world worldSeed map player []
-            )
+        Just _ ->
+            Screen.world worldSeed map player []
 
         Nothing ->
             if player.lifes > 0 then
-                ( identity
-                , Screen.world worldSeed map player []
-                )
+                Screen.world worldSeed map player []
 
             else
-                ( Transition.death (Screen.world worldSeed map player [])
-                , Screen.death
-                )
+                Screen.death
 
 
-width : Int
-width =
-    16
-
-
-view : Model -> { title : String, options : Maybe (Options Msg), body : List (Area Msg) }
+view : Model -> Html Msg
 view model =
     let
-        ( optionFunction, body ) =
+        body =
             case model of
                 Just ({ gameType, oldScreen, player, map } as modelContent) ->
                     case gameType of
@@ -403,15 +427,9 @@ view model =
                             Tutorial.view oldScreen player map num
 
                 Nothing ->
-                    ( identity, Screen.menu )
-
-        options =
-            optionFunction Options.default
+                    Screen.menu
     in
-    { title = "Dig Dig Boom"
-    , options = Just options
-    , body = body
-    }
+    body
 
 
 
@@ -420,13 +438,11 @@ view model =
 -------------------------------
 
 
-main : PixelEngine {} Model Msg
+main : Program {} Model Msg
 main =
-    game
+    Browser.element
         { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
-        , controls = Input >> Just
-        , width = toFloat <| TileView.tileset.spriteWidth * width
         }

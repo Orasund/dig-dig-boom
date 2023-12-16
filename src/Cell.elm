@@ -13,6 +13,7 @@ module Cell exposing
     , tutorial
     )
 
+import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import PixelEngine.Tile exposing (Tile)
@@ -322,22 +323,21 @@ generator =
         positionToMaybeCell : Maybe Cell -> Generator (( Int, Int ) -> Maybe Cell)
         positionToMaybeCell maybeCell =
             constant
-                (\pos ->
-                    case pos of
-                        ( 0, _ ) ->
-                            mapBorder
+                (\( x, y ) ->
+                    {--if x == 0 then
+                        mapBorder
 
-                        ( 15, _ ) ->
-                            mapBorder
+                    else if x == Config.mapSize - 1 then
+                        mapBorder
 
-                        ( _, 0 ) ->
-                            mapBorder
+                    else if y == 0 then
+                        mapBorder
 
-                        ( _, 15 ) ->
-                            mapBorder
+                    else if y == Config.mapSize - 1 then
+                        mapBorder
 
-                        _ ->
-                            maybeCell
+                    else--}
+                    maybeCell
                 )
 
         mapBorder : Maybe Cell

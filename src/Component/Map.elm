@@ -5,6 +5,7 @@ module Component.Map exposing
     , posFront
     )
 
+import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import Position
@@ -62,13 +63,25 @@ generator size fun =
 
 move : Actor -> Dict ( Int, Int ) a -> Dict ( Int, Int ) a
 move ( pos, dir ) grid =
-    case grid |> Dict.get pos of
-        Just a ->
-            grid
-                |> Dict.insert
-                    (pos |> Position.add (Direction.toCoord dir))
-                    a
-                |> Dict.remove pos
+    let
+        newPos =
+            pos |> Position.add (Direction.toCoord dir)
 
-        Nothing ->
-            grid
+        isValid ( x, y ) =
+            (x >= 0)
+                && (x < Config.mapSize)
+                && (y >= 0)
+                && (y < Config.mapSize)
+    in
+    if isValid newPos then
+        case grid |> Dict.get pos of
+            Just a ->
+                grid
+                    |> Dict.insert newPos a
+                    |> Dict.remove pos
+
+            Nothing ->
+                grid
+
+    else
+        grid
