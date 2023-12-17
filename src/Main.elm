@@ -93,7 +93,7 @@ tutorial num =
         currentMap =
             Cell.tutorial num
                 |> Dict.update ( 7, 7 )
-                    (always (Just (Player Down)))
+                    (always (Just (PlayerCell Down)))
     in
     { map = currentMap
     , oldScreen = Nothing
@@ -115,7 +115,7 @@ createNewMap worldSeed =
                 (Map.generator worldSize Cell.generator)
                 (Random.initialSeed worldSeed)
                 |> Tuple.mapFirst
-                    (Dict.update ( 3, 3 ) <| always <| Just <| Player Down)
+                    (Dict.update ( 3, 3 ) <| always <| Just <| PlayerCell Down)
     in
     { map = currentMap
     , oldScreen = Nothing
@@ -186,7 +186,7 @@ update msg model =
                 Dict.filter
                     (\_ cell ->
                         case cell of
-                            Enemy _ _ ->
+                            EnemyCell _ _ ->
                                 True
 
                             _ ->
@@ -208,7 +208,7 @@ update msg model =
                                     |> List.filter
                                         (\( _, cell ) ->
                                             case cell of
-                                                Player _ ->
+                                                PlayerCell _ ->
                                                     True
 
                                                 _ ->
@@ -218,7 +218,7 @@ update msg model =
                                     |> Maybe.andThen
                                         (\( key, cell ) ->
                                             case cell of
-                                                Player dir ->
+                                                PlayerCell dir ->
                                                     Just ( key, dir )
 
                                                 _ ->

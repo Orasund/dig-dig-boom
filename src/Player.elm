@@ -17,7 +17,6 @@ import Cell
         , EffectType(..)
         , EnemyType(..)
         , ItemType(..)
-        , MaterialType
         , SolidType(..)
         )
 import Component.Inventory as Inventory exposing (Inventory)
@@ -50,7 +49,7 @@ face :
     -> Dict ( Int, Int ) Cell
 face position direction map =
     map
-        |> Dict.insert position (Player direction)
+        |> Dict.insert position (PlayerCell direction)
 
 
 attack : Actor -> Game -> Game
@@ -66,7 +65,7 @@ attack ( location, _ ) ( playerData, currentMap ) =
                 identity
 
             else
-                Dict.insert location <| Effect Bone
+                Dict.insert location <| EffectCell Bone
            )
     )
 
@@ -105,7 +104,7 @@ move worldSize ( ( location, direction ) as playerCell, ( playerData, currentMap
 
     else
         case currentMap |> Dict.get newLocation of
-            Just (Item item) ->
+            Just (ItemCell item) ->
                 ( newPlayerCell
                 , ( { playerData
                         | inventory =
@@ -118,7 +117,7 @@ move worldSize ( ( location, direction ) as playerCell, ( playerData, currentMap
                   )
                 )
 
-            Just (Enemy enemy id) ->
+            Just (EnemyCell enemy id) ->
                 ( playerCell, game )
                     |> Tuple.mapSecond (Tuple.mapSecond (throwEnemy playerCell enemy id))
 
@@ -130,7 +129,7 @@ move worldSize ( ( location, direction ) as playerCell, ( playerData, currentMap
                   )
                 )
 
-            Just (Effect _) ->
+            Just (EffectCell _) ->
                 let
                     ( item, inventory ) =
                         playerData.inventory |> Inventory.drop
@@ -141,19 +140,18 @@ move worldSize ( ( location, direction ) as playerCell, ( playerData, currentMap
                         Just a ->
                             currentMap
                                 |> Map.move playerCell
-                                |> Dict.insert location (Item a)
+                                |> Dict.insert location (ItemCell a)
 
                         Nothing ->
                             currentMap
                   )
                 )
 
-            Just (Solid solid) ->
+            Just (SolidCell solid) ->
                 ( playerCell
                 , case Cell.decomposing solid of
-                    ( Nothing, material ) ->
+                    Nothing ->
                         ( playerData
-                            |> (addToInventory <| Material material)
                         , currentMap
                             |> Dict.remove newLocation
                         )
@@ -176,15 +174,15 @@ throwEnemy (( _, direction ) as playerCell) enemyType enemyId currentMap =
             playerCell |> Map.posFront 1
     in
     currentMap
-        |> Dict.update newLocation (always (Just <| Stunned enemyType enemyId))
+        |> Dict.update newLocation (always (Just <| StunnedCell enemyType enemyId))
         |> (case
                 currentMap
                     |> Dict.get (playerCell |> Map.posFront 2)
             of
-                Just (Solid _) ->
+                Just (SolidCell _) ->
                     identity
 
-                Just (Enemy _ _) ->
+                Just (EnemyCell _ _) ->
                     identity
 
                 _ ->
@@ -195,10 +193,10 @@ throwEnemy (( _, direction ) as playerCell) enemyType enemyId currentMap =
                                     newMap
                                         |> Dict.get (playerCell |> Map.posFront 3)
                                 of
-                                    Just (Solid _) ->
+                                    Just (SolidCell _) ->
                                         identity
 
-                                    Just (Enemy _ _) ->
+                                    Just (EnemyCell _ _) ->
                                         identity
 
                                     _ ->
@@ -237,12 +235,12 @@ placingItem map playerCell cell specialCase =
                 Tuple.mapSecond
                     (Dict.insert frontPos cell)
 
-        Just (Effect _) ->
+        Just (EffectCell _) ->
             Just <|
                 Tuple.mapSecond
                     (Dict.insert frontPos cell)
 
-        Just (Solid solidType) ->
+        Just (SolidCell solidType) ->
             specialCase solidType
 
         _ ->
@@ -265,7 +263,7 @@ drop playerCell ( playerData, map ) =
             , case maybeItem of
                 Just item ->
                     map
-                        |> Dict.insert dir (Item item)
+                        |> Dict.insert dir (ItemCell item)
 
                 Nothing ->
                     map
@@ -318,9 +316,6 @@ itemAction playerCell consumable (( playerData, map ) as game) =
                 Bombe ->
                     bombeAction map playerCell
 
-                Material material ->
-                    materialAction map playerCell material
-
                 HealthPotion ->
                     healthPotionAction playerData
             )
@@ -350,7 +345,7 @@ bombeAction currentMap playerCell =
         specialCase : SolidType -> Maybe (Game -> Game)
         specialCase solidType =
             let
-                ( maybeSolid, material ) =
+                maybeSolid =
                     Cell.decomposing solidType
             in
             maybeSolid
@@ -358,9 +353,8 @@ bombeAction currentMap playerCell =
                     (\solid ->
                         \( playerData, map ) ->
                             ( playerData
-                                |> addToInventory (Material material)
                             , map
-                                |> Dict.insert (playerCell |> Map.posFront 1) (Solid solid)
+                                |> Dict.insert (playerCell |> Map.posFront 1) (SolidCell solid)
                             )
                     )
 
@@ -375,33 +369,4 @@ bombeAction currentMap playerCell =
                 ++ "_"
                 ++ String.fromInt front_y
     in
-    placingItem currentMap playerCell (Enemy PlacedBombe id) specialCase
-
-
-materialAction : Dict ( Int, Int ) Cell -> Actor -> MaterialType -> Maybe (Game -> Game)
-materialAction map playerCell material =
-    let
-        specialCase : SolidType -> Maybe (Game -> Game)
-        specialCase solidType =
-            Just
-                (case Cell.composing ( Just solidType, material ) of
-                    Just newSolid ->
-                        Tuple.mapSecond
-                            (\grid ->
-                                grid
-                                    |> Dict.insert (playerCell |> Map.posFront 1) (Solid newSolid)
-                            )
-
-                    Nothing ->
-                        Tuple.mapFirst <| addToInventory <| Material material
-                )
-    in
-    Cell.composing ( Nothing, material )
-        |> Maybe.andThen
-            (\solid ->
-                placingItem
-                    map
-                    playerCell
-                    (Solid solid)
-                    specialCase
-            )
+    placingItem currentMap playerCell (EnemyCell PlacedBombe id) specialCase

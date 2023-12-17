@@ -30,7 +30,7 @@ posFront n ( position, direction ) =
             )
 
 
-generator : Int -> Generator (( Int, Int ) -> Maybe a) -> Generator (Dict ( Int, Int ) a)
+generator : Int -> Generator (Maybe a) -> Generator (Dict ( Int, Int ) a)
 generator size fun =
     Random.list (size * size) fun
         |> Random.map
@@ -45,7 +45,7 @@ generator size fun =
                                     , xy // size
                                     )
                             in
-                            ( case maybeA pos of
+                            ( case maybeA of
                                 Just a ->
                                     grid |> Dict.insert pos a
 

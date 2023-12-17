@@ -3,9 +3,7 @@ module Cell exposing
     , EffectType(..)
     , EnemyType(..)
     , ItemType(..)
-    , MaterialType(..)
     , SolidType
-    , composing
     , decomposing
     , generator
     , getImage
@@ -13,7 +11,6 @@ module Cell exposing
     , tutorial
     )
 
-import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import PixelEngine.Tile exposing (Tile)
@@ -24,7 +21,6 @@ import View.Tile as Tile
 type ItemType
     = Bombe
     | HealthPotion
-    | Material MaterialType
 
 
 type EnemyType
@@ -40,66 +36,37 @@ type EffectType
 
 
 type Cell
-    = Player Direction
-    | Solid SolidType
-    | Enemy EnemyType String
-    | Stunned EnemyType String
-    | Item ItemType
-    | Effect EffectType
-
-
-type MaterialType
-    = Dirt
-    | Stone
+    = PlayerCell Direction
+    | SolidCell SolidType
+    | EnemyCell EnemyType String
+    | StunnedCell EnemyType String
+    | ItemCell ItemType
+    | EffectCell EffectType
 
 
 type SolidType
     = StoneWall
     | StoneBrickWall
-    | Placed MaterialType
+    | DirtWall
 
 
-decomposing : SolidType -> ( Maybe SolidType, MaterialType )
+decomposing : SolidType -> Maybe SolidType
 decomposing solidType =
     case solidType of
-        Placed material ->
-            ( Nothing, material )
+        DirtWall ->
+            Nothing
 
         StoneWall ->
-            ( Just (Placed Dirt), Stone )
+            Just DirtWall
 
         StoneBrickWall ->
-            ( Just StoneWall, Stone )
-
-
-composing : ( Maybe SolidType, MaterialType ) -> Maybe SolidType
-composing tuple =
-    case tuple of
-        ( Just (Placed placedMaterial), material ) ->
-            case ( placedMaterial, material ) of
-                ( Dirt, Dirt ) ->
-                    Nothing
-
-                ( Stone, Dirt ) ->
-                    Just StoneWall
-
-                ( Dirt, Stone ) ->
-                    Just StoneWall
-
-                ( Stone, Stone ) ->
-                    Just StoneBrickWall
-
-        ( Nothing, material ) ->
-            Just (Placed material)
-
-        ( Just _, _ ) ->
-            Nothing
+            Just StoneWall
 
 
 getImage : Cell -> Tile msg
 getImage cell =
     case cell of
-        Player a ->
+        PlayerCell a ->
             (case a of
                 Down ->
                     Tile.player_down
@@ -115,31 +82,22 @@ getImage cell =
             )
                 Tile.colorWhite
 
-        Solid (Placed Stone) ->
-            Tile.placed_stone Tile.colorGray
-
-        Solid (Placed Dirt) ->
+        SolidCell DirtWall ->
             Tile.dirt_wall Tile.colorBrown
 
-        Solid StoneWall ->
+        SolidCell StoneWall ->
             Tile.stone_wall Tile.colorGray
 
-        Solid StoneBrickWall ->
+        SolidCell StoneBrickWall ->
             Tile.stone_brick_wall Tile.colorGray
 
-        Item Bombe ->
+        ItemCell Bombe ->
             Tile.bombe Tile.colorGreen
 
-        Item HealthPotion ->
+        ItemCell HealthPotion ->
             Tile.health_potion Tile.colorGreen
 
-        Item (Material Dirt) ->
-            Tile.dirt_wall Tile.colorBlue
-
-        Item (Material Stone) ->
-            Tile.stone Tile.colorBlue
-
-        Enemy enemy id ->
+        EnemyCell enemy id ->
             (case enemy of
                 PlacedBombe ->
                     Tile.placed_bombe id
@@ -155,7 +113,7 @@ getImage cell =
             )
                 Tile.colorRed
 
-        Stunned enemy id ->
+        StunnedCell enemy id ->
             (case enemy of
                 PlacedBombe ->
                     Tile.placed_bombe id
@@ -171,7 +129,7 @@ getImage cell =
             )
                 Tile.colorYellow
 
-        Effect effect ->
+        EffectCell effect ->
             (case effect of
                 Smoke ->
                     Tile.smoke
@@ -196,10 +154,7 @@ resistancy solid =
         StoneBrickWall ->
             4
 
-        Placed Dirt ->
-            2
-
-        Placed Stone ->
+        DirtWall ->
             2
 
 
@@ -218,22 +173,19 @@ tutorial num =
                         5 ->
                             case pos of
                                 ( 13, 8 ) ->
-                                    Just <| Enemy Rat "rat_1"
+                                    Just <| EnemyCell Rat "rat_1"
 
                                 ( 11, 7 ) ->
-                                    Just <| Enemy Oger "Oger_1"
+                                    Just <| EnemyCell Oger "Oger_1"
 
                                 ( 8, 7 ) ->
-                                    Just <| Solid <| Placed <| Stone
+                                    Just <| SolidCell <| DirtWall
 
                                 ( 3, 8 ) ->
-                                    Just <| (Item <| Bombe)
-
-                                ( 6, 7 ) ->
-                                    Just <| (Item <| Material <| Stone)
+                                    Just <| (ItemCell <| Bombe)
 
                                 ( 7, 8 ) ->
-                                    Just <| (Item <| Bombe)
+                                    Just <| (ItemCell <| Bombe)
 
                                 _ ->
                                     Nothing
@@ -241,19 +193,19 @@ tutorial num =
                         4 ->
                             case pos of
                                 ( 9, 7 ) ->
-                                    Just <| Solid StoneBrickWall
+                                    Just <| SolidCell StoneBrickWall
 
                                 ( 9, 8 ) ->
-                                    Just <| Solid StoneWall
+                                    Just <| SolidCell StoneWall
 
                                 ( 13, 7 ) ->
-                                    Just <| Enemy Goblin "goblin_1"
+                                    Just <| EnemyCell Goblin "goblin_1"
 
                                 ( 7, 8 ) ->
-                                    Just <| (Item <| Bombe)
+                                    Just <| (ItemCell <| Bombe)
 
                                 ( 8, 8 ) ->
-                                    Just <| (Item <| Bombe)
+                                    Just <| (ItemCell <| Bombe)
 
                                 _ ->
                                     Nothing
@@ -261,13 +213,13 @@ tutorial num =
                         3 ->
                             case pos of
                                 ( 10, 8 ) ->
-                                    Just <| Solid StoneWall
+                                    Just <| SolidCell StoneWall
 
                                 ( 13, 7 ) ->
-                                    Just <| Enemy Goblin "goblin_1"
+                                    Just <| EnemyCell Goblin "goblin_1"
 
                                 ( 11, 8 ) ->
-                                    Just <| (Item <| Bombe)
+                                    Just <| (ItemCell <| Bombe)
 
                                 _ ->
                                     Nothing
@@ -275,19 +227,19 @@ tutorial num =
                         2 ->
                             case pos of
                                 ( 9, 7 ) ->
-                                    Just <| Solid StoneWall
+                                    Just <| SolidCell StoneWall
 
                                 ( 11, 7 ) ->
-                                    Just <| (Solid <| Placed Dirt)
+                                    Just <| (SolidCell <| DirtWall)
 
                                 ( 9, 8 ) ->
-                                    Just <| (Solid <| Placed Dirt)
+                                    Just <| (SolidCell <| DirtWall)
 
                                 ( 13, 7 ) ->
-                                    Just <| Enemy Goblin "goblin_1"
+                                    Just <| EnemyCell Goblin "goblin_1"
 
                                 ( 7, 8 ) ->
-                                    Just <| (Item <| Bombe)
+                                    Just <| (ItemCell <| Bombe)
 
                                 _ ->
                                     Nothing
@@ -295,19 +247,19 @@ tutorial num =
                         _ ->
                             case pos of
                                 ( 9, 7 ) ->
-                                    Just <| Solid StoneWall
+                                    Just <| SolidCell StoneWall
 
                                 ( 13, 7 ) ->
-                                    Just <| Enemy Rat "rat_1"
+                                    Just <| EnemyCell Rat "rat_1"
 
                                 ( 7, 8 ) ->
-                                    Just <| (Item <| Bombe)
+                                    Just <| (ItemCell <| Bombe)
 
                                 _ ->
                                     Nothing
 
                  else
-                    Just (Solid StoneBrickWall)
+                    Just (SolidCell StoneBrickWall)
                 )
                     |> Maybe.map
                         (\a ->
@@ -317,76 +269,47 @@ tutorial num =
         |> Dict.fromList
 
 
-generator : Generator (( Int, Int ) -> Maybe Cell)
+generator : Generator (Maybe Cell)
 generator =
-    let
-        positionToMaybeCell : Maybe Cell -> Generator (( Int, Int ) -> Maybe Cell)
-        positionToMaybeCell maybeCell =
-            constant
-                (\( x, y ) ->
-                    {--if x == 0 then
-                        mapBorder
-
-                    else if x == Config.mapSize - 1 then
-                        mapBorder
-
-                    else if y == 0 then
-                        mapBorder
-
-                    else if y == Config.mapSize - 1 then
-                        mapBorder
-
-                    else--}
-                    maybeCell
-                )
-
-        mapBorder : Maybe Cell
-        mapBorder =
-            Just <| Solid StoneBrickWall
-
-        constant : a -> Generator a
-        constant a =
-            Random.int 0 0 |> Random.map (always a)
-    in
     Random.int 0 500
         |> Random.andThen
             (\r ->
                 if r < 50 then
-                    positionToMaybeCell <| Just <| Solid <| Placed Dirt
+                    Random.constant <| Just <| SolidCell <| DirtWall
 
                 else if r < 150 then
-                    positionToMaybeCell <| Just <| Solid StoneWall
+                    Random.constant <| Just <| SolidCell StoneWall
 
                 else if r < 200 then
-                    positionToMaybeCell <| Just <| Solid StoneBrickWall
+                    Random.constant <| Just <| SolidCell StoneBrickWall
 
                 else if r < 225 then
-                    positionToMaybeCell <| Just <| Item Bombe
+                    Random.constant <| Just <| ItemCell Bombe
 
                 else if r < 230 then
-                    positionToMaybeCell <| Just <| Item HealthPotion
+                    Random.constant <| Just <| ItemCell HealthPotion
 
                 else if r < 235 then
                     Random.float 0 1
                         |> Random.andThen
                             (\id ->
-                                positionToMaybeCell <| Just <| Enemy Rat <| "Rat" ++ String.fromFloat id
+                                Random.constant <| Just <| EnemyCell Rat <| "Rat" ++ String.fromFloat id
                             )
 
                 else if r < 238 then
                     Random.float 0 1
                         |> Random.andThen
                             (\id ->
-                                positionToMaybeCell <| Just <| Enemy Goblin <| "Goblin" ++ String.fromFloat id
+                                Random.constant <| Just <| EnemyCell Goblin <| "Goblin" ++ String.fromFloat id
                             )
 
                 else if r < 239 then
                     Random.float 0 1
                         |> Random.andThen
                             (\id ->
-                                positionToMaybeCell <| Just <| Enemy Oger <| "Oger" ++ String.fromFloat id
+                                Random.constant <| Just <| EnemyCell Oger <| "Oger" ++ String.fromFloat id
                             )
 
                 else
-                    positionToMaybeCell <| Nothing
+                    Random.constant <| Nothing
             )

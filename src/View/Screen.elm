@@ -7,13 +7,14 @@ import Config
 import Dict exposing (Dict)
 import Html exposing (Html)
 import Html.Attributes
+import Image
 import Layout
-import Pixel
 import PixelEngine
-import PixelEngine.Image as Image
+import PixelEngine.Image
 import PixelEngine.Options as Options
 import PixelEngine.Tile as Tile exposing (Tile, Tileset)
 import Player exposing (PlayerData)
+import View.Item
 import View.Tile as TileView
 
 
@@ -50,7 +51,7 @@ death =
         , background = PixelEngine.colorBackground (Color.rgb255 20 12 28)
         }
         [ ( ( toFloat <| (16 * width) // 2 - 64, toFloat <| (12 * width) // 2 - 64 )
-          , Image.fromSrc "skull.png"
+          , PixelEngine.Image.fromSrc "skull.png"
           )
         ]
     , PixelEngine.tiledArea
@@ -111,7 +112,7 @@ menu =
         { height = toFloat <| 9 * 16
         , background = PixelEngine.colorBackground (Color.rgb255 20 12 28)
         }
-        [ ( ( toFloat <| (16 * width) // 2 - 64, 0 ), Image.fromTile tile logo )
+        [ ( ( toFloat <| (16 * width) // 2 - 64, 0 ), PixelEngine.Image.fromTile tile logo )
         ]
     , PixelEngine.tiledArea
         { rows = 4
@@ -160,15 +161,12 @@ world worldSeed map player hints =
             ++ String.fromInt (modBy 100 (abs worldSeed) // 10)
             ++ String.fromInt (modBy 10 (abs worldSeed))
             |> Layout.text [ Html.Attributes.style "font-size" "32px" ]
-      , List.range 0 (player.lifes - 1)
-            |> List.map
-                (\_ ->
-                    Pixel.image [ Pixel.pixelated ]
-                        { url = "heart.png"
-                        , width = 32
-                        , height = 32
-                        }
-                )
+      , Image.image [ Image.pixelated ]
+            { url = "heart.png"
+            , width = 32
+            , height = 32
+            }
+            |> List.repeat player.lifes
             |> Layout.row []
       ]
         |> Layout.row [ Layout.contentWithSpaceBetween ]
@@ -222,25 +220,9 @@ world worldSeed map player hints =
                     |> Options.withScale 2
                     |> Just
             }
-    , PixelEngine.tiledArea
-        { rows = 3
-        , background = PixelEngine.colorBackground (Color.rgb255 20 12 28)
-        , tileset = TileView.tileset
-        }
-        (player.inventory
-            |> Inventory.get
-            |> List.indexedMap
-                (\i a ->
-                    ( ( 4 + i, 1 ), Cell.getImage (Item a) )
-                )
-        )
-        |> List.singleton
-        |> PixelEngine.toHtml
-            { width = toFloat <| TileView.tileset.spriteWidth * Config.mapSize
-            , options =
-                Options.default
-                    |> Options.withScale 2
-                    |> Just
-            }
+    , player.inventory
+        |> Inventory.get
+        |> List.map View.Item.toHtml
+        |> Layout.row []
     ]
         |> Layout.column []
