@@ -116,7 +116,7 @@ specialBehaviour currentLocation enemyType ( playerLocation, _ ) game =
                                 |> Map.move actor
                     }
 
-                Just (ItemCell _) ->
+                Just ItemCell ->
                     { game
                         | cells =
                             game.cells
@@ -169,6 +169,10 @@ placedBombeBehavoiur location direction game =
                         case elem of
                             Just (EnemyCell _ _) ->
                                 Just <| EffectCell Bone
+
+                            Just (SolidCell solidType) ->
+                                Cell.decomposing solidType
+                                    |> Maybe.map SolidCell
 
                             Nothing ->
                                 Just <| EffectCell Smoke

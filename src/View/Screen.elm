@@ -170,37 +170,10 @@ world worldSeed game hints =
       ]
         |> Layout.row [ Layout.contentWithSpaceBetween ]
     , PixelEngine.tiledArea
-        { rows = 1
-        , background = PixelEngine.colorBackground (Color.rgb255 20 12 28)
-        , tileset = TileView.tileset
-        }
-        (( 0, 0 )
-            |> TileView.text
-                ("X-exit score:"
-                    ++ (if (worldSeed // abs worldSeed) == -1 then
-                            "-"
-
-                        else
-                            " "
-                       )
-                    ++ String.fromInt (modBy 100 (abs worldSeed) // 10)
-                    ++ String.fromInt (modBy 10 (abs worldSeed))
-                )
-                TileView.colorWhite
-        )
-        |> List.singleton
-        |> PixelEngine.toHtml
-            { width = toFloat <| TileView.tileset.spriteWidth * Config.mapSize
-            , options =
-                Options.default
-                    |> Options.withScale 2
-                    |> Just
-            }
-    , PixelEngine.tiledArea
-        { rows = 16
+        { rows = Config.mapSize
         , background =
             PixelEngine.imageBackground
-                { source = "groundTile.png", width = 16, height = 16 }
+                { source = "groundTile.png", width = 32, height = 32 }
         , tileset = TileView.tileset
         }
         (hints
@@ -216,7 +189,7 @@ world worldSeed game hints =
             { width = toFloat <| TileView.tileset.spriteWidth * Config.mapSize
             , options =
                 Options.default
-                    |> Options.withScale 2
+                    |> Options.withScale 4
                     |> Just
             }
     , View.Item.toHtml Bombe

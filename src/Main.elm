@@ -9,6 +9,7 @@ import Cell
         , ItemType(..)
         , SolidType(..)
         )
+import Cell.Generate
 import Component.Map as Map exposing (Actor)
 import Config
 import Dict exposing (Dict)
@@ -105,7 +106,7 @@ createNewMap worldSeed =
     let
         ( currentMap, currentSeed ) =
             Random.step
-                (Map.generator worldSize Cell.generator)
+                (Map.generator worldSize Cell.Generate.generator)
                 (Random.initialSeed worldSeed)
                 |> Tuple.mapFirst
                     (Dict.update ( 3, 3 ) <| always <| Just <| PlayerCell Down)

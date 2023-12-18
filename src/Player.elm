@@ -41,14 +41,14 @@ init =
     }
 
 
-addLife : PlayerData -> PlayerData
-addLife player =
-    { player | lifes = player.lifes - 1 |> min 0 }
-
-
 removeLife : PlayerData -> PlayerData
 removeLife player =
-    { player | lifes = player.lifes + 1 |> max Config.maxLifes }
+    { player | lifes = player.lifes - 1 |> max 0 }
+
+
+addLife : PlayerData -> PlayerData
+addLife player =
+    { player | lifes = player.lifes + 1 |> min Config.maxLifes }
 
 
 face :
@@ -65,7 +65,7 @@ attack : Actor -> Game -> Game
 attack ( location, _ ) game =
     let
         player =
-            game.player |> addLife
+            game.player |> removeLife
     in
     { game
         | player = player
@@ -116,19 +116,11 @@ move worldSize ( ( location, direction ) as playerCell, game ) =
 
     else
         case game.cells |> Dict.get newLocation of
-            Just (ItemCell item) ->
+            Just ItemCell ->
                 ( newPlayerCell
                 , { game
-                    | player =
-                        { playerData
-                            | bombs =
-                                playerData.bombs
-                                    + 1
-                                    |> max Config.maxBombs
-                        }
-                    , cells =
-                        game.cells
-                            |> Map.move playerCell
+                    | player = playerData |> addBombe
+                    , cells = game.cells |> Map.move playerCell
                   }
                 )
 
@@ -155,7 +147,7 @@ move worldSize ( ( location, direction ) as playerCell, game ) =
                         , cells =
                             game.cells
                                 |> Map.move playerCell
-                                |> Dict.insert location (ItemCell Bombe)
+                                |> Dict.insert location ItemCell
                       }
                     )
 
@@ -247,7 +239,7 @@ addBombe playerData =
         | bombs =
             playerData.bombs
                 + 1
-                |> max Config.maxBombs
+                |> min Config.maxBombs
     }
 
 
@@ -269,7 +261,7 @@ applyHealthPotion game =
         Just
             { game
                 | player =
-                    addLife game.player
+                    removeLife game.player
             }
 
     else

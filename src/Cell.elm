@@ -3,9 +3,8 @@ module Cell exposing
     , EffectType(..)
     , EnemyType(..)
     , ItemType(..)
-    , SolidType
+    , SolidType(..)
     , decomposing
-    , generator
     , getImage
     , resistancy
     , tutorial
@@ -14,7 +13,6 @@ module Cell exposing
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import PixelEngine.Tile exposing (Tile)
-import Random exposing (Generator)
 import View.Tile as Tile
 
 
@@ -40,7 +38,7 @@ type Cell
     | SolidCell SolidType
     | EnemyCell EnemyType String
     | StunnedCell EnemyType String
-    | ItemCell ItemType
+    | ItemCell
     | EffectCell EffectType
 
 
@@ -91,11 +89,8 @@ getImage cell =
         SolidCell StoneBrickWall ->
             Tile.stone_brick_wall Tile.colorGray
 
-        ItemCell Bombe ->
+        ItemCell ->
             Tile.bombe Tile.colorGreen
-
-        ItemCell HealthPotion ->
-            Tile.health_potion Tile.colorGreen
 
         EnemyCell enemy id ->
             (case enemy of
@@ -182,10 +177,10 @@ tutorial num =
                                     Just <| SolidCell <| DirtWall
 
                                 ( 3, 8 ) ->
-                                    Just <| (ItemCell <| Bombe)
+                                    Just <| ItemCell
 
                                 ( 7, 8 ) ->
-                                    Just <| (ItemCell <| Bombe)
+                                    Just <| ItemCell
 
                                 _ ->
                                     Nothing
@@ -202,10 +197,10 @@ tutorial num =
                                     Just <| EnemyCell Goblin "goblin_1"
 
                                 ( 7, 8 ) ->
-                                    Just <| (ItemCell <| Bombe)
+                                    Just <| ItemCell
 
                                 ( 8, 8 ) ->
-                                    Just <| (ItemCell <| Bombe)
+                                    Just <| ItemCell
 
                                 _ ->
                                     Nothing
@@ -219,7 +214,7 @@ tutorial num =
                                     Just <| EnemyCell Goblin "goblin_1"
 
                                 ( 11, 8 ) ->
-                                    Just <| (ItemCell <| Bombe)
+                                    Just <| ItemCell
 
                                 _ ->
                                     Nothing
@@ -239,7 +234,7 @@ tutorial num =
                                     Just <| EnemyCell Goblin "goblin_1"
 
                                 ( 7, 8 ) ->
-                                    Just <| (ItemCell <| Bombe)
+                                    Just <| ItemCell
 
                                 _ ->
                                     Nothing
@@ -253,7 +248,7 @@ tutorial num =
                                     Just <| EnemyCell Rat "rat_1"
 
                                 ( 7, 8 ) ->
-                                    Just <| (ItemCell <| Bombe)
+                                    Just <| ItemCell
 
                                 _ ->
                                     Nothing
@@ -267,49 +262,3 @@ tutorial num =
                         )
             )
         |> Dict.fromList
-
-
-generator : Generator (Maybe Cell)
-generator =
-    Random.int 0 500
-        |> Random.andThen
-            (\r ->
-                if r < 50 then
-                    Random.constant <| Just <| SolidCell <| DirtWall
-
-                else if r < 150 then
-                    Random.constant <| Just <| SolidCell StoneWall
-
-                else if r < 200 then
-                    Random.constant <| Just <| SolidCell StoneBrickWall
-
-                else if r < 225 then
-                    Random.constant <| Just <| ItemCell Bombe
-
-                else if r < 230 then
-                    Random.constant <| Just <| ItemCell HealthPotion
-
-                else if r < 235 then
-                    Random.float 0 1
-                        |> Random.andThen
-                            (\id ->
-                                Random.constant <| Just <| EnemyCell Rat <| "Rat" ++ String.fromFloat id
-                            )
-
-                else if r < 238 then
-                    Random.float 0 1
-                        |> Random.andThen
-                            (\id ->
-                                Random.constant <| Just <| EnemyCell Goblin <| "Goblin" ++ String.fromFloat id
-                            )
-
-                else if r < 239 then
-                    Random.float 0 1
-                        |> Random.andThen
-                            (\id ->
-                                Random.constant <| Just <| EnemyCell Oger <| "Oger" ++ String.fromFloat id
-                            )
-
-                else
-                    Random.constant <| Nothing
-            )
