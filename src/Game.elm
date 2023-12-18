@@ -28,12 +28,15 @@ applyDirection size dir (( ( location, direction ), _ ) as playerCellAndGame) =
 
     else
         playerCellAndGame
-            |> Tuple.mapSecond (Tuple.mapSecond (Player.face location dir))
+            |> Tuple.mapSecond
+                (\game ->
+                    { game | cells = game.cells |> Player.face location dir }
+                )
 
 
 updateGame : Actor -> Game -> Game
-updateGame playerCell (( _, map ) as game) =
-    map
+updateGame playerCell game =
+    game.cells
         |> Dict.toList
         |> List.foldl
             (updateCell playerCell)
@@ -41,19 +44,19 @@ updateGame playerCell (( _, map ) as game) =
 
 
 updateCell : Actor -> ( ( Int, Int ), Cell ) -> Game -> Game
-updateCell playerCell ( position, cell ) =
+updateCell playerCell ( position, cell ) game =
     case cell of
         EnemyCell enemy _ ->
-            updateEnemy position enemy playerCell
+            updateEnemy position enemy playerCell game
 
         EffectCell _ ->
-            Tuple.mapSecond (Dict.remove position)
+            { game | cells = game.cells |> Dict.remove position }
 
         StunnedCell enemy id ->
-            Tuple.mapSecond (Dict.update position (always <| Just <| EnemyCell enemy id))
+            { game | cells = game.cells |> Dict.update position (always <| Just <| EnemyCell enemy id) }
 
         _ ->
-            identity
+            game
 
 
 updateEnemy : ( Int, Int ) -> EnemyType -> Actor -> Game -> Game
@@ -63,7 +66,7 @@ updateEnemy position enemyType playerCell =
 
 
 attackPlayer : ( Int, Int ) -> Actor -> Game -> Game
-attackPlayer location (( playerLocation, _ ) as playerCell) ( playerData, map ) =
+attackPlayer location (( playerLocation, _ ) as playerCell) game =
     [ Up, Down, Left, Right ]
         |> List.filter
             (\direction ->
@@ -72,20 +75,21 @@ attackPlayer location (( playerLocation, _ ) as playerCell) ( playerData, map ) 
                     |> (==) (playerLocation |> Position.coordTo location)
             )
         |> List.head
-        |> Maybe.map (always (( playerData, map ) |> Player.attack playerCell))
-        |> Maybe.withDefault ( playerData, map )
+        |> Maybe.map (always (game |> Player.attack playerCell))
+        |> Maybe.withDefault game
 
 
 specialBehaviour : ( Int, Int ) -> EnemyType -> Actor -> Game -> Game
-specialBehaviour currentLocation enemyType ( playerLocation, _ ) (( _, map ) as game) =
+specialBehaviour currentLocation enemyType ( playerLocation, _ ) game =
     case enemyType of
         PlacedBombe ->
             [ Up, Down, Left, Right ]
                 |> List.foldl
                     (placedBombeBehavoiur currentLocation)
                     game
-                |> Tuple.mapSecond
-                    (Dict.update currentLocation (always (Just (EffectCell Smoke))))
+                |> (\g ->
+                        { g | cells = g.cells |> Dict.update currentLocation (always (Just (EffectCell Smoke))) }
+                   )
 
         monster ->
             let
@@ -104,43 +108,50 @@ specialBehaviour currentLocation enemyType ( playerLocation, _ ) (( _, map ) as 
                 newLocation =
                     actor |> Map.posFront 1
             in
-            game
-                |> (case map |> Dict.get newLocation of
-                        Nothing ->
-                            Tuple.mapSecond
-                                (Map.move actor)
+            case game.cells |> Dict.get newLocation of
+                Nothing ->
+                    { game
+                        | cells =
+                            game.cells
+                                |> Map.move actor
+                    }
 
-                        Just (ItemCell _) ->
-                            Tuple.mapSecond
-                                (Map.move actor)
+                Just (ItemCell _) ->
+                    { game
+                        | cells =
+                            game.cells
+                                |> Map.move actor
+                    }
 
-                        Just (SolidCell solid) ->
-                            if
-                                Cell.resistancy solid
-                                    <= (case monster of
-                                            PlacedBombe ->
-                                                0
+                Just (SolidCell solid) ->
+                    if
+                        Cell.resistancy solid
+                            <= (case monster of
+                                    PlacedBombe ->
+                                        0
 
-                                            Oger ->
-                                                3
+                                    Oger ->
+                                        3
 
-                                            Goblin ->
-                                                2
+                                    Goblin ->
+                                        2
 
-                                            Rat ->
-                                                1
-                                       )
-                            then
-                                Tuple.mapSecond <|
-                                    Dict.update newLocation <|
-                                        always (Cell.decomposing solid |> Maybe.map SolidCell)
+                                    Rat ->
+                                        1
+                               )
+                    then
+                        { game
+                            | cells =
+                                game.cells
+                                    |> Dict.update newLocation
+                                        (always (Cell.decomposing solid |> Maybe.map SolidCell))
+                        }
 
-                            else
-                                identity
+                    else
+                        game
 
-                        _ ->
-                            identity
-                   )
+                _ ->
+                    game
 
 
 placedBombeBehavoiur : ( Int, Int ) -> Direction -> Game -> Game
@@ -149,19 +160,20 @@ placedBombeBehavoiur location direction game =
         newLocation =
             ( location, direction ) |> Map.posFront 1
     in
-    game
-        |> Tuple.mapSecond
-            (Dict.update
-                newLocation
-                (\elem ->
-                    case elem of
-                        Just (EnemyCell _ _) ->
-                            Just <| EffectCell Bone
+    { game
+        | cells =
+            game.cells
+                |> Dict.update
+                    newLocation
+                    (\elem ->
+                        case elem of
+                            Just (EnemyCell _ _) ->
+                                Just <| EffectCell Bone
 
-                        Nothing ->
-                            Just <| EffectCell Smoke
+                            Nothing ->
+                                Just <| EffectCell Smoke
 
-                        _ ->
-                            elem
-                )
-            )
+                            _ ->
+                                elem
+                    )
+    }

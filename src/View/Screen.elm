@@ -2,9 +2,8 @@ module View.Screen exposing (death, menu, world)
 
 import Cell exposing (Cell(..), EnemyType(..), ItemType(..), SolidType(..))
 import Color
-import Component.Inventory as Inventory
 import Config
-import Dict exposing (Dict)
+import Dict
 import Html exposing (Html)
 import Html.Attributes
 import Image
@@ -13,7 +12,7 @@ import PixelEngine
 import PixelEngine.Image
 import PixelEngine.Options as Options
 import PixelEngine.Tile as Tile exposing (Tile, Tileset)
-import Player exposing (PlayerData)
+import Player exposing (Game)
 import View.Item
 import View.Tile as TileView
 
@@ -149,8 +148,8 @@ menu =
             }
 
 
-world : Int -> Dict ( Int, Int ) Cell -> PlayerData -> List ( ( Int, Int ), Tile msg ) -> Html msg
-world worldSeed map player hints =
+world : Int -> Game -> List ( ( Int, Int ), Tile msg ) -> Html msg
+world worldSeed game hints =
     [ [ "Score:"
             ++ (if (worldSeed // abs worldSeed) == -1 then
                     "-"
@@ -166,7 +165,7 @@ world worldSeed map player hints =
             , width = 32
             , height = 32
             }
-            |> List.repeat player.lifes
+            |> List.repeat game.player.lifes
             |> Layout.row []
       ]
         |> Layout.row [ Layout.contentWithSpaceBetween ]
@@ -206,7 +205,7 @@ world worldSeed map player hints =
         }
         (hints
             |> List.append
-                (map
+                (game.cells
                     |> Dict.toList
                     |> List.map
                         (\( pos, cell ) -> ( pos, Cell.getImage cell ))
@@ -220,9 +219,8 @@ world worldSeed map player hints =
                     |> Options.withScale 2
                     |> Just
             }
-    , player.inventory
-        |> Inventory.get
-        |> List.map View.Item.toHtml
+    , View.Item.toHtml Bombe
+        |> List.repeat game.player.bombs
         |> Layout.row []
     ]
         |> Layout.column []

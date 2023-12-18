@@ -17,7 +17,7 @@ import Game
 import Html exposing (Html)
 import Json.Decode as Decode
 import PixelEngine exposing (Input(..), game)
-import Player exposing (PlayerData)
+import Player exposing (Game)
 import Random
 import View.Screen as Screen
 import View.Tutorial as Tutorial
@@ -38,9 +38,8 @@ type GameType
 
 
 type alias ModelContent =
-    { map : Dict ( Int, Int ) Cell
-    , oldScreen : Maybe (Html Msg)
-    , player : PlayerData
+    { oldScreen : Maybe (Html Msg)
+    , game : Game
     , gameType : GameType
     }
 
@@ -86,18 +85,16 @@ init _ =
 tutorial : Int -> ModelContent
 tutorial num =
     let
-        backpackSize : Int
-        backpackSize =
-            8
-
         currentMap =
             Cell.tutorial num
                 |> Dict.update ( 7, 7 )
                     (always (Just (PlayerCell Down)))
     in
-    { map = currentMap
-    , oldScreen = Nothing
-    , player = Player.init backpackSize
+    { oldScreen = Nothing
+    , game =
+        { player = Player.init
+        , cells = currentMap
+        }
     , gameType =
         Tutorial num
     }
@@ -106,10 +103,6 @@ tutorial num =
 createNewMap : Int -> ModelContent
 createNewMap worldSeed =
     let
-        backpackSize : Int
-        backpackSize =
-            8
-
         ( currentMap, currentSeed ) =
             Random.step
                 (Map.generator worldSize Cell.generator)
@@ -117,9 +110,8 @@ createNewMap worldSeed =
                 |> Tuple.mapFirst
                     (Dict.update ( 3, 3 ) <| always <| Just <| PlayerCell Down)
     in
-    { map = currentMap
-    , oldScreen = Nothing
-    , player = Player.init backpackSize
+    { oldScreen = Nothing
+    , game = { player = Player.init, cells = currentMap }
     , gameType =
         Rogue
             { worldSeed = worldSeed
@@ -129,14 +121,18 @@ createNewMap worldSeed =
 
 
 nextLevel : ModelContent -> ( Model, Cmd Msg )
-nextLevel { gameType, map, player } =
+nextLevel { gameType, game } =
     case gameType of
         Rogue { worldSeed } ->
             ( Just
                 (createNewMap (worldSeed + 7)
                     |> (\newModel ->
                             { newModel
-                                | oldScreen = Just (Screen.world worldSeed map player [])
+                                | oldScreen =
+                                    Screen.world worldSeed
+                                        game
+                                        []
+                                        |> Just
                             }
                        )
                 )
@@ -154,7 +150,7 @@ nextLevel { gameType, map, player } =
                     (tutorial (num + 1)
                         |> (\newModel ->
                                 { newModel
-                                    | oldScreen = Just (Screen.world num map player [])
+                                    | oldScreen = Just (Screen.world num game [])
                                 }
                            )
                     )
@@ -163,25 +159,20 @@ nextLevel { gameType, map, player } =
 
 
 updateGame : (Player.Game -> Player.Game) -> ModelContent -> ( Model, Cmd Msg )
-updateGame fun ({ player, map } as modelContent) =
-    ( player, map )
-        |> fun
-        |> (\( playerData, newMap ) ->
-                ( Just
-                    { modelContent
-                        | player = playerData
-                        , map = newMap
-                        , oldScreen = Nothing
-                    }
-                , Cmd.none
-                )
-           )
+updateGame fun ({ game } as modelContent) =
+    ( Just
+        { modelContent
+            | game = fun game
+            , oldScreen = Nothing
+        }
+    , Cmd.none
+    )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case model of
-        Just ({ map, gameType } as modelContent) ->
+        Just ({ gameType } as modelContent) ->
             if
                 Dict.filter
                     (\_ cell ->
@@ -192,7 +183,7 @@ update msg model =
                             _ ->
                                 False
                     )
-                    map
+                    modelContent.game.cells
                     |> Dict.isEmpty
             then
                 nextLevel modelContent
@@ -225,7 +216,7 @@ update msg model =
                                                     Nothing
                                         )
                         in
-                        case maybePlayer map of
+                        case maybePlayer modelContent.game.cells of
                             Just playerCell ->
                                 let
                                     updateDirection dir game =
@@ -236,7 +227,12 @@ update msg model =
                                 case input of
                                     InputA ->
                                         modelContent
-                                            |> updateGame (Player.activate playerCell)
+                                            |> updateGame
+                                                (\game ->
+                                                    game
+                                                        |> Player.placeBombe playerCell
+                                                        |> Maybe.withDefault game
+                                                )
 
                                     InputUp ->
                                         modelContent
@@ -255,12 +251,14 @@ update msg model =
                                             |> updateGame (updateDirection Right)
 
                                     InputX ->
-                                        modelContent
-                                            |> updateGame (Tuple.mapFirst Player.rotateLeft)
+                                        ( Nothing
+                                        , Cmd.none
+                                        )
 
                                     InputY ->
-                                        modelContent
-                                            |> updateGame (Tuple.mapFirst Player.rotateRight)
+                                        ( Nothing
+                                        , Cmd.none
+                                        )
 
                                     InputB ->
                                         ( Nothing
@@ -400,14 +398,14 @@ subscriptions _ =
 
 
 viewRogue : ModelContent -> Int -> Html Msg
-viewRogue { oldScreen, player, map } worldSeed =
+viewRogue { oldScreen, game } worldSeed =
     case oldScreen of
         Just _ ->
-            Screen.world worldSeed map player []
+            Screen.world worldSeed game []
 
         Nothing ->
-            if player.lifes > 0 then
-                Screen.world worldSeed map player []
+            if game.player.lifes > 0 then
+                Screen.world worldSeed game []
 
             else
                 Screen.death
@@ -418,13 +416,13 @@ view model =
     let
         body =
             case model of
-                Just ({ gameType, oldScreen, player, map } as modelContent) ->
+                Just ({ gameType, oldScreen, game } as modelContent) ->
                     case gameType of
                         Rogue { worldSeed } ->
                             viewRogue modelContent worldSeed
 
                         Tutorial num ->
-                            Tutorial.view oldScreen player map num
+                            Tutorial.view oldScreen game num
 
                 Nothing ->
                     Screen.menu

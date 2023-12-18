@@ -1,14 +1,11 @@
 module Player exposing
     ( Game
     , PlayerData
-    , activate
     , attack
-    , drop
     , face
     , init
     , move
-    , rotateLeft
-    , rotateRight
+    , placeBombe
     )
 
 import Cell
@@ -19,27 +16,39 @@ import Cell
         , ItemType(..)
         , SolidType(..)
         )
-import Component.Inventory as Inventory exposing (Inventory)
 import Component.Map as Map exposing (Actor)
+import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 
 
 type alias PlayerData =
-    { inventory : Inventory ItemType
+    { bombs : Int
     , lifes : Int
     }
 
 
 type alias Game =
-    ( PlayerData, Dict ( Int, Int ) Cell )
-
-
-init : Int -> PlayerData
-init backpackSize =
-    { inventory = Inventory.init backpackSize
-    , lifes = 3
+    { player : PlayerData
+    , cells : Dict ( Int, Int ) Cell
     }
+
+
+init : PlayerData
+init =
+    { bombs = 0
+    , lifes = Config.maxLifes
+    }
+
+
+addLife : PlayerData -> PlayerData
+addLife player =
+    { player | lifes = player.lifes - 1 |> min 0 }
+
+
+removeLife : PlayerData -> PlayerData
+removeLife player =
+    { player | lifes = player.lifes + 1 |> max Config.maxLifes }
 
 
 face :
@@ -53,25 +62,25 @@ face position direction map =
 
 
 attack : Actor -> Game -> Game
-attack ( location, _ ) ( playerData, currentMap ) =
+attack ( location, _ ) game =
     let
-        lifes : Int
-        lifes =
-            playerData.lifes - 1
+        player =
+            game.player |> addLife
     in
-    ( { playerData | lifes = lifes }
-    , currentMap
-        |> (if lifes > 0 then
-                identity
+    { game
+        | player = player
+        , cells =
+            if player.lifes > 1 then
+                game.cells
 
             else
-                Dict.insert location <| EffectCell Bone
-           )
-    )
+                game.cells
+                    |> Dict.insert location (EffectCell Bone)
+    }
 
 
 move : Int -> ( Actor, Game ) -> ( Actor, Game )
-move worldSize ( ( location, direction ) as playerCell, ( playerData, currentMap ) as game ) =
+move worldSize ( ( location, direction ) as playerCell, game ) =
     let
         outOfBound : Bool
         outOfBound =
@@ -98,71 +107,79 @@ move worldSize ( ( location, direction ) as playerCell, ( playerData, currentMap
         newPlayerCell : Actor
         newPlayerCell =
             playerCell |> Tuple.mapFirst (always newLocation)
+
+        playerData =
+            game.player
     in
     if outOfBound then
         ( playerCell, game )
 
     else
-        case currentMap |> Dict.get newLocation of
+        case game.cells |> Dict.get newLocation of
             Just (ItemCell item) ->
                 ( newPlayerCell
-                , ( { playerData
-                        | inventory =
-                            playerData.inventory
-                                |> Inventory.add item
-                                |> Maybe.withDefault playerData.inventory
-                    }
-                  , currentMap
-                        |> Map.move playerCell
-                  )
+                , { game
+                    | player =
+                        { playerData
+                            | bombs =
+                                playerData.bombs
+                                    + 1
+                                    |> max Config.maxBombs
+                        }
+                    , cells =
+                        game.cells
+                            |> Map.move playerCell
+                  }
                 )
 
             Just (EnemyCell enemy id) ->
-                ( playerCell, game )
-                    |> Tuple.mapSecond (Tuple.mapSecond (throwEnemy playerCell enemy id))
+                ( playerCell
+                , { game | cells = throwEnemy playerCell enemy id game.cells }
+                )
 
             Nothing ->
                 ( newPlayerCell
-                , ( playerData
-                  , currentMap
-                        |> Map.move playerCell
-                  )
+                , { game
+                    | player = playerData
+                    , cells =
+                        game.cells
+                            |> Map.move playerCell
+                  }
                 )
 
             Just (EffectCell _) ->
-                let
-                    ( item, inventory ) =
-                        playerData.inventory |> Inventory.drop
-                in
-                ( newPlayerCell
-                , ( playerData |> (\a -> { a | inventory = inventory })
-                  , case item of
-                        Just a ->
-                            currentMap
+                if playerData.bombs > 0 then
+                    ( newPlayerCell
+                    , { game
+                        | player = { playerData | bombs = playerData.bombs - 1 }
+                        , cells =
+                            game.cells
                                 |> Map.move playerCell
-                                |> Dict.insert location (ItemCell a)
+                                |> Dict.insert location (ItemCell Bombe)
+                      }
+                    )
 
-                        Nothing ->
-                            currentMap
-                  )
-                )
+                else
+                    ( newPlayerCell, game )
 
             Just (SolidCell solid) ->
                 ( playerCell
                 , case Cell.decomposing solid of
                     Nothing ->
-                        ( playerData
-                        , currentMap
-                            |> Dict.remove newLocation
-                        )
+                        { game
+                            | player = playerData
+                            , cells =
+                                game.cells
+                                    |> Dict.remove newLocation
+                        }
 
                     _ ->
-                        game |> Tuple.mapSecond (face location direction)
+                        { game | cells = face location direction game.cells }
                 )
 
             _ ->
                 ( playerCell
-                , game |> Tuple.mapSecond (face location direction)
+                , { game | cells = game.cells |> face location direction }
                 )
 
 
@@ -205,157 +222,74 @@ throwEnemy (( _, direction ) as playerCell) enemyType enemyId currentMap =
            )
 
 
-activate : Actor -> Game -> Game
-activate playerCell (( playerData, _ ) as game) =
-    case Inventory.selected playerData.inventory of
-        Just consumable ->
-            game
-                |> Tuple.mapFirst takeFromInventory
-                |> itemAction playerCell consumable
-
-        Nothing ->
-            drop playerCell game
-
-
-placingItem :
-    Dict ( Int, Int ) Cell
-    -> Actor
-    -> Cell
-    -> (SolidType -> Maybe (Game -> Game))
-    -> Maybe (Game -> Game)
-placingItem map playerCell cell specialCase =
-    let
-        frontPos : ( Int, Int )
-        frontPos =
-            playerCell |> Map.posFront 1
-    in
-    case map |> Dict.get frontPos of
-        Nothing ->
-            Just <|
-                Tuple.mapSecond
-                    (Dict.insert frontPos cell)
-
-        Just (EffectCell _) ->
-            Just <|
-                Tuple.mapSecond
-                    (Dict.insert frontPos cell)
-
-        Just (SolidCell solidType) ->
-            specialCase solidType
-
-        _ ->
-            Nothing
-
-
-drop : Actor -> Game -> Game
-drop playerCell ( playerData, map ) =
-    let
-        ( maybeItem, inventory ) =
-            playerData.inventory |> Inventory.drop
-
-        dir : ( Int, Int )
-        dir =
-            playerCell |> Map.posFront 1
-    in
-    case map |> Dict.get dir of
-        Nothing ->
-            ( { playerData | inventory = inventory }
-            , case maybeItem of
-                Just item ->
-                    map
-                        |> Dict.insert dir (ItemCell item)
-
-                Nothing ->
-                    map
+placeBombe : Actor -> Game -> Maybe Game
+placeBombe playerCell game =
+    takeFromInventory game.player
+        |> Maybe.map
+            (\playerData ->
+                { game | player = playerData }
+                    |> itemAction playerCell Bombe
             )
 
-        _ ->
-            ( playerData, map )
 
-
-takeFromInventory : PlayerData -> PlayerData
-takeFromInventory ({ inventory } as playerData) =
-    { playerData
-        | inventory = inventory |> Inventory.drop |> Tuple.second
-    }
-
-
-addToInventory : ItemType -> PlayerData -> PlayerData
-addToInventory item ({ inventory } as playerData) =
-    { playerData
-        | inventory =
-            inventory
-                |> Inventory.add item
-                |> Maybe.withDefault inventory
-    }
-
-
-rotateLeft : PlayerData -> PlayerData
-rotateLeft ({ inventory } as playerData) =
-    { playerData
-        | inventory = inventory |> Inventory.rotateLeft
-    }
-
-
-rotateRight : PlayerData -> PlayerData
-rotateRight ({ inventory } as playerData) =
-    { playerData
-        | inventory = inventory |> Inventory.rotateRight
-    }
-
-
-itemAction : Actor -> ItemType -> Game -> Game
-itemAction playerCell consumable (( playerData, map ) as game) =
-    let
-        defaultCase : Game -> Game
-        defaultCase =
-            Tuple.mapFirst (addToInventory consumable)
-    in
-    game
-        |> ((case consumable of
-                Bombe ->
-                    bombeAction map playerCell
-
-                HealthPotion ->
-                    healthPotionAction playerData
-            )
-                |> Maybe.withDefault defaultCase
-           )
-
-
-healthPotionAction : PlayerData -> Maybe (Game -> Game)
-healthPotionAction { lifes } =
-    if lifes < 3 then
-        Just
-            (\game ->
-                game
-                    |> Tuple.mapFirst
-                        (\playerData ->
-                            { playerData | lifes = lifes + 1 }
-                        )
-            )
+takeFromInventory : PlayerData -> Maybe PlayerData
+takeFromInventory playerData =
+    if playerData.bombs > 0 then
+        Just { playerData | bombs = playerData.bombs - 1 }
 
     else
         Nothing
 
 
-bombeAction : Dict ( Int, Int ) Cell -> Actor -> Maybe (Game -> Game)
-bombeAction currentMap playerCell =
+addBombe : PlayerData -> PlayerData
+addBombe playerData =
+    { playerData
+        | bombs =
+            playerData.bombs
+                + 1
+                |> max Config.maxBombs
+    }
+
+
+itemAction : Actor -> ItemType -> Game -> Game
+itemAction playerCell consumable game =
+    (case consumable of
+        Bombe ->
+            applyBombe playerCell game
+
+        HealthPotion ->
+            applyHealthPotion game
+    )
+        |> Maybe.withDefault { game | player = game.player |> addBombe }
+
+
+applyHealthPotion : Game -> Maybe Game
+applyHealthPotion game =
+    if game.player.lifes < 3 then
+        Just
+            { game
+                | player =
+                    addLife game.player
+            }
+
+    else
+        Nothing
+
+
+applyBombe : Actor -> Game -> Maybe Game
+applyBombe playerCell game =
     let
-        specialCase : SolidType -> Maybe (Game -> Game)
+        specialCase : SolidType -> Maybe Game
         specialCase solidType =
-            let
-                maybeSolid =
-                    Cell.decomposing solidType
-            in
-            maybeSolid
+            Cell.decomposing solidType
                 |> Maybe.map
                     (\solid ->
-                        \( playerData, map ) ->
-                            ( playerData
-                            , map
-                                |> Dict.insert (playerCell |> Map.posFront 1) (SolidCell solid)
-                            )
+                        { game
+                            | cells =
+                                game.cells
+                                    |> Dict.insert (playerCell |> Map.posFront 1)
+                                        (SolidCell solid)
+                        }
                     )
 
         id : String
@@ -368,5 +302,34 @@ bombeAction currentMap playerCell =
                 ++ String.fromInt front_x
                 ++ "_"
                 ++ String.fromInt front_y
+
+        cell =
+            EnemyCell PlacedBombe id
+
+        frontPos : ( Int, Int )
+        frontPos =
+            playerCell |> Map.posFront 1
+
+        map =
+            game.cells
     in
-    placingItem currentMap playerCell (EnemyCell PlacedBombe id) specialCase
+    case map |> Dict.get frontPos of
+        Nothing ->
+            { game
+                | cells =
+                    game.cells |> Dict.insert frontPos cell
+            }
+                |> Just
+
+        Just (EffectCell _) ->
+            { game
+                | cells =
+                    game.cells |> Dict.insert frontPos cell
+            }
+                |> Just
+
+        Just (SolidCell solidType) ->
+            specialCase solidType
+
+        _ ->
+            Nothing

@@ -1,10 +1,9 @@
 module View.Tutorial exposing (view)
 
 import Cell exposing (Cell(..), EnemyType(..), ItemType(..), SolidType(..))
-import Dict exposing (Dict)
 import Html exposing (Html)
 import PixelEngine.Tile exposing (Tile)
-import Player exposing (PlayerData)
+import Player exposing (Game)
 import View.Screen as Screen
 import View.Tile as TileView
 
@@ -81,13 +80,12 @@ viewHint num =
                 ]
 
 
-view : Maybe (Html msg) -> PlayerData -> Dict ( Int, Int ) Cell -> Int -> Html msg
-view oldScreen player map num =
+view : Maybe (Html msg) -> Game -> Int -> Html msg
+view oldScreen game num =
     let
         tutorialWorldScreen =
             Screen.world num
-                map
-                player
+                game
                 (( 2, 4 )
                     |> TileView.text "hint:" TileView.colorWhite
                     |> List.append (viewHint num)
@@ -98,7 +96,7 @@ view oldScreen player map num =
             tutorialWorldScreen
 
         Nothing ->
-            if player.lifes > 0 then
+            if game.player.lifes > 0 then
                 tutorialWorldScreen
 
             else
