@@ -9,19 +9,23 @@ import Cell
         , ItemType(..)
         , SolidType(..)
         )
-import Cell.Generate
-import Component.Map as Map exposing (Actor)
+import Component.Map exposing (Actor)
 import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import Game
+import Game.Generate
 import Html exposing (Html)
+import Html.Attributes
 import Json.Decode as Decode
+import Layout
 import PixelEngine exposing (Input(..), game)
 import Player exposing (Game)
-import Random
+import Random exposing (Seed)
+import Time
 import View.Screen as Screen
-import View.Tutorial as Tutorial
+import View.Stylesheet
+import View.Transition exposing (nextLevel)
 
 
 
@@ -30,27 +34,27 @@ import View.Tutorial as Tutorial
 -------------------------------
 
 
-type GameType
-    = Rogue
-        { seed : Random.Seed
-        , worldSeed : Int
-        }
-    | Tutorial Int
+type Overlay
+    = Menu
 
 
 type alias ModelContent =
-    { oldScreen : Maybe (Html Msg)
-    , game : Game
-    , gameType : GameType
+    { game : Game
+    , score : Int
+    , seed : Seed
+    , overlay : Maybe Overlay
+    , frame : Int
     }
 
 
 type alias Model =
-    Maybe ModelContent
+    ModelContent
 
 
 type Msg
     = Input Input
+    | GotSeed Seed
+    | NextFrameRequested
 
 
 
@@ -72,8 +76,18 @@ worldSize =
 
 init : flag -> ( Model, Cmd Msg )
 init _ =
-    ( Nothing
-    , Cmd.none
+    let
+        ( game, seed ) =
+            Random.step Game.Generate.new
+                (Random.initialSeed 42)
+    in
+    ( { seed = seed
+      , game = game
+      , overlay = Just Menu
+      , score = 0
+      , frame = 0
+      }
+    , Random.generate GotSeed Random.independentSeed
     )
 
 
@@ -83,97 +97,59 @@ init _ =
 -------------------------------
 
 
-tutorial : Int -> ModelContent
-tutorial num =
+nextLevel : Model -> Model
+nextLevel model =
     let
-        currentMap =
-            Cell.tutorial num
-                |> Dict.update ( 7, 7 )
-                    (always (Just (PlayerCell Down)))
+        ( game, seed ) =
+            Random.step Game.Generate.new model.seed
     in
-    { oldScreen = Nothing
-    , game =
-        { player = Player.init
-        , cells = currentMap
-        }
-    , gameType =
-        Tutorial num
+    { model
+        | seed = seed
+        , game = game
+        , overlay = Nothing
     }
 
 
-createNewMap : Int -> ModelContent
-createNewMap worldSeed =
-    let
-        ( currentMap, currentSeed ) =
-            Random.step
-                (Map.generator worldSize Cell.Generate.generator)
-                (Random.initialSeed worldSeed)
-                |> Tuple.mapFirst
-                    (Dict.update ( 3, 3 ) <| always <| Just <| PlayerCell Down)
-    in
-    { oldScreen = Nothing
-    , game = { player = Player.init, cells = currentMap }
-    , gameType =
-        Rogue
-            { worldSeed = worldSeed
-            , seed = currentSeed
-            }
-    }
-
-
-nextLevel : ModelContent -> ( Model, Cmd Msg )
-nextLevel { gameType, game } =
-    case gameType of
-        Rogue { worldSeed } ->
-            ( Just
-                (createNewMap (worldSeed + 7)
-                    |> (\newModel ->
-                            { newModel
-                                | oldScreen =
-                                    Screen.world worldSeed
-                                        game
-                                        []
-                                        |> Just
-                            }
-                       )
-                )
-            , Cmd.none
-            )
-
-        Tutorial num ->
-            if num == 5 then
-                ( Nothing
-                , Cmd.none
-                )
-
-            else
-                ( Just
-                    (tutorial (num + 1)
-                        |> (\newModel ->
-                                { newModel
-                                    | oldScreen = Just (Screen.world num game [])
-                                }
-                           )
-                    )
-                , Cmd.none
-                )
-
-
-updateGame : (Player.Game -> Player.Game) -> ModelContent -> ( Model, Cmd Msg )
-updateGame fun ({ game } as modelContent) =
-    ( Just
-        { modelContent
-            | game = fun game
-            , oldScreen = Nothing
-        }
+gameWon : ModelContent -> ( Model, Cmd Msg )
+gameWon model =
+    ( { model
+        | score = model.score + 1
+      }
+        |> nextLevel
     , Cmd.none
     )
 
 
+gameLost : ModelContent -> ( Model, Cmd Msg )
+gameLost model =
+    ( model |> nextLevel
+    , Cmd.none
+    )
+
+
+updateGame : (Player.Game -> Player.Game) -> ModelContent -> ( Model, Cmd Msg )
+updateGame fun ({ game } as modelContent) =
+    ( { modelContent
+        | game = fun game
+      }
+    , Cmd.none
+    )
+
+
+gotSeed : Seed -> Model -> Model
+gotSeed seed model =
+    { model | seed = seed }
+
+
+nextFrameRequested : Model -> Model
+nextFrameRequested model =
+    { model | frame = model.frame + 1 |> modBy 2 }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case model of
-        Just ({ gameType } as modelContent) ->
+    case model.overlay of
+        Nothing ->
             if
                 Dict.filter
                     (\_ cell ->
@@ -184,10 +160,10 @@ update msg model =
                             _ ->
                                 False
                     )
-                    modelContent.game.cells
+                    model.game.cells
                     |> Dict.isEmpty
             then
-                nextLevel modelContent
+                gameWon model
 
             else
                 case msg of
@@ -217,7 +193,7 @@ update msg model =
                                                     Nothing
                                         )
                         in
-                        case maybePlayer modelContent.game.cells of
+                        case maybePlayer model.game.cells of
                             Just playerCell ->
                                 let
                                     updateDirection dir game =
@@ -227,7 +203,7 @@ update msg model =
                                 in
                                 case input of
                                     InputA ->
-                                        modelContent
+                                        model
                                             |> updateGame
                                                 (\game ->
                                                     game
@@ -236,116 +212,68 @@ update msg model =
                                                 )
 
                                     InputUp ->
-                                        modelContent
+                                        model
                                             |> updateGame (updateDirection Up)
 
                                     InputLeft ->
-                                        modelContent
+                                        model
                                             |> updateGame (updateDirection Left)
 
                                     InputDown ->
-                                        modelContent
+                                        model
                                             |> updateGame (updateDirection Down)
 
                                     InputRight ->
-                                        modelContent
+                                        model
                                             |> updateGame (updateDirection Right)
 
                                     InputX ->
-                                        ( Nothing
+                                        ( model
                                         , Cmd.none
                                         )
 
                                     InputY ->
-                                        ( Nothing
+                                        ( model
                                         , Cmd.none
                                         )
 
                                     InputB ->
-                                        ( Nothing
+                                        ( model
                                         , Cmd.none
                                         )
 
                             Nothing ->
-                                case gameType of
-                                    Rogue { worldSeed } ->
-                                        ( Just
-                                            (createNewMap (worldSeed - 2)
-                                                |> (\newModel ->
-                                                        { newModel
-                                                            | oldScreen = Just Screen.death
-                                                        }
-                                                   )
-                                            )
-                                        , Cmd.none
-                                        )
+                                gameLost model
 
-                                    Tutorial num ->
-                                        ( Just
-                                            (tutorial num
-                                                |> (\newModel ->
-                                                        { newModel
-                                                            | oldScreen = Just Screen.death
-                                                        }
-                                                   )
-                                            )
-                                        , Cmd.none
-                                        )
-
-        Nothing ->
-            case msg of
-                Input InputLeft ->
-                    ( Just
-                        (createNewMap 1
-                            |> (\newModel ->
-                                    { newModel
-                                        | oldScreen = Just Screen.menu
-                                    }
-                               )
+                    NextFrameRequested ->
+                        ( nextFrameRequested model
+                        , Cmd.none
                         )
-                    , Cmd.none
-                    )
 
-                Input InputRight ->
-                    ( Just
-                        (createNewMap 1
-                            |> (\newModel ->
-                                    { newModel
-                                        | oldScreen = Just Screen.menu
-                                    }
-                               )
-                        )
-                    , Cmd.none
-                    )
+                    GotSeed seed ->
+                        ( gotSeed seed model, Cmd.none )
 
-                Input InputUp ->
-                    ( Just
-                        (tutorial 1
-                            |> (\newModel ->
-                                    { newModel
-                                        | oldScreen = Just Screen.menu
-                                    }
-                               )
-                        )
-                    , Cmd.none
-                    )
+        Just Menu ->
+            updateMenu msg model
 
-                Input InputDown ->
-                    ( Just
-                        (tutorial 1
-                            |> (\newModel ->
-                                    { newModel
-                                        | oldScreen = Just Screen.menu
-                                    }
-                               )
-                        )
-                    , Cmd.none
-                    )
 
-                _ ->
-                    ( model
-                    , Cmd.none
-                    )
+updateMenu : Msg -> Model -> ( Model, Cmd Msg )
+updateMenu msg model =
+    case msg of
+        Input _ ->
+            ( nextLevel model
+            , Cmd.none
+            )
+
+        NextFrameRequested ->
+            ( nextFrameRequested model
+            , Cmd.none
+            )
+
+        GotSeed seed ->
+            ( gotSeed seed model
+            , Cmd.none
+            )
 
 
 
@@ -389,7 +317,10 @@ toDirection string =
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
-    Browser.Events.onKeyDown keyDecoder
+    [ Browser.Events.onKeyDown keyDecoder
+    , Time.every 500 (\_ -> NextFrameRequested)
+    ]
+        |> Sub.batch
 
 
 
@@ -398,37 +329,27 @@ subscriptions _ =
 -------------------------------
 
 
-viewRogue : ModelContent -> Int -> Html Msg
-viewRogue { oldScreen, game } worldSeed =
-    case oldScreen of
-        Just _ ->
-            Screen.world worldSeed game []
+viewGame : Model -> Html Msg
+viewGame model =
+    if model.game.player.lifes > 0 then
+        Screen.world { score = model.score, onInput = Input } model.game []
 
-        Nothing ->
-            if game.player.lifes > 0 then
-                Screen.world worldSeed game []
-
-            else
-                Screen.death
+    else
+        Screen.death
 
 
 view : Model -> Html Msg
 view model =
-    let
-        body =
-            case model of
-                Just ({ gameType, oldScreen, game } as modelContent) ->
-                    case gameType of
-                        Rogue { worldSeed } ->
-                            viewRogue modelContent worldSeed
+    [ View.Stylesheet.toHtml
+    , case model.overlay of
+        Nothing ->
+            viewGame model
 
-                        Tutorial num ->
-                            Tutorial.view oldScreen game num
-
-                Nothing ->
-                    Screen.menu
-    in
-    body
+        Just Menu ->
+            Screen.menu
+                { frame = model.frame }
+    ]
+        |> Html.div []
 
 
 

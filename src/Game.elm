@@ -1,4 +1,4 @@
-module Game exposing (applyDirection)
+module Game exposing (applyDirection, fromCells)
 
 import Cell
     exposing
@@ -9,10 +9,19 @@ import Cell
         , SolidType(..)
         )
 import Component.Map as Map exposing (Actor)
-import Dict
+import Config
+import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import Player exposing (Game)
 import Position
+
+
+fromCells : Dict ( Int, Int ) Cell -> Game
+fromCells cells =
+    { cells =
+        cells
+    , player = Player.init
+    }
 
 
 applyDirection : Int -> Direction -> ( Actor, Game ) -> ( Actor, Game )

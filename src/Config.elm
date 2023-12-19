@@ -3,7 +3,7 @@ module Config exposing (..)
 
 mapSize : Int
 mapSize =
-    5
+    4
 
 
 maxBombs : Int
