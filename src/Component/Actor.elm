@@ -1,4 +1,4 @@
-module Component.Map exposing
+module Component.Actor exposing
     ( Actor
     , generator
     , move

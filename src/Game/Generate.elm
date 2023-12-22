@@ -1,28 +1,33 @@
 module Game.Generate exposing (..)
 
-import Cell exposing (Cell(..), EnemyType(..), SolidType(..))
-import Component.Map as Map
+import Cell exposing (Cell(..), EnemyType(..), Wall(..))
 import Config
 import Dict
 import Direction exposing (Direction(..))
 import Game
+import Game.Level1
 import Player exposing (Game)
 import Random exposing (Generator)
 
 
 new : Generator Game
 new =
+    let
+        rec level =
+            fromList level.content
+                |> Random.andThen
+                    (\game ->
+                        if level.valid game.cells then
+                            Random.constant game
+
+                        else
+                            Random.lazy (\() -> rec level)
+                    )
+    in
     Random.uniform
-        [ EnemyCell Rat "Rat_0"
-        , ItemCell
-        , ItemCell
-        , SolidCell DirtWall
-        , SolidCell DirtWall
-        , SolidCell StoneWall
-        , PlayerCell Down
-        ]
+        Game.Level1.new
         []
-        |> Random.andThen fromList
+        |> Random.andThen rec
 
 
 fromList : List Cell -> Generator Game
@@ -45,36 +50,3 @@ fromList cells =
                     |> Dict.fromList
                     |> Game.fromCells
             )
-
-
-generateCell : Generator (Maybe Cell)
-generateCell =
-    Random.weighted
-        ( 50, Random.constant Nothing )
-        [ ( 15, Random.constant <| Just <| SolidCell <| DirtWall )
-        , ( 5, Random.constant <| Just <| SolidCell StoneWall )
-        , ( 1, Random.constant <| Just <| SolidCell StoneBrickWall )
-        , ( 20, Random.constant <| Just <| ItemCell )
-        , ( 5
-          , Random.float 0 1
-                |> Random.andThen
-                    (\id ->
-                        Random.constant <| Just <| EnemyCell Rat <| "Rat" ++ String.fromFloat id
-                    )
-          )
-        , ( 3
-          , Random.float 0 1
-                |> Random.andThen
-                    (\id ->
-                        Random.constant <| Just <| EnemyCell Goblin <| "Goblin" ++ String.fromFloat id
-                    )
-          )
-        , ( 1
-          , Random.float 0 1
-                |> Random.andThen
-                    (\id ->
-                        Random.constant <| Just <| EnemyCell Oger <| "Oger" ++ String.fromFloat id
-                    )
-          )
-        ]
-        |> Random.andThen identity

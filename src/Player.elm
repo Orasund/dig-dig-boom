@@ -14,12 +14,14 @@ import Cell
         , EffectType(..)
         , EnemyType(..)
         , ItemType(..)
-        , SolidType(..)
+        , Wall(..)
         )
-import Component.Map as Map exposing (Actor)
+import Component.Actor as Map exposing (Actor)
 import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
+import Math
+import Position
 
 
 type alias PlayerData =
@@ -37,7 +39,7 @@ type alias Game =
 init : PlayerData
 init =
     { bombs = 0
-    , lifes = Config.maxLifes
+    , lifes = 1
     }
 
 
@@ -70,7 +72,7 @@ attack ( location, _ ) game =
     { game
         | player = player
         , cells =
-            if player.lifes > 1 then
+            if player.lifes > 0 then
                 game.cells
 
             else
@@ -116,10 +118,18 @@ move worldSize ( ( location, direction ) as playerCell, game ) =
 
     else
         case game.cells |> Dict.get newLocation of
-            Just ItemCell ->
+            Just InactiveBombCell ->
                 ( newPlayerCell
                 , { game
                     | player = playerData |> addBombe
+                    , cells = game.cells |> Map.move playerCell
+                  }
+                )
+
+            Just HeartCell ->
+                ( newPlayerCell
+                , { game
+                    | player = playerData |> addLife
                     , cells = game.cells |> Map.move playerCell
                   }
                 )
@@ -128,6 +138,36 @@ move worldSize ( ( location, direction ) as playerCell, game ) =
                 ( playerCell
                 , { game | cells = throwEnemy playerCell enemy id game.cells }
                 )
+
+            Just (EffectCell _) ->
+                if playerData.bombs > 0 then
+                    ( newPlayerCell
+                    , { game
+                        | player = { playerData | bombs = playerData.bombs - 1 }
+                        , cells =
+                            game.cells
+                                |> Map.move playerCell
+                                |> Dict.insert location InactiveBombCell
+                      }
+                    )
+
+                else
+                    ( newPlayerCell, game )
+
+            Just CrateCell ->
+                game.cells
+                    |> pushCrate newLocation direction
+                    |> Maybe.map
+                        (\cells ->
+                            ( newPlayerCell
+                            , { game
+                                | cells =
+                                    cells
+                                        |> Map.move playerCell
+                              }
+                            )
+                        )
+                    |> Maybe.withDefault ( playerCell, game )
 
             Nothing ->
                 ( newPlayerCell
@@ -139,40 +179,37 @@ move worldSize ( ( location, direction ) as playerCell, game ) =
                   }
                 )
 
-            Just (EffectCell _) ->
-                if playerData.bombs > 0 then
-                    ( newPlayerCell
-                    , { game
-                        | player = { playerData | bombs = playerData.bombs - 1 }
-                        , cells =
-                            game.cells
-                                |> Map.move playerCell
-                                |> Dict.insert location ItemCell
-                      }
-                    )
-
-                else
-                    ( newPlayerCell, game )
-
-            Just (SolidCell solid) ->
-                ( playerCell
-                , case Cell.decomposing solid of
-                    Nothing ->
-                        { game
-                            | player = playerData
-                            , cells =
-                                game.cells
-                                    |> Dict.remove newLocation
-                        }
-
-                    _ ->
-                        { game | cells = face location direction game.cells }
-                )
-
             _ ->
                 ( playerCell
                 , { game | cells = game.cells |> face location direction }
                 )
+
+
+pushCrate : ( Int, Int ) -> Direction -> Dict ( Int, Int ) Cell -> Maybe (Dict ( Int, Int ) Cell)
+pushCrate pos dir cells =
+    let
+        newPos =
+            dir
+                |> Direction.toCoord
+                |> Position.addTo pos
+    in
+    Dict.get pos cells
+        |> Maybe.andThen
+            (\from ->
+                if
+                    Dict.get newPos
+                        cells
+                        == Nothing
+                        && Math.posIsValid newPos
+                then
+                    cells
+                        |> Dict.insert newPos from
+                        |> Dict.remove pos
+                        |> Just
+
+                else
+                    Nothing
+            )
 
 
 throwEnemy : Actor -> EnemyType -> String -> Dict ( Int, Int ) Cell -> Dict ( Int, Int ) Cell
@@ -188,13 +225,7 @@ throwEnemy (( _, direction ) as playerCell) enemyType enemyId currentMap =
                 currentMap
                     |> Dict.get (playerCell |> Map.posFront 2)
             of
-                Just (SolidCell _) ->
-                    identity
-
-                Just (EnemyCell _ _) ->
-                    identity
-
-                _ ->
+                Nothing ->
                     \newMap ->
                         newMap
                             |> Map.move ( newLocation, direction )
@@ -202,15 +233,15 @@ throwEnemy (( _, direction ) as playerCell) enemyType enemyId currentMap =
                                     newMap
                                         |> Dict.get (playerCell |> Map.posFront 3)
                                 of
-                                    Just (SolidCell _) ->
-                                        identity
-
-                                    Just (EnemyCell _ _) ->
-                                        identity
+                                    Nothing ->
+                                        Map.move ( playerCell |> Map.posFront 2, direction )
 
                                     _ ->
-                                        Map.move ( playerCell |> Map.posFront 2, direction )
+                                        identity
                                )
+
+                _ ->
+                    identity
            )
 
 
@@ -220,7 +251,7 @@ placeBombe playerCell game =
         |> Maybe.map
             (\playerData ->
                 { game | player = playerData }
-                    |> itemAction playerCell Bombe
+                    |> itemAction playerCell Bomb
             )
 
 
@@ -246,7 +277,7 @@ addBombe playerData =
 itemAction : Actor -> ItemType -> Game -> Game
 itemAction playerCell consumable game =
     (case consumable of
-        Bombe ->
+        Bomb ->
             applyBombe playerCell game
 
         HealthPotion ->
@@ -271,7 +302,7 @@ applyHealthPotion game =
 applyBombe : Actor -> Game -> Maybe Game
 applyBombe playerCell game =
     let
-        specialCase : SolidType -> Maybe Game
+        specialCase : Wall -> Maybe Game
         specialCase solidType =
             Cell.decomposing solidType
                 |> Maybe.map
@@ -280,7 +311,7 @@ applyBombe playerCell game =
                             | cells =
                                 game.cells
                                     |> Dict.insert (playerCell |> Map.posFront 1)
-                                        (SolidCell solid)
+                                        (WallCell solid)
                         }
                     )
 
@@ -296,7 +327,7 @@ applyBombe playerCell game =
                 ++ String.fromInt front_y
 
         cell =
-            EnemyCell PlacedBombe id
+            EnemyCell PlacedBomb id
 
         frontPos : ( Int, Int )
         frontPos =
@@ -320,7 +351,7 @@ applyBombe playerCell game =
             }
                 |> Just
 
-        Just (SolidCell solidType) ->
+        Just (WallCell solidType) ->
             specialCase solidType
 
         _ ->

@@ -7,19 +7,17 @@ import Cell
         ( Cell(..)
         , EnemyType(..)
         , ItemType(..)
-        , SolidType(..)
+        , Wall(..)
         )
-import Component.Map exposing (Actor)
+import Component.Actor exposing (Actor)
 import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
-import Game
 import Game.Generate
+import Game.Update
 import Html exposing (Html)
-import Html.Attributes
 import Json.Decode as Decode
-import Layout
-import PixelEngine exposing (Input(..), game)
+import PixelEngine exposing (Input(..))
 import Player exposing (Game)
 import Random exposing (Seed)
 import Time
@@ -41,6 +39,7 @@ type Overlay
 type alias ModelContent =
     { game : Game
     , score : Int
+    , levelSeed : Seed
     , seed : Seed
     , overlay : Maybe Overlay
     , frame : Int
@@ -81,7 +80,8 @@ init _ =
             Random.step Game.Generate.new
                 (Random.initialSeed 42)
     in
-    ( { seed = seed
+    ( { levelSeed = seed
+      , seed = seed
       , game = game
       , overlay = Just Menu
       , score = 0
@@ -104,7 +104,8 @@ nextLevel model =
             Random.step Game.Generate.new model.seed
     in
     { model
-        | seed = seed
+        | levelSeed = model.seed
+        , seed = seed
         , game = game
         , overlay = Nothing
     }
@@ -122,18 +123,17 @@ gameWon model =
 
 gameLost : ModelContent -> ( Model, Cmd Msg )
 gameLost model =
-    ( model |> nextLevel
+    ( { model | seed = model.levelSeed }
+        |> nextLevel
     , Cmd.none
     )
 
 
-updateGame : (Player.Game -> Player.Game) -> ModelContent -> ( Model, Cmd Msg )
-updateGame fun ({ game } as modelContent) =
-    ( { modelContent
-        | game = fun game
-      }
-    , Cmd.none
-    )
+setGame : Model -> Player.Game -> Model
+setGame model game =
+    { model
+        | game = game
+    }
 
 
 gotSeed : Seed -> Model -> Model
@@ -169,8 +169,8 @@ update msg model =
                 case msg of
                     Input input ->
                         let
-                            maybePlayer : Dict ( Int, Int ) Cell -> Maybe Actor
-                            maybePlayer currentMap =
+                            maybePlayerPosition : Dict ( Int, Int ) Cell -> Maybe Actor
+                            maybePlayerPosition currentMap =
                                 currentMap
                                     |> Dict.toList
                                     |> List.filter
@@ -193,39 +193,52 @@ update msg model =
                                                     Nothing
                                         )
                         in
-                        case maybePlayer model.game.cells of
-                            Just playerCell ->
+                        case maybePlayerPosition model.game.cells of
+                            Just ( playerPosition, playerDirection ) ->
                                 let
                                     updateDirection dir game =
-                                        ( playerCell, game )
-                                            |> Game.applyDirection (worldSize - 1) dir
+                                        Game.Update.applyDirection (worldSize - 1)
+                                            dir
+                                            playerPosition
+                                            game
                                             |> Tuple.second
                                 in
                                 case input of
                                     InputA ->
-                                        model
-                                            |> updateGame
-                                                (\game ->
-                                                    game
-                                                        |> Player.placeBombe playerCell
-                                                        |> Maybe.withDefault game
-                                                )
+                                        ( model.game
+                                            |> Player.placeBombe ( playerPosition, playerDirection )
+                                            |> Maybe.withDefault model.game
+                                            |> setGame model
+                                        , Cmd.none
+                                        )
 
                                     InputUp ->
-                                        model
-                                            |> updateGame (updateDirection Up)
+                                        ( model.game
+                                            |> updateDirection Up
+                                            |> setGame model
+                                        , Cmd.none
+                                        )
 
                                     InputLeft ->
-                                        model
-                                            |> updateGame (updateDirection Left)
+                                        ( model.game
+                                            |> updateDirection Left
+                                            |> setGame model
+                                        , Cmd.none
+                                        )
 
                                     InputDown ->
-                                        model
-                                            |> updateGame (updateDirection Down)
+                                        ( model.game
+                                            |> updateDirection Down
+                                            |> setGame model
+                                        , Cmd.none
+                                        )
 
                                     InputRight ->
-                                        model
-                                            |> updateGame (updateDirection Right)
+                                        ( model.game
+                                            |> updateDirection Right
+                                            |> setGame model
+                                        , Cmd.none
+                                        )
 
                                     InputX ->
                                         ( model

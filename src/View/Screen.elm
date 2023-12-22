@@ -1,6 +1,6 @@
 module View.Screen exposing (death, menu, world)
 
-import Cell exposing (Cell(..), EnemyType(..), ItemType(..), SolidType(..))
+import Cell exposing (Cell(..), EnemyType(..), ItemType(..), Wall(..))
 import Color
 import Config
 import Dict
@@ -108,7 +108,10 @@ world args game hints =
             ++ String.fromInt args.score
             |> Layout.text [ Html.Attributes.style "font-size" "32px" ]
       ]
-        |> Layout.row [ Layout.contentWithSpaceBetween ]
+        |> Layout.row
+            [ Layout.contentWithSpaceBetween
+            , Html.Attributes.style "color" "white"
+            ]
     , PixelEngine.tiledArea
         { rows = Config.mapSize
         , background =
@@ -132,7 +135,7 @@ world args game hints =
                     |> Options.withScale 4
                     |> Just
             }
-    , [ View.Item.toHtml Bombe
+    , [ View.Item.toHtml Bomb
             |> List.repeat game.player.bombs
             |> Layout.row []
       , Image.image [ Image.pixelated ]
@@ -140,7 +143,7 @@ world args game hints =
             , width = 64
             , height = 64
             }
-            |> List.repeat game.player.lifes
+            |> List.repeat (game.player.lifes - 1)
             |> Layout.row []
       ]
         |> Layout.row [ Layout.contentWithSpaceBetween ]
@@ -148,7 +151,6 @@ world args game hints =
         { onInput = args.onInput }
     ]
         |> Layout.column
-            ([ Html.Attributes.style "width" "400px"
-             ]
-                ++ Layout.centered
+            (Html.Attributes.style "width" "400px"
+                :: Layout.centered
             )

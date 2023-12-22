@@ -12,6 +12,7 @@ module View.Tile exposing
     , colorRed
     , colorWhite
     , colorYellow
+    , crate
     , dirt_wall
     , goblin
     , health_potion
@@ -159,6 +160,11 @@ stone_wall color =
 dirt_wall : Color -> Tile msg
 dirt_wall color =
     Tile.fromPosition ( 0, 2 ) |> Tile.monochrome color
+
+
+crate : Color -> Tile msg
+crate color =
+    Tile.fromPosition ( 1, 3 ) |> Tile.monochrome color
 
 
 stone_brick_wall : Color -> Tile msg

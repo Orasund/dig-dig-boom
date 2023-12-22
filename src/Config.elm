@@ -13,4 +13,4 @@ maxBombs =
 
 maxLifes : Int
 maxLifes =
-    3
+    2

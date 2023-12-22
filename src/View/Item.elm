@@ -14,7 +14,7 @@ toHtml item =
                 HealthPotion ->
                     ( 0, 0 )
 
-                Bombe ->
+                Bomb ->
                     ( 1, 0 )
         , sheetColumns = 2
         , sheetRows = 1
