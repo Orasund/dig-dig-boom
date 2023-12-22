@@ -4,6 +4,7 @@ import Cell exposing (Cell(..), EnemyType(..), ItemType(..), Wall(..))
 import Color
 import Config
 import Dict
+import Game exposing (Game)
 import Html exposing (Html)
 import Html.Attributes
 import Image
@@ -11,8 +12,7 @@ import Layout
 import PixelEngine exposing (Input)
 import PixelEngine.Image
 import PixelEngine.Options as Options
-import PixelEngine.Tile as Tile exposing (Tile, Tileset)
-import Player exposing (Game)
+import PixelEngine.Tile exposing (Tile)
 import View.Controls
 import View.Item
 import View.Tile as TileView
@@ -30,8 +30,8 @@ logo frame =
         }
 
 
-death : Html msg
-death =
+death : { onClick : msg } -> Html msg
+death args =
     let
         width : Int
         width =
@@ -85,9 +85,15 @@ death =
                     |> Options.withScale 2
                     |> Just
             }
+        |> Layout.el
+            (Layout.asButton
+                { label = "Next Level"
+                , onPress = Just args.onClick
+                }
+            )
 
 
-menu : { frame : Int } -> Html msg
+menu : { frame : Int, onClick : msg } -> Html msg
 menu args =
     [ [ "DIG" |> Layout.text [ Layout.contentCentered ]
       , "DIG" |> Layout.text [ Layout.contentCentered ]
@@ -99,7 +105,12 @@ menu args =
             ]
     , logo args.frame
     ]
-        |> Layout.column []
+        |> Layout.column
+            (Layout.asButton
+                { label = "Next Level"
+                , onPress = Just args.onClick
+                }
+            )
 
 
 world : { score : Int, onInput : Input -> msg } -> Game -> List ( ( Int, Int ), Tile msg ) -> Html msg

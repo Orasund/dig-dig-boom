@@ -9,16 +9,15 @@ import Cell
         , ItemType(..)
         , Wall(..)
         )
-import Component.Actor exposing (Actor)
 import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
+import Game exposing (Game)
 import Game.Generate
 import Game.Update
 import Html exposing (Html)
 import Json.Decode as Decode
 import PixelEngine exposing (Input(..))
-import Player exposing (Game)
 import Random exposing (Seed)
 import Time
 import View.Screen as Screen
@@ -129,7 +128,7 @@ gameLost model =
     )
 
 
-setGame : Model -> Player.Game -> Model
+setGame : Model -> Game -> Model
 setGame model game =
     { model
         | game = game
@@ -169,7 +168,7 @@ update msg model =
                 case msg of
                     Input input ->
                         let
-                            maybePlayerPosition : Dict ( Int, Int ) Cell -> Maybe Actor
+                            maybePlayerPosition : Dict ( Int, Int ) Cell -> Maybe ( ( Int, Int ), Direction )
                             maybePlayerPosition currentMap =
                                 currentMap
                                     |> Dict.toList
@@ -197,16 +196,15 @@ update msg model =
                             Just ( playerPosition, playerDirection ) ->
                                 let
                                     updateDirection dir game =
-                                        Game.Update.applyDirection (worldSize - 1)
+                                        Game.Update.movePlayerInDirectionAndUpdateGame (worldSize - 1)
                                             dir
                                             playerPosition
                                             game
-                                            |> Tuple.second
                                 in
                                 case input of
                                     InputA ->
                                         ( model.game
-                                            |> Player.placeBombe ( playerPosition, playerDirection )
+                                            |> Game.Update.placeBombe ( playerPosition, playerDirection )
                                             |> Maybe.withDefault model.game
                                             |> setGame model
                                         , Cmd.none
@@ -348,7 +346,7 @@ viewGame model =
         Screen.world { score = model.score, onInput = Input } model.game []
 
     else
-        Screen.death
+        Screen.death { onClick = Input InputA }
 
 
 view : Model -> Html Msg
@@ -360,7 +358,9 @@ view model =
 
         Just Menu ->
             Screen.menu
-                { frame = model.frame }
+                { frame = model.frame
+                , onClick = Input InputA
+                }
     ]
         |> Html.div []
 

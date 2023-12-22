@@ -4,9 +4,8 @@ import Cell exposing (Cell(..), EnemyType(..), Wall(..))
 import Config
 import Dict
 import Direction exposing (Direction(..))
-import Game
+import Game exposing (Game)
 import Game.Level1
-import Player exposing (Game)
 import Random exposing (Generator)
 
 
@@ -25,7 +24,7 @@ new =
                     )
     in
     Random.uniform
-        Game.Level1.new
+        Game.Level1.level2
         []
         |> Random.andThen rec
 

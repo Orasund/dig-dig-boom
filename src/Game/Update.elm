@@ -1,28 +1,31 @@
 module Game.Update exposing (..)
 
-import Cell exposing (Cell(..), EnemyType)
-import Component.Actor exposing (Actor)
+import Cell exposing (Cell(..), EnemyType(..), ItemType(..), Wall)
 import Dict
 import Direction exposing (Direction(..))
 import Enemy
-import Player exposing (Game)
+import Game exposing (Game)
+import Player
 import Position
 
 
-updateGame : Actor -> Game -> Game
-updateGame playerCell game =
+updateGame : Game -> Game
+updateGame game =
     game.cells
         |> Dict.toList
         |> List.foldl
-            (updateCell playerCell)
+            updateCell
             game
 
 
-updateCell : Actor -> ( ( Int, Int ), Cell ) -> Game -> Game
-updateCell playerCell ( position, cell ) game =
+updateCell : ( ( Int, Int ), Cell ) -> Game -> Game
+updateCell ( position, cell ) game =
     case cell of
         EnemyCell enemy _ ->
-            updateEnemy position enemy playerCell game
+            game
+                |> Enemy.tryAttacking position
+                |> Maybe.withDefault game
+                |> Enemy.enemyBehaviour position enemy
 
         EffectCell _ ->
             { game | cells = game.cells |> Dict.remove position }
@@ -34,44 +37,193 @@ updateCell playerCell ( position, cell ) game =
             game
 
 
-updateEnemy : ( Int, Int ) -> EnemyType -> Actor -> Game -> Game
-updateEnemy position enemyType playerCell =
-    attackPlayer position playerCell
-        >> Enemy.enemyBehaviour position enemyType playerCell
-
-
-applyDirection : Int -> Direction -> ( Int, Int ) -> Game -> ( Actor, Game )
-applyDirection size dir location game =
-    --if direction == dir then
+movePlayerInDirectionAndUpdateGame : Int -> Direction -> ( Int, Int ) -> Game -> Game
+movePlayerInDirectionAndUpdateGame size dir location game =
     ( ( location, dir )
     , { game | cells = game.cells |> Player.face location dir }
     )
-        |> Player.move size
-        |> (\( newPlayerCell, newGame ) ->
-                ( newPlayerCell
-                , updateGame newPlayerCell newGame
-                )
-           )
+        |> movePlayer size
+        |> updateGame
 
 
+movePlayer : Int -> ( ( ( Int, Int ), Direction ), Game ) -> Game
+movePlayer worldSize ( ( position, direction ), game ) =
+    let
+        outOfBound : Bool
+        outOfBound =
+            position
+                |> (\( x, y ) ->
+                        case direction of
+                            Up ->
+                                y == 0
 
-{--else
-        playerCellAndGame
-        |> Tuple.mapSecond
-                (\game ->
-                    { game | cells = game.cells |> Player.face location dir }
-                )--}
+                            Down ->
+                                y == worldSize
+
+                            Left ->
+                                x == 0
+
+                            Right ->
+                                x == worldSize
+                   )
+
+        newLocation : ( Int, Int )
+        newLocation =
+            direction
+                |> Direction.toCoord
+                |> Position.addTo position
+
+        playerData =
+            game.player
+    in
+    if outOfBound then
+        game
+
+    else
+        case game.cells |> Dict.get newLocation of
+            Just InactiveBombCell ->
+                { game
+                    | player = playerData |> Player.addBomb
+                }
+                    |> Game.remove newLocation
+                    |> Game.move
+                        { from = position
+                        , to = newLocation
+                        }
+                    |> Maybe.withDefault game
+
+            Just HeartCell ->
+                { game
+                    | player = playerData |> Player.addLife
+                }
+                    |> Game.remove newLocation
+                    |> Game.move { from = position, to = newLocation }
+                    |> Maybe.withDefault game
+
+            Just (EnemyCell enemy id) ->
+                game.cells
+                    |> Dict.insert newLocation (StunnedCell enemy id)
+                    |> (\cells -> { game | cells = cells })
+                    |> Game.slide newLocation direction
+
+            Just (EffectCell _) ->
+                game
+                    |> Game.remove newLocation
+                    |> Game.move { from = position, to = newLocation }
+                    |> Maybe.withDefault game
+
+            Just CrateCell ->
+                game.cells
+                    |> Player.pushCrate newLocation direction
+                    |> Maybe.map
+                        (\cells ->
+                            { game | cells = cells }
+                                |> Game.move { from = position, to = newLocation }
+                                |> Maybe.withDefault game
+                        )
+                    |> Maybe.withDefault game
+
+            Nothing ->
+                { game
+                    | player = playerData
+                }
+                    |> Game.move { from = position, to = newLocation }
+                    |> Maybe.withDefault game
+
+            _ ->
+                { game | cells = game.cells |> Player.face position direction }
 
 
-attackPlayer : ( Int, Int ) -> Actor -> Game -> Game
-attackPlayer location (( playerLocation, _ ) as playerCell) game =
-    [ Up, Down, Left, Right ]
-        |> List.filter
-            (\direction ->
-                direction
-                    |> Direction.toCoord
-                    |> (==) (playerLocation |> Position.coordTo location)
+itemAction : ( ( Int, Int ), Direction ) -> ItemType -> Game -> Game
+itemAction playerCell consumable game =
+    (case consumable of
+        Bomb ->
+            applyBomb playerCell game
+
+        HealthPotion ->
+            applyHealthPotion game
+    )
+        |> Maybe.withDefault { game | player = game.player |> Player.addBomb }
+
+
+applyHealthPotion : Game -> Maybe Game
+applyHealthPotion game =
+    if game.player.lifes < 3 then
+        Just
+            { game
+                | player =
+                    Player.removeLife game.player
+            }
+
+    else
+        Nothing
+
+
+applyBomb : ( ( Int, Int ), Direction ) -> Game -> Maybe Game
+applyBomb ( position, direction ) game =
+    let
+        newPosition =
+            direction
+                |> Direction.toCoord
+                |> Position.addTo position
+
+        specialCase : Wall -> Maybe Game
+        specialCase solidType =
+            Cell.decomposing solidType
+                |> Maybe.map
+                    (\solid ->
+                        { game
+                            | cells =
+                                game.cells
+                                    |> Dict.insert newPosition
+                                        (WallCell solid)
+                        }
+                    )
+
+        id : String
+        id =
+            let
+                ( front_x, front_y ) =
+                    newPosition
+            in
+            "bombe_"
+                ++ String.fromInt front_x
+                ++ "_"
+                ++ String.fromInt front_y
+
+        cell =
+            EnemyCell PlacedBomb id
+
+        map =
+            game.cells
+    in
+    case map |> Dict.get newPosition of
+        Nothing ->
+            { game
+                | cells =
+                    game.cells |> Dict.insert newPosition cell
+            }
+                |> Just
+
+        Just (EffectCell _) ->
+            { game
+                | cells =
+                    game.cells |> Dict.insert newPosition cell
+            }
+                |> Just
+
+        Just (WallCell solidType) ->
+            specialCase solidType
+
+        _ ->
+            Nothing
+
+
+placeBombe : ( ( Int, Int ), Direction ) -> Game -> Maybe Game
+placeBombe playerCell game =
+    Player.removeBomb game.player
+        |> Maybe.map
+            (\playerData ->
+                { game | player = playerData }
+                    |> itemAction playerCell Bomb
             )
-        |> List.head
-        |> Maybe.map (always (game |> Player.attack playerCell))
-        |> Maybe.withDefault game

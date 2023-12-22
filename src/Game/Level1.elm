@@ -17,36 +17,59 @@ new =
     , PlayerCell Down
     , HeartCell
     ]
-        |> Level.new
-            (\dict ->
-                dict
-                    |> Dict.toList
-                    |> List.all
-                        (\( pos, cell ) ->
-                            case cell of
-                                EnemyCell _ _ ->
-                                    Level.count ((==) (Just InactiveBombCell))
-                                        (Level.neighbors4 pos dict)
-                                        < 1
+        |> Level.new validator
 
-                                PlayerCell _ ->
-                                    (Level.count ((==) Nothing)
-                                        (Level.neighbors4 pos dict)
-                                        > 1
-                                    )
-                                        && (Level.diagNeighbors pos dict
-                                                |> List.all
-                                                    (\c ->
-                                                        case c of
-                                                            Just (EnemyCell _ _) ->
-                                                                False
 
-                                                            _ ->
-                                                                True
-                                                    )
-                                           )
+level2 : Level
+level2 =
+    [ EnemyCell Rat "Rat_0"
+    , EnemyCell Rat "Rat_1"
+    , InactiveBombCell
+    , InactiveBombCell
+    , InactiveBombCell
+    , CrateCell
+    , CrateCell
+    , CrateCell
+    , PlayerCell Down
+    , HeartCell
+    ]
+        |> Level.new validator
 
-                                _ ->
-                                    True
-                        )
-            )
+
+validator =
+    \dict ->
+        dict
+            |> Dict.toList
+            |> List.all
+                (\( pos, cell ) ->
+                    case cell of
+                        EnemyCell _ _ ->
+                            Level.count ((==) (Just InactiveBombCell))
+                                (Level.neighbors4 pos dict)
+                                < 1
+
+                        PlayerCell _ ->
+                            (Level.count ((==) Nothing)
+                                (Level.neighbors4 pos dict)
+                                > 1
+                            )
+                                && (Level.diagNeighbors pos dict
+                                        |> List.all
+                                            (\c ->
+                                                case c of
+                                                    Just (EnemyCell _ _) ->
+                                                        False
+
+                                                    _ ->
+                                                        True
+                                            )
+                                   )
+
+                        CrateCell ->
+                            Level.count ((==) (Just CrateCell))
+                                (Level.neighbors4 pos dict)
+                                < 1
+
+                        _ ->
+                            True
+                )

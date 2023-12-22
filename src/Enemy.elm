@@ -1,17 +1,15 @@
 module Enemy exposing (..)
 
 import Cell exposing (Cell(..), EffectType(..), EnemyType(..))
-import Component.Actor as Map exposing (Actor)
 import Dict
 import Direction exposing (Direction(..))
-import Game
+import Game exposing (Game)
 import Math
-import Player exposing (Game)
 import Position
 
 
-enemyBehaviour : ( Int, Int ) -> EnemyType -> Actor -> Game -> Game
-enemyBehaviour currentLocation enemyType ( playerLocation, _ ) game =
+enemyBehaviour : ( Int, Int ) -> EnemyType -> Game -> Game
+enemyBehaviour currentLocation enemyType game =
     case enemyType of
         PlacedBomb ->
             [ Up, Down, Left, Right ]
@@ -79,29 +77,64 @@ placedBombeBehavoiur : ( Int, Int ) -> Direction -> Game -> Game
 placedBombeBehavoiur location direction game =
     let
         newLocation =
-            ( location, direction ) |> Map.posFront 1
+            direction
+                |> Direction.toCoord
+                |> Position.addTo location
     in
-    { game
-        | cells =
-            game.cells
-                |> Dict.update
-                    newLocation
-                    (\elem ->
-                        case elem of
-                            Just (EnemyCell _ _) ->
-                                Just <| EffectCell Bone
+    if Math.posIsValid newLocation then
+        { game
+            | cells =
+                game.cells
+                    |> Dict.update
+                        newLocation
+                        (\elem ->
+                            case elem of
+                                Just (EnemyCell _ _) ->
+                                    Just <| EffectCell Bone
 
-                            Just (WallCell solidType) ->
-                                Cell.decomposing solidType
-                                    |> Maybe.map WallCell
+                                Just (WallCell solidType) ->
+                                    Cell.decomposing solidType
+                                        |> Maybe.map WallCell
 
-                            Just CrateCell ->
-                                Just <| EffectCell Smoke
+                                Just CrateCell ->
+                                    Just <| EffectCell Smoke
 
-                            Nothing ->
-                                Just <| EffectCell Smoke
+                                Nothing ->
+                                    Just <| EffectCell Smoke
 
-                            _ ->
-                                elem
-                    )
-    }
+                                _ ->
+                                    elem
+                        )
+        }
+
+    else
+        game
+
+
+tryAttacking : ( Int, Int ) -> Game -> Maybe Game
+tryAttacking position game =
+    [ Up, Down, Left, Right ]
+        |> List.filterMap
+            (\direction ->
+                let
+                    newPos =
+                        direction
+                            |> Direction.toCoord
+                            |> Position.addTo position
+                in
+                case
+                    Dict.get newPos
+                        game.cells
+                of
+                    Just (PlayerCell _) ->
+                        Just newPos
+
+                    _ ->
+                        Nothing
+            )
+        |> List.head
+        |> Maybe.map
+            (\playerPos ->
+                game
+                    |> Game.attackPlayer playerPos
+            )
