@@ -14,7 +14,6 @@ import Cell
         ( Cell(..)
         , EffectType(..)
         , EnemyType(..)
-        , ItemType(..)
         , Wall(..)
         )
 import Config

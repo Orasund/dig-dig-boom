@@ -1,6 +1,6 @@
 module View.Screen exposing (death, menu, world)
 
-import Cell exposing (Cell(..), EnemyType(..), ItemType(..), Wall(..))
+import Cell exposing (Cell(..), EnemyType(..), Wall(..))
 import Color
 import Config
 import Dict
@@ -13,8 +13,8 @@ import PixelEngine exposing (Input)
 import PixelEngine.Image
 import PixelEngine.Options as Options
 import PixelEngine.Tile exposing (Tile)
+import View.Bomb
 import View.Controls
-import View.Item
 import View.Tile as TileView
 
 
@@ -146,7 +146,7 @@ world args game hints =
                     |> Options.withScale 4
                     |> Just
             }
-    , [ View.Item.toHtml Bomb
+    , [ View.Bomb.toHtml
             |> List.repeat game.player.bombs
             |> Layout.row []
       , Image.image [ Image.pixelated ]

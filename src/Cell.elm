@@ -2,7 +2,6 @@ module Cell exposing
     ( Cell(..)
     , EffectType(..)
     , EnemyType(..)
-    , ItemType(..)
     , Wall(..)
     , decomposing
     , getImage
@@ -11,11 +10,6 @@ module Cell exposing
 import Direction exposing (Direction(..))
 import PixelEngine.Tile exposing (Tile)
 import View.Tile as Tile
-
-
-type ItemType
-    = Bomb
-    | HealthPotion
 
 
 type EnemyType

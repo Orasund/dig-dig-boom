@@ -5,7 +5,6 @@ import Cell
         ( Cell(..)
         , EffectType(..)
         , EnemyType(..)
-        , ItemType(..)
         , Wall(..)
         )
 import Dict exposing (Dict)

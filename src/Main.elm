@@ -6,7 +6,6 @@ import Cell
     exposing
         ( Cell(..)
         , EnemyType(..)
-        , ItemType(..)
         , Wall(..)
         )
 import Config

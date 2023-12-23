@@ -1,10 +1,11 @@
-module Game.Update exposing (..)
+module Game.Update exposing (movePlayerInDirectionAndUpdateGame, placeBombe)
 
-import Cell exposing (Cell(..), EnemyType(..), ItemType(..), Wall)
+import Cell exposing (Cell(..), EnemyType(..), Wall)
 import Dict
 import Direction exposing (Direction(..))
 import Enemy
 import Game exposing (Game)
+import Math
 import Player
 import Position
 
@@ -134,31 +135,6 @@ movePlayer worldSize ( ( position, direction ), game ) =
                 { game | cells = game.cells |> Player.face position direction }
 
 
-itemAction : ( ( Int, Int ), Direction ) -> ItemType -> Game -> Game
-itemAction playerCell consumable game =
-    (case consumable of
-        Bomb ->
-            applyBomb playerCell game
-
-        HealthPotion ->
-            applyHealthPotion game
-    )
-        |> Maybe.withDefault { game | player = game.player |> Player.addBomb }
-
-
-applyHealthPotion : Game -> Maybe Game
-applyHealthPotion game =
-    if game.player.lifes < 3 then
-        Just
-            { game
-                | player =
-                    Player.removeLife game.player
-            }
-
-    else
-        Nothing
-
-
 applyBomb : ( ( Int, Int ), Direction ) -> Game -> Maybe Game
 applyBomb ( position, direction ) game =
     let
@@ -197,33 +173,37 @@ applyBomb ( position, direction ) game =
         map =
             game.cells
     in
-    case map |> Dict.get newPosition of
-        Nothing ->
-            { game
-                | cells =
-                    game.cells |> Dict.insert newPosition cell
-            }
-                |> Just
+    if Math.posIsValid newPosition then
+        case map |> Dict.get newPosition of
+            Nothing ->
+                { game
+                    | cells =
+                        game.cells |> Dict.insert newPosition cell
+                }
+                    |> Just
 
-        Just (EffectCell _) ->
-            { game
-                | cells =
-                    game.cells |> Dict.insert newPosition cell
-            }
-                |> Just
+            Just (EffectCell _) ->
+                { game
+                    | cells =
+                        game.cells |> Dict.insert newPosition cell
+                }
+                    |> Just
 
-        Just (WallCell solidType) ->
-            specialCase solidType
+            Just (WallCell solidType) ->
+                specialCase solidType
 
-        _ ->
-            Nothing
+            _ ->
+                Nothing
+
+    else
+        Nothing
 
 
 placeBombe : ( ( Int, Int ), Direction ) -> Game -> Maybe Game
 placeBombe playerCell game =
     Player.removeBomb game.player
-        |> Maybe.map
+        |> Maybe.andThen
             (\playerData ->
                 { game | player = playerData }
-                    |> itemAction playerCell Bomb
+                    |> applyBomb playerCell
             )
