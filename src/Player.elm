@@ -14,7 +14,6 @@ import Cell
         ( Cell(..)
         , EffectType(..)
         , EnemyType(..)
-        , Wall(..)
         )
 import Config
 import Dict exposing (Dict)
@@ -62,8 +61,8 @@ pushCrate pos dir cells =
     let
         newPos =
             dir
-                |> Direction.toCoord
-                |> Position.addTo pos
+                |> Direction.toVector
+                |> Position.addToVector pos
     in
     Dict.get pos cells
         |> Maybe.andThen

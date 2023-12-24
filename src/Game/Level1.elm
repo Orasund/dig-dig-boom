@@ -1,6 +1,6 @@
 module Game.Level1 exposing (..)
 
-import Cell exposing (Cell(..), EnemyType(..), Wall(..))
+import Cell exposing (Cell(..), EnemyType(..))
 import Dict
 import Direction exposing (Direction(..))
 import Game.Level as Level exposing (Level)

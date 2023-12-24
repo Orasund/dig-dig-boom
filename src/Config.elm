@@ -3,7 +3,7 @@ module Config exposing (..)
 
 mapSize : Int
 mapSize =
-    4
+    5
 
 
 maxBombs : Int
@@ -14,3 +14,7 @@ maxBombs =
 maxLifes : Int
 maxLifes =
     2
+
+
+cellSize =
+    50

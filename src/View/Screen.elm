@@ -1,21 +1,17 @@
 module View.Screen exposing (death, menu, world)
 
-import Cell exposing (Cell(..), EnemyType(..), Wall(..))
-import Color
+import Cell exposing (Cell(..), EnemyType(..))
 import Config
 import Dict
 import Game exposing (Game)
 import Html exposing (Html)
 import Html.Attributes
 import Image
+import Input exposing (Input)
 import Layout
-import PixelEngine exposing (Input)
-import PixelEngine.Image
-import PixelEngine.Options as Options
-import PixelEngine.Tile exposing (Tile)
 import View.Bomb
+import View.Cell
 import View.Controls
-import View.Tile as TileView
 
 
 logo : Int -> Html msg
@@ -30,66 +26,35 @@ logo frame =
         }
 
 
+skull : Html msg
+skull =
+    Image.image [ Image.pixelated ]
+        { url = "skull.png"
+        , width = 350
+        , height = 350
+        }
+
+
 death : { onClick : msg } -> Html msg
 death args =
-    let
-        width : Int
-        width =
-            16
-    in
-    [ PixelEngine.tiledArea
-        { rows = 2
-        , background = PixelEngine.colorBackground (Color.rgb255 20 12 28)
-        , tileset = TileView.tileset
-        }
-        []
-    , PixelEngine.tiledArea
-        { rows = 2
-        , background = PixelEngine.colorBackground (Color.rgb255 20 12 28)
-        , tileset = TileView.tileset
-        }
-        (List.concat
-            [ ( 4, 0 ) |> TileView.text "You have" TileView.colorWhite
-            , ( 6, 1 ) |> TileView.text "died" TileView.colorWhite
-            ]
-        )
-    , PixelEngine.imageArea
-        { height = toFloat <| 12 * 16
-        , background = PixelEngine.colorBackground (Color.rgb255 20 12 28)
-        }
-        [ ( ( toFloat <| (16 * width) // 2 - 64, toFloat <| (12 * width) // 2 - 64 )
-          , PixelEngine.Image.fromSrc "skull.png"
-          )
-        ]
-    , PixelEngine.tiledArea
-        { rows = 2
-        , background = PixelEngine.colorBackground (Color.rgb255 20 12 28)
-        , tileset = TileView.tileset
-        }
-        (List.concat
-            [ ( 4, 0 ) |> TileView.text "Press any" TileView.colorWhite
-            , ( 6, 1 ) |> TileView.text "button" TileView.colorWhite
-            ]
-        )
-    , PixelEngine.tiledArea
-        { rows = 2
-        , background = PixelEngine.colorBackground (Color.rgb255 20 12 28)
-        , tileset = TileView.tileset
-        }
-        []
+    [ [ "You have" |> Layout.text [ Layout.contentCentered ]
+      , "died" |> Layout.text [ Layout.contentCentered ]
+      ]
+        |> Layout.column []
+    , skull
+    , [ "Press any" |> Layout.text [ Layout.contentCentered ]
+      , "button" |> Layout.text [ Layout.contentCentered ]
+      ]
+        |> Layout.column []
     ]
-        |> PixelEngine.toHtml
-            { width = toFloat <| TileView.tileset.spriteWidth * width
-            , options =
-                Options.default
-                    |> Options.withScale 2
-                    |> Just
-            }
-        |> Layout.el
-            (Layout.asButton
-                { label = "Next Level"
-                , onPress = Just args.onClick
-                }
+        |> Layout.column
+            ([ Html.Attributes.style "font-size" "60px"
+             , Html.Attributes.style "color" "white"
+             ]
+                ++ Layout.asButton
+                    { label = "Next Level"
+                    , onPress = Just args.onClick
+                    }
             )
 
 
@@ -113,8 +78,14 @@ menu args =
             )
 
 
-world : { score : Int, onInput : Input -> msg } -> Game -> List ( ( Int, Int ), Tile msg ) -> Html msg
-world args game hints =
+world :
+    { score : Int
+    , onInput : Input -> msg
+    , frame : Int
+    }
+    -> Game
+    -> Html msg
+world args game =
     [ [ "Score:"
             ++ String.fromInt args.score
             |> Layout.text [ Html.Attributes.style "font-size" "32px" ]
@@ -123,29 +94,33 @@ world args game hints =
             [ Layout.contentWithSpaceBetween
             , Html.Attributes.style "color" "white"
             ]
-    , PixelEngine.tiledArea
-        { rows = Config.mapSize
-        , background =
-            PixelEngine.imageBackground
-                { source = "groundTile.png", width = 32, height = 32 }
-        , tileset = TileView.tileset
-        }
-        (hints
-            |> List.append
-                (game.cells
-                    |> Dict.toList
-                    |> List.map
-                        (\( pos, cell ) -> ( pos, Cell.getImage cell ))
+    , game.cells
+        |> Dict.toList
+        |> List.map
+            (\( ( x, y ), cell ) ->
+                View.Cell.toHtml
+                    [ Html.Attributes.style "position" "absolute"
+                    , Html.Attributes.style "left"
+                        (String.fromFloat (Config.cellSize * toFloat x) ++ "px")
+                    , Html.Attributes.style "top"
+                        (String.fromFloat (Config.cellSize * toFloat y) ++ "px")
+                    ]
+                    { frame = args.frame }
+                    cell
+            )
+        |> Html.div
+            [ Html.Attributes.style "position" "relative"
+            , Html.Attributes.style "width" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")
+            , Html.Attributes.style "height" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")
+            , Html.Attributes.style "background-image" "url('groundTile.png')"
+            , Html.Attributes.style "background-repeat" "repeat"
+            , Html.Attributes.style "background-size"
+                (String.fromFloat Config.cellSize
+                    ++ "px "
+                    ++ String.fromFloat Config.cellSize
+                    ++ "px"
                 )
-        )
-        |> List.singleton
-        |> PixelEngine.toHtml
-            { width = toFloat <| TileView.tileset.spriteWidth * Config.mapSize
-            , options =
-                Options.default
-                    |> Options.withScale 4
-                    |> Just
-            }
+            ]
     , [ View.Bomb.toHtml
             |> List.repeat game.player.bombs
             |> Layout.row []

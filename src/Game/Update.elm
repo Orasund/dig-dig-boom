@@ -1,6 +1,6 @@
 module Game.Update exposing (movePlayerInDirectionAndUpdateGame, placeBombe)
 
-import Cell exposing (Cell(..), EnemyType(..), Wall)
+import Cell exposing (Cell(..), EnemyType(..))
 import Dict
 import Direction exposing (Direction(..))
 import Enemy
@@ -71,8 +71,8 @@ movePlayer worldSize ( ( position, direction ), game ) =
         newLocation : ( Int, Int )
         newLocation =
             direction
-                |> Direction.toCoord
-                |> Position.addTo position
+                |> Direction.toVector
+                |> Position.addToVector position
 
         playerData =
             game.player
@@ -140,21 +140,8 @@ applyBomb ( position, direction ) game =
     let
         newPosition =
             direction
-                |> Direction.toCoord
-                |> Position.addTo position
-
-        specialCase : Wall -> Maybe Game
-        specialCase solidType =
-            Cell.decomposing solidType
-                |> Maybe.map
-                    (\solid ->
-                        { game
-                            | cells =
-                                game.cells
-                                    |> Dict.insert newPosition
-                                        (WallCell solid)
-                        }
-                    )
+                |> Direction.toVector
+                |> Position.addToVector position
 
         id : String
         id =
@@ -188,9 +175,6 @@ applyBomb ( position, direction ) game =
                         game.cells |> Dict.insert newPosition cell
                 }
                     |> Just
-
-            Just (WallCell solidType) ->
-                specialCase solidType
 
             _ ->
                 Nothing

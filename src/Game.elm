@@ -5,7 +5,6 @@ import Cell
         ( Cell(..)
         , EffectType(..)
         , EnemyType(..)
-        , Wall(..)
         )
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
@@ -52,8 +51,8 @@ slide position direction game =
         newLocation : ( Int, Int )
         newLocation =
             direction
-                |> Direction.toCoord
-                |> Position.addTo position
+                |> Direction.toVector
+                |> Position.addToVector position
     in
     case
         game

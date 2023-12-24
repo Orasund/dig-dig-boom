@@ -1,6 +1,6 @@
 module Game.Generate exposing (..)
 
-import Cell exposing (Cell(..), EnemyType(..), Wall(..))
+import Cell exposing (Cell(..), EnemyType(..))
 import Config
 import Dict
 import Direction exposing (Direction(..))

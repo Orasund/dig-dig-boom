@@ -3,8 +3,8 @@ module View.Controls exposing (..)
 import Html exposing (Attribute, Html)
 import Html.Attributes
 import Image
+import Input exposing (Input(..))
 import Layout
-import PixelEngine exposing (Input(..))
 
 
 sprite : List (Attribute msg) -> ( Int, Int ) -> Html msg

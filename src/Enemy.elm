@@ -40,8 +40,8 @@ findFirstInDirection : ( Int, Int ) -> Direction -> Game -> Maybe Cell
 findFirstInDirection position direction game =
     let
         newPos =
-            Direction.toCoord direction
-                |> Position.addTo position
+            Direction.toVector direction
+                |> Position.addToVector position
     in
     if Math.posIsValid newPos then
         case Dict.get newPos game.cells of
@@ -65,8 +65,8 @@ monsterMoveInDir position direction game =
                 |> Game.move
                     { from = position
                     , to =
-                        Direction.toCoord direction
-                            |> Position.addTo position
+                        Direction.toVector direction
+                            |> Position.addToVector position
                     }
 
         _ ->
@@ -78,8 +78,8 @@ placedBombeBehavoiur location direction game =
     let
         newLocation =
             direction
-                |> Direction.toCoord
-                |> Position.addTo location
+                |> Direction.toVector
+                |> Position.addToVector location
     in
     if Math.posIsValid newLocation then
         { game
@@ -91,10 +91,6 @@ placedBombeBehavoiur location direction game =
                             case elem of
                                 Just (EnemyCell _ _) ->
                                     Just <| EffectCell Bone
-
-                                Just (WallCell solidType) ->
-                                    Cell.decomposing solidType
-                                        |> Maybe.map WallCell
 
                                 Just CrateCell ->
                                     Just <| EffectCell Smoke
@@ -119,8 +115,8 @@ tryAttacking position game =
                 let
                     newPos =
                         direction
-                            |> Direction.toCoord
-                            |> Position.addTo position
+                            |> Direction.toVector
+                            |> Position.addToVector position
                 in
                 case
                     Dict.get newPos

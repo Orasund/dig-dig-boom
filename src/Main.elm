@@ -6,7 +6,6 @@ import Cell
     exposing
         ( Cell(..)
         , EnemyType(..)
-        , Wall(..)
         )
 import Config
 import Dict exposing (Dict)
@@ -15,13 +14,12 @@ import Game exposing (Game)
 import Game.Generate
 import Game.Update
 import Html exposing (Html)
+import Input exposing (Input(..))
 import Json.Decode as Decode
-import PixelEngine exposing (Input(..))
 import Random exposing (Seed)
 import Time
 import View.Screen as Screen
 import View.Stylesheet
-import View.Transition exposing (nextLevel)
 
 
 
@@ -52,6 +50,7 @@ type Msg
     = Input Input
     | GotSeed Seed
     | NextFrameRequested
+    | NoOps
 
 
 
@@ -146,26 +145,31 @@ nextFrameRequested model =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case model.overlay of
-        Nothing ->
-            if
-                Dict.filter
-                    (\_ cell ->
-                        case cell of
-                            EnemyCell _ _ ->
-                                True
-
-                            _ ->
-                                False
+    case msg of
+        Input input ->
+            case model.overlay of
+                Just Menu ->
+                    ( nextLevel model
+                    , Cmd.none
                     )
-                    model.game.cells
-                    |> Dict.isEmpty
-            then
-                gameWon model
 
-            else
-                case msg of
-                    Input input ->
+                Nothing ->
+                    if
+                        Dict.filter
+                            (\_ cell ->
+                                case cell of
+                                    EnemyCell _ _ ->
+                                        True
+
+                                    _ ->
+                                        False
+                            )
+                            model.game.cells
+                            |> Dict.isEmpty
+                    then
+                        gameWon model
+
+                    else
                         let
                             maybePlayerPosition : Dict ( Int, Int ) Cell -> Maybe ( ( Int, Int ), Direction )
                             maybePlayerPosition currentMap =
@@ -237,43 +241,8 @@ update msg model =
                                         , Cmd.none
                                         )
 
-                                    InputX ->
-                                        ( model
-                                        , Cmd.none
-                                        )
-
-                                    InputY ->
-                                        ( model
-                                        , Cmd.none
-                                        )
-
-                                    InputB ->
-                                        ( model
-                                        , Cmd.none
-                                        )
-
                             Nothing ->
                                 gameLost model
-
-                    NextFrameRequested ->
-                        ( nextFrameRequested model
-                        , Cmd.none
-                        )
-
-                    GotSeed seed ->
-                        ( gotSeed seed model, Cmd.none )
-
-        Just Menu ->
-            updateMenu msg model
-
-
-updateMenu : Msg -> Model -> ( Model, Cmd Msg )
-updateMenu msg model =
-    case msg of
-        Input _ ->
-            ( nextLevel model
-            , Cmd.none
-            )
 
         NextFrameRequested ->
             ( nextFrameRequested model
@@ -281,9 +250,10 @@ updateMenu msg model =
             )
 
         GotSeed seed ->
-            ( gotSeed seed model
-            , Cmd.none
-            )
+            ( gotSeed seed model, Cmd.none )
+
+        NoOps ->
+            ( model, Cmd.none )
 
 
 
@@ -312,17 +282,11 @@ toDirection string =
         "s" ->
             Input InputDown
 
-        "q" ->
-            Input InputX
-
-        "e" ->
-            Input InputY
-
         " " ->
             Input InputA
 
         _ ->
-            Input InputB
+            NoOps
 
 
 subscriptions : Model -> Sub Msg
@@ -342,7 +306,12 @@ subscriptions _ =
 viewGame : Model -> Html Msg
 viewGame model =
     if model.game.player.lifes > 0 then
-        Screen.world { score = model.score, onInput = Input } model.game []
+        Screen.world
+            { score = model.score
+            , onInput = Input
+            , frame = model.frame
+            }
+            model.game
 
     else
         Screen.death { onClick = Input InputA }
