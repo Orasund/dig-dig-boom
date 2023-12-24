@@ -2,14 +2,14 @@ module Main exposing (main)
 
 import Browser
 import Browser.Events
-import Cell
-    exposing
-        ( Cell(..)
-        , EnemyType(..)
-        )
 import Config
-import Dict exposing (Dict)
+import Dict
 import Direction exposing (Direction(..))
+import Entity
+    exposing
+        ( EnemyType(..)
+        , Entity(..)
+        )
 import Game exposing (Game)
 import Game.Generate
 import Game.Update
@@ -157,8 +157,8 @@ update msg model =
                     if
                         Dict.filter
                             (\_ cell ->
-                                case cell of
-                                    EnemyCell _ _ ->
+                                case cell.entity of
+                                    Enemy _ _ ->
                                         True
 
                                     _ ->
@@ -170,32 +170,7 @@ update msg model =
                         gameWon model
 
                     else
-                        let
-                            maybePlayerPosition : Dict ( Int, Int ) Cell -> Maybe ( ( Int, Int ), Direction )
-                            maybePlayerPosition currentMap =
-                                currentMap
-                                    |> Dict.toList
-                                    |> List.filter
-                                        (\( _, cell ) ->
-                                            case cell of
-                                                PlayerCell _ ->
-                                                    True
-
-                                                _ ->
-                                                    False
-                                        )
-                                    |> List.head
-                                    |> Maybe.andThen
-                                        (\( key, cell ) ->
-                                            case cell of
-                                                PlayerCell dir ->
-                                                    Just ( key, dir )
-
-                                                _ ->
-                                                    Nothing
-                                        )
-                        in
-                        case maybePlayerPosition model.game.cells of
+                        case Game.getPlayerPosition model.game of
                             Just ( playerPosition, playerDirection ) ->
                                 let
                                     updateDirection dir game =

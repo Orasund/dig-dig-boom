@@ -1,24 +1,25 @@
 module Game.Level exposing (..)
 
-import Cell exposing (Cell(..))
 import Dict exposing (Dict)
+import Entity exposing (Entity(..))
+import Game exposing (Cell)
 import Math
 
 
 type alias Level =
-    { content : List Cell
+    { content : List Entity
     , valid : Dict ( Int, Int ) Cell -> Bool
     }
 
 
-new : (Dict ( Int, Int ) Cell -> Bool) -> List Cell -> Level
+new : (Dict ( Int, Int ) Cell -> Bool) -> List Entity -> Level
 new validate content =
     { content = content
     , valid = validate
     }
 
 
-neighbors4 : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Cell)
+neighbors4 : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)
 neighbors4 ( x, y ) dict =
     [ ( x + 1, y )
     , ( x - 1, y )
@@ -28,11 +29,11 @@ neighbors4 ( x, y ) dict =
         |> List.filter Math.posIsValid
         |> List.map
             (\pos ->
-                dict |> Dict.get pos
+                dict |> Dict.get pos |> Maybe.map .entity
             )
 
 
-neighbors8 : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Cell)
+neighbors8 : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)
 neighbors8 ( x, y ) dict =
     [ ( x + 1, y )
     , ( x - 1, y )
@@ -46,11 +47,11 @@ neighbors8 ( x, y ) dict =
         |> List.filter Math.posIsValid
         |> List.map
             (\pos ->
-                dict |> Dict.get pos
+                dict |> Dict.get pos |> Maybe.map .entity
             )
 
 
-diagNeighbors : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Cell)
+diagNeighbors : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)
 diagNeighbors ( x, y ) dict =
     [ ( x + 1, y + 1 )
     , ( x + 1, y - 1 )
@@ -60,14 +61,14 @@ diagNeighbors ( x, y ) dict =
         |> List.filter Math.posIsValid
         |> List.map
             (\pos ->
-                dict |> Dict.get pos
+                dict |> Dict.get pos |> Maybe.map .entity
             )
 
 
-isPlayer : Cell -> Bool
+isPlayer : Entity -> Bool
 isPlayer cell =
     case cell of
-        PlayerCell _ ->
+        Player _ ->
             True
 
         _ ->

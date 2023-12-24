@@ -2,25 +2,19 @@ module Player exposing
     ( PlayerData
     , addBomb
     , addLife
-    , face
     , init
-    , pushCrate
     , removeBomb
     , removeLife
     )
 
-import Cell
-    exposing
-        ( Cell(..)
-        , EffectType(..)
-        , EnemyType(..)
-        )
 import Config
-import Dict exposing (Dict)
 import Direction exposing (Direction(..))
-import Html.Attributes exposing (dir)
-import Math
-import Position
+import Entity
+    exposing
+        ( EffectType(..)
+        , EnemyType(..)
+        , Entity(..)
+        )
 
 
 type alias PlayerData =
@@ -44,43 +38,6 @@ removeLife player =
 addLife : PlayerData -> PlayerData
 addLife player =
     { player | lifes = player.lifes + 1 |> min Config.maxLifes }
-
-
-face :
-    ( Int, Int )
-    -> Direction
-    -> Dict ( Int, Int ) Cell
-    -> Dict ( Int, Int ) Cell
-face position direction map =
-    map
-        |> Dict.insert position (PlayerCell direction)
-
-
-pushCrate : ( Int, Int ) -> Direction -> Dict ( Int, Int ) Cell -> Maybe (Dict ( Int, Int ) Cell)
-pushCrate pos dir cells =
-    let
-        newPos =
-            dir
-                |> Direction.toVector
-                |> Position.addToVector pos
-    in
-    Dict.get pos cells
-        |> Maybe.andThen
-            (\from ->
-                if
-                    Dict.get newPos
-                        cells
-                        == Nothing
-                        && Math.posIsValid newPos
-                then
-                    cells
-                        |> Dict.insert newPos from
-                        |> Dict.remove pos
-                        |> Just
-
-                else
-                    Nothing
-            )
 
 
 removeBomb : PlayerData -> Maybe PlayerData

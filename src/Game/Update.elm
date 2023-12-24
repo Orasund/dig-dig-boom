@@ -1,10 +1,10 @@
 module Game.Update exposing (movePlayerInDirectionAndUpdateGame, placeBombe)
 
-import Cell exposing (Cell(..), EnemyType(..))
-import Dict
+import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import Enemy
-import Game exposing (Game)
+import Entity exposing (EnemyType(..), Entity(..))
+import Game exposing (Cell, Game)
 import Math
 import Player
 import Position
@@ -21,18 +21,18 @@ updateGame game =
 
 updateCell : ( ( Int, Int ), Cell ) -> Game -> Game
 updateCell ( position, cell ) game =
-    case cell of
-        EnemyCell enemy _ ->
+    case cell.entity of
+        Enemy enemy _ ->
             game
                 |> Enemy.tryAttacking position
                 |> Maybe.withDefault game
                 |> Enemy.enemyBehaviour position enemy
 
-        EffectCell _ ->
-            { game | cells = game.cells |> Dict.remove position }
+        Particle _ ->
+            game |> Game.remove position
 
-        StunnedCell enemy id ->
-            { game | cells = game.cells |> Dict.update position (always <| Just <| EnemyCell enemy id) }
+        Stunned enemy id ->
+            game |> Game.update position (\_ -> Enemy enemy id)
 
         _ ->
             game
@@ -41,7 +41,7 @@ updateCell ( position, cell ) game =
 movePlayerInDirectionAndUpdateGame : Int -> Direction -> ( Int, Int ) -> Game -> Game
 movePlayerInDirectionAndUpdateGame size dir location game =
     ( ( location, dir )
-    , { game | cells = game.cells |> Player.face location dir }
+    , game |> Game.face location dir
     )
         |> movePlayer size
         |> updateGame
@@ -81,8 +81,8 @@ movePlayer worldSize ( ( position, direction ), game ) =
         game
 
     else
-        case game.cells |> Dict.get newLocation of
-            Just InactiveBombCell ->
+        case game.cells |> Dict.get newLocation |> Maybe.map .entity of
+            Just InactiveBomb ->
                 { game
                     | player = playerData |> Player.addBomb
                 }
@@ -93,7 +93,7 @@ movePlayer worldSize ( ( position, direction ), game ) =
                         }
                     |> Maybe.withDefault game
 
-            Just HeartCell ->
+            Just Heart ->
                 { game
                     | player = playerData |> Player.addLife
                 }
@@ -101,21 +101,20 @@ movePlayer worldSize ( ( position, direction ), game ) =
                     |> Game.move { from = position, to = newLocation }
                     |> Maybe.withDefault game
 
-            Just (EnemyCell enemy id) ->
-                game.cells
-                    |> Dict.insert newLocation (StunnedCell enemy id)
-                    |> (\cells -> { game | cells = cells })
+            Just (Enemy enemy id) ->
+                game
+                    |> Game.update newLocation (\_ -> Stunned enemy id)
                     |> Game.slide newLocation direction
 
-            Just (EffectCell _) ->
+            Just (Particle _) ->
                 game
                     |> Game.remove newLocation
                     |> Game.move { from = position, to = newLocation }
                     |> Maybe.withDefault game
 
-            Just CrateCell ->
+            Just Crate ->
                 game.cells
-                    |> Player.pushCrate newLocation direction
+                    |> pushCrate newLocation direction
                     |> Maybe.map
                         (\cells ->
                             { game | cells = cells }
@@ -132,7 +131,7 @@ movePlayer worldSize ( ( position, direction ), game ) =
                     |> Maybe.withDefault game
 
             _ ->
-                { game | cells = game.cells |> Player.face position direction }
+                game |> Game.face position direction
 
 
 applyBomb : ( ( Int, Int ), Direction ) -> Game -> Maybe Game
@@ -155,25 +154,21 @@ applyBomb ( position, direction ) game =
                 ++ String.fromInt front_y
 
         cell =
-            EnemyCell PlacedBomb id
+            Enemy PlacedBomb id
 
         map =
             game.cells
     in
     if Math.posIsValid newPosition then
-        case map |> Dict.get newPosition of
+        case map |> Dict.get newPosition |> Maybe.map .entity of
             Nothing ->
-                { game
-                    | cells =
-                        game.cells |> Dict.insert newPosition cell
-                }
+                game
+                    |> Game.insert newPosition cell
                     |> Just
 
-            Just (EffectCell _) ->
-                { game
-                    | cells =
-                        game.cells |> Dict.insert newPosition cell
-                }
+            Just (Particle _) ->
+                game
+                    |> Game.insert newPosition cell
                     |> Just
 
             _ ->
@@ -190,4 +185,31 @@ placeBombe playerCell game =
             (\playerData ->
                 { game | player = playerData }
                     |> applyBomb playerCell
+            )
+
+
+pushCrate : ( Int, Int ) -> Direction -> Dict ( Int, Int ) Cell -> Maybe (Dict ( Int, Int ) Cell)
+pushCrate pos dir cells =
+    let
+        newPos =
+            dir
+                |> Direction.toVector
+                |> Position.addToVector pos
+    in
+    Dict.get pos cells
+        |> Maybe.andThen
+            (\from ->
+                if
+                    Dict.get newPos
+                        cells
+                        == Nothing
+                        && Math.posIsValid newPos
+                then
+                    cells
+                        |> Dict.insert newPos from
+                        |> Dict.remove pos
+                        |> Just
+
+                else
+                    Nothing
             )

@@ -1,11 +1,12 @@
 module View.Screen exposing (death, menu, world)
 
-import Cell exposing (Cell(..), EnemyType(..))
 import Config
 import Dict
+import Entity exposing (EnemyType(..), Entity(..))
 import Game exposing (Game)
 import Html exposing (Html)
 import Html.Attributes
+import Html.Keyed
 import Image
 import Input exposing (Input)
 import Layout
@@ -98,7 +99,8 @@ world args game =
         |> Dict.toList
         |> List.map
             (\( ( x, y ), cell ) ->
-                View.Cell.toHtml
+                ( String.fromInt cell.id
+                , View.Cell.toHtml
                     [ Html.Attributes.style "position" "absolute"
                     , Html.Attributes.style "left"
                         (String.fromFloat (Config.cellSize * toFloat x) ++ "px")
@@ -106,9 +108,11 @@ world args game =
                         (String.fromFloat (Config.cellSize * toFloat y) ++ "px")
                     ]
                     { frame = args.frame }
-                    cell
+                    cell.entity
+                )
             )
-        |> Html.div
+        |> List.sortBy Tuple.first
+        |> Html.Keyed.node "div"
             [ Html.Attributes.style "position" "relative"
             , Html.Attributes.style "width" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")
             , Html.Attributes.style "height" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")

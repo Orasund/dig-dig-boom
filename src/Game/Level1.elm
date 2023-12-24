@@ -1,37 +1,37 @@
 module Game.Level1 exposing (..)
 
-import Cell exposing (Cell(..), EnemyType(..))
 import Dict
 import Direction exposing (Direction(..))
+import Entity exposing (EnemyType(..), Entity(..))
 import Game.Level as Level exposing (Level)
 
 
 new : Level
 new =
-    [ EnemyCell Rat "Rat_0"
-    , InactiveBombCell
-    , InactiveBombCell
-    , CrateCell
-    , CrateCell
-    , CrateCell
-    , PlayerCell Down
-    , HeartCell
+    [ Enemy Rat "Rat_0"
+    , InactiveBomb
+    , InactiveBomb
+    , Crate
+    , Crate
+    , Crate
+    , Player Down
+    , Heart
     ]
         |> Level.new validator
 
 
 level2 : Level
 level2 =
-    [ EnemyCell Rat "Rat_0"
-    , EnemyCell Rat "Rat_1"
-    , InactiveBombCell
-    , InactiveBombCell
-    , InactiveBombCell
-    , CrateCell
-    , CrateCell
-    , CrateCell
-    , PlayerCell Down
-    , HeartCell
+    [ Enemy Rat "Rat_0"
+    , Enemy Rat "Rat_1"
+    , InactiveBomb
+    , InactiveBomb
+    , InactiveBomb
+    , Crate
+    , Crate
+    , Crate
+    , Player Down
+    , Heart
     ]
         |> Level.new validator
 
@@ -42,13 +42,13 @@ validator =
             |> Dict.toList
             |> List.all
                 (\( pos, cell ) ->
-                    case cell of
-                        EnemyCell _ _ ->
-                            Level.count ((==) (Just InactiveBombCell))
+                    case cell.entity of
+                        Enemy _ _ ->
+                            Level.count ((==) (Just InactiveBomb))
                                 (Level.neighbors4 pos dict)
                                 < 1
 
-                        PlayerCell _ ->
+                        Player _ ->
                             (Level.count ((==) Nothing)
                                 (Level.neighbors4 pos dict)
                                 > 1
@@ -57,7 +57,7 @@ validator =
                                         |> List.all
                                             (\c ->
                                                 case c of
-                                                    Just (EnemyCell _ _) ->
+                                                    Just (Enemy _ _) ->
                                                         False
 
                                                     _ ->
@@ -65,8 +65,8 @@ validator =
                                             )
                                    )
 
-                        CrateCell ->
-                            Level.count ((==) (Just CrateCell))
+                        Crate ->
+                            Level.count ((==) (Just Crate))
                                 (Level.neighbors4 pos dict)
                                 < 1
 

@@ -1,10 +1,11 @@
 module Game.Generate exposing (..)
 
-import Cell exposing (Cell(..), EnemyType(..))
 import Config
 import Dict
 import Direction exposing (Direction(..))
+import Entity exposing (EnemyType(..), Entity(..))
 import Game exposing (Game)
+import Game.Level exposing (Level)
 import Game.Level1
 import Random exposing (Generator)
 
@@ -12,6 +13,7 @@ import Random exposing (Generator)
 new : Generator Game
 new =
     let
+        rec : Level -> Generator Game
         rec level =
             fromList level.content
                 |> Random.andThen
@@ -29,7 +31,7 @@ new =
         |> Random.andThen rec
 
 
-fromList : List Cell -> Generator Game
+fromList : List Entity -> Generator Game
 fromList cells =
     Random.list (Config.mapSize * Config.mapSize) (Random.float 0 1)
         |> Random.map

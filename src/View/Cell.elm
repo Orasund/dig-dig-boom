@@ -1,8 +1,8 @@
 module View.Cell exposing (..)
 
-import Cell exposing (Cell(..), EffectType(..), EnemyType(..))
 import Config
 import Direction exposing (Direction(..))
+import Entity exposing (EffectType(..), EnemyType(..), Entity(..))
 import Html exposing (Attribute, Html)
 import Image
 
@@ -20,10 +20,10 @@ sprite attrs pos =
         }
 
 
-toHtml : List (Attribute msg) -> { frame : Int } -> Cell -> Html msg
+toHtml : List (Attribute msg) -> { frame : Int } -> Entity -> Html msg
 toHtml attrs args cell =
     (case cell of
-        PlayerCell a ->
+        Player a ->
             case a of
                 Down ->
                     ( 0 + args.frame, 4 )
@@ -37,22 +37,22 @@ toHtml attrs args cell =
                 Right ->
                     ( 2 + args.frame, 5 )
 
-        CrateCell ->
+        Crate ->
             ( 1, 3 )
 
-        InactiveBombCell ->
+        InactiveBomb ->
             ( 0, 2 )
 
-        HeartCell ->
+        Heart ->
             ( 0, 3 )
 
-        EnemyCell enemy id ->
-            fromEnemy attrs args enemy
+        Enemy enemy id ->
+            fromEnemy args enemy
 
-        StunnedCell enemy id ->
-            fromEnemy attrs args enemy
+        Stunned enemy id ->
+            fromEnemy args enemy
 
-        EffectCell effect ->
+        Particle effect ->
             case effect of
                 Smoke ->
                     ( 2, 2 )
@@ -63,8 +63,8 @@ toHtml attrs args cell =
         |> sprite attrs
 
 
-fromEnemy : List (Attribute msg) -> { frame : Int } -> EnemyType -> ( Int, Int )
-fromEnemy attrs args enemy =
+fromEnemy : { frame : Int } -> EnemyType -> ( Int, Int )
+fromEnemy args enemy =
     case enemy of
         PlacedBomb ->
             ( 2 + args.frame, 1 )
