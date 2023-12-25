@@ -20,11 +20,11 @@ sprite attrs pos =
         }
 
 
-toHtml : List (Attribute msg) -> { frame : Int } -> Entity -> Html msg
+toHtml : List (Attribute msg) -> { frame : Int, playerDirection : Direction } -> Entity -> Html msg
 toHtml attrs args cell =
     (case cell of
-        Player a ->
-            case a of
+        Player ->
+            case args.playerDirection of
                 Down ->
                     ( 0 + args.frame, 4 )
 
@@ -46,11 +46,11 @@ toHtml attrs args cell =
         Heart ->
             ( 0, 3 )
 
-        Enemy enemy id ->
-            fromEnemy args enemy
+        Enemy enemy ->
+            fromEnemy { frame = args.frame } enemy
 
-        Stunned enemy id ->
-            fromEnemy args enemy
+        Stunned enemy ->
+            fromEnemy { frame = args.frame } enemy
 
         Particle effect ->
             case effect of

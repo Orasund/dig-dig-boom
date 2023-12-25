@@ -65,16 +65,6 @@ diagNeighbors ( x, y ) dict =
             )
 
 
-isPlayer : Entity -> Bool
-isPlayer cell =
-    case cell of
-        Player _ ->
-            True
-
-        _ ->
-            False
-
-
 count : (a -> Bool) -> List a -> Int
 count fun list =
     list |> List.filter fun |> List.length

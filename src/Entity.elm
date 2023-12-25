@@ -4,8 +4,6 @@ module Entity exposing
     , Entity(..)
     )
 
-import Direction exposing (Direction(..))
-
 
 type EnemyType
     = PlacedBomb
@@ -20,10 +18,10 @@ type EffectType
 
 
 type Entity
-    = Player Direction
+    = Player
     | Crate
-    | Enemy EnemyType String
-    | Stunned EnemyType String
+    | Enemy EnemyType
+    | Stunned EnemyType
     | InactiveBomb
     | Heart
     | Particle EffectType

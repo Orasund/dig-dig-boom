@@ -22,6 +22,7 @@ type alias Game =
     , nextId : Int
     , bombs : Int
     , lifes : Int
+    , playerDirection : Direction
     }
 
 
@@ -90,29 +91,19 @@ findFirstInDirection position direction game =
         Nothing
 
 
-getPlayerPosition : Game -> Maybe ( ( Int, Int ), Direction )
+getPlayerPosition : Game -> Maybe ( Int, Int )
 getPlayerPosition game =
     game.cells
         |> Dict.toList
-        |> List.filter
-            (\( _, cell ) ->
-                case cell.entity of
-                    Player _ ->
-                        True
+        |> List.filterMap
+            (\( key, cell ) ->
+                if cell.entity == Player then
+                    Just key
 
-                    _ ->
-                        False
+                else
+                    Nothing
             )
         |> List.head
-        |> Maybe.andThen
-            (\( key, cell ) ->
-                case cell.entity of
-                    Player dir ->
-                        Just ( key, dir )
-
-                    _ ->
-                        Nothing
-            )
 
 
 slide : ( Int, Int ) -> Direction -> Game -> Game
@@ -148,6 +139,7 @@ fromCells cells =
     , bombs = 0
     , lifes = 1
     , nextId = Dict.size cells
+    , playerDirection = Down
     }
 
 
@@ -162,7 +154,7 @@ attackPlayer position game =
         |> Maybe.andThen
             (\cell ->
                 case cell.entity of
-                    Player _ ->
+                    Player ->
                         { newGame
                             | cells =
                                 if newGame.lifes > 0 then
@@ -180,13 +172,11 @@ attackPlayer position game =
 
 
 face :
-    ( Int, Int )
-    -> Direction
+    Direction
     -> Game
     -> Game
-face position direction game =
-    game
-        |> update position (\_ -> Player direction)
+face direction game =
+    { game | playerDirection = direction }
 
 
 removeLife : Game -> Game

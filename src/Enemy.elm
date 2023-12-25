@@ -44,7 +44,7 @@ enemyBehaviour currentLocation enemyType game =
 monsterMoveInDir : ( Int, Int ) -> Direction -> Game -> Maybe Game
 monsterMoveInDir position direction game =
     case Game.findFirstInDirection position direction game of
-        Just (Player _) ->
+        Just Player ->
             game
                 |> Game.move
                     { from = position
@@ -73,7 +73,7 @@ placedBombeBehavoiur location direction game =
         of
             Just elem ->
                 case elem.entity of
-                    Enemy _ _ ->
+                    Enemy _ ->
                         game.cells
                             |> Dict.insert newLocation { elem | entity = Particle Bone }
                             |> (\cells -> { game | cells = cells })

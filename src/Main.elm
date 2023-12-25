@@ -2,7 +2,6 @@ module Main exposing (main)
 
 import Browser
 import Browser.Events
-import Config
 import Dict
 import Direction exposing (Direction(..))
 import Entity
@@ -51,17 +50,6 @@ type Msg
     | GotSeed Seed
     | NextFrameRequested
     | NoOps
-
-
-
--------------------------------
--- CONSTANTS
--------------------------------
-
-
-worldSize : Int
-worldSize =
-    Config.mapSize
 
 
 
@@ -158,7 +146,7 @@ update msg model =
                         Dict.filter
                             (\_ cell ->
                                 case cell.entity of
-                                    Enemy _ _ ->
+                                    Enemy _ ->
                                         True
 
                                     _ ->
@@ -171,10 +159,10 @@ update msg model =
 
                     else
                         case Game.getPlayerPosition model.game of
-                            Just ( playerPosition, playerDirection ) ->
+                            Just playerPosition ->
                                 let
                                     updateDirection dir game =
-                                        Game.Update.movePlayerInDirectionAndUpdateGame (worldSize - 1)
+                                        Game.Update.movePlayerInDirectionAndUpdateGame
                                             dir
                                             playerPosition
                                             game
@@ -182,7 +170,7 @@ update msg model =
                                 case input of
                                     InputA ->
                                         ( model.game
-                                            |> Game.Update.placeBombe ( playerPosition, playerDirection )
+                                            |> Game.Update.placeBombe playerPosition
                                             |> Maybe.withDefault model.game
                                             |> setGame model
                                         , Cmd.none

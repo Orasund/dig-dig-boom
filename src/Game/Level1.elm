@@ -8,13 +8,13 @@ import Game.Level as Level exposing (Level)
 
 new : Level
 new =
-    [ Enemy Rat "Rat_0"
+    [ Enemy Rat
     , InactiveBomb
     , InactiveBomb
     , Crate
     , Crate
     , Crate
-    , Player Down
+    , Player
     , Heart
     ]
         |> Level.new validator
@@ -22,8 +22,8 @@ new =
 
 level2 : Level
 level2 =
-    [ Enemy Rat "Rat_0"
-    , Enemy Rat "Rat_1"
+    [ Enemy Rat
+    , Enemy Rat
     , InactiveBomb
     , InactiveBomb
     , InactiveBomb
@@ -32,7 +32,7 @@ level2 =
     , Crate
     , Crate
     , Crate
-    , Player Down
+    , Player
     , Heart
     ]
         |> Level.new validator
@@ -45,12 +45,12 @@ validator =
             |> List.all
                 (\( pos, cell ) ->
                     case cell.entity of
-                        Enemy _ _ ->
+                        Enemy _ ->
                             Level.count ((==) (Just InactiveBomb))
                                 (Level.neighbors4 pos dict)
                                 < 1
 
-                        Player _ ->
+                        Player ->
                             (Level.count ((==) Nothing)
                                 (Level.neighbors4 pos dict)
                                 > 1
@@ -59,7 +59,7 @@ validator =
                                         |> List.all
                                             (\c ->
                                                 case c of
-                                                    Just (Enemy _ _) ->
+                                                    Just (Enemy _) ->
                                                         False
 
                                                     _ ->

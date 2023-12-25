@@ -21,7 +21,7 @@ updateGame game =
 updateCell : ( ( Int, Int ), Cell ) -> Game -> Game
 updateCell ( position, cell ) game =
     case cell.entity of
-        Enemy enemy _ ->
+        Enemy enemy ->
             game
                 |> Enemy.tryAttacking position
                 |> Maybe.withDefault game
@@ -30,53 +30,31 @@ updateCell ( position, cell ) game =
         Particle _ ->
             game |> Game.remove position
 
-        Stunned enemy id ->
-            game |> Game.update position (\_ -> Enemy enemy id)
+        Stunned enemy ->
+            game |> Game.update position (\_ -> Enemy enemy)
 
         _ ->
             game
 
 
-movePlayerInDirectionAndUpdateGame : Int -> Direction -> ( Int, Int ) -> Game -> Game
-movePlayerInDirectionAndUpdateGame size dir location game =
-    ( ( location, dir )
-    , game |> Game.face location dir
-    )
-        |> movePlayer size
+movePlayerInDirectionAndUpdateGame : Direction -> ( Int, Int ) -> Game -> Game
+movePlayerInDirectionAndUpdateGame dir location game =
+    game
+        |> Game.face dir
+        |> movePlayer location
         |> updateGame
 
 
-movePlayer : Int -> ( ( ( Int, Int ), Direction ), Game ) -> Game
-movePlayer worldSize ( ( position, direction ), game ) =
+movePlayer : ( Int, Int ) -> Game -> Game
+movePlayer position game =
     let
-        outOfBound : Bool
-        outOfBound =
-            position
-                |> (\( x, y ) ->
-                        case direction of
-                            Up ->
-                                y == 0
-
-                            Down ->
-                                y == worldSize
-
-                            Left ->
-                                x == 0
-
-                            Right ->
-                                x == worldSize
-                   )
-
         newLocation : ( Int, Int )
         newLocation =
-            direction
+            game.playerDirection
                 |> Direction.toVector
                 |> Position.addToVector position
     in
-    if outOfBound then
-        game
-
-    else
+    if Math.posIsValid newLocation then
         case game.cells |> Dict.get newLocation |> Maybe.map .entity of
             Just InactiveBomb ->
                 game
@@ -95,10 +73,10 @@ movePlayer worldSize ( ( position, direction ), game ) =
                     |> Game.move { from = position, to = newLocation }
                     |> Maybe.withDefault game
 
-            Just (Enemy enemy id) ->
+            Just (Enemy enemy) ->
                 game
-                    |> Game.update newLocation (\_ -> Stunned enemy id)
-                    |> Game.slide newLocation direction
+                    |> Game.update newLocation (\_ -> Stunned enemy)
+                    |> Game.slide newLocation game.playerDirection
 
             Just (Particle _) ->
                 game
@@ -108,7 +86,7 @@ movePlayer worldSize ( ( position, direction ), game ) =
 
             Just Crate ->
                 game.cells
-                    |> pushCrate newLocation direction
+                    |> pushCrate newLocation game.playerDirection
                     |> Maybe.map
                         (\cells ->
                             { game | cells = cells }
@@ -123,30 +101,22 @@ movePlayer worldSize ( ( position, direction ), game ) =
                     |> Maybe.withDefault game
 
             _ ->
-                game |> Game.face position direction
+                game |> Game.face game.playerDirection
+
+    else
+        game
 
 
-applyBomb : ( ( Int, Int ), Direction ) -> Game -> Maybe Game
-applyBomb ( position, direction ) game =
+applyBomb : ( Int, Int ) -> Game -> Maybe Game
+applyBomb position game =
     let
         newPosition =
-            direction
+            game.playerDirection
                 |> Direction.toVector
                 |> Position.addToVector position
 
-        id : String
-        id =
-            let
-                ( front_x, front_y ) =
-                    newPosition
-            in
-            "bombe_"
-                ++ String.fromInt front_x
-                ++ "_"
-                ++ String.fromInt front_y
-
         cell =
-            Enemy PlacedBomb id
+            Enemy PlacedBomb
 
         map =
             game.cells
@@ -170,7 +140,7 @@ applyBomb ( position, direction ) game =
         Nothing
 
 
-placeBombe : ( ( Int, Int ), Direction ) -> Game -> Maybe Game
+placeBombe : ( Int, Int ) -> Game -> Maybe Game
 placeBombe playerCell game =
     Game.removeBomb game
         |> Maybe.andThen (applyBomb playerCell)

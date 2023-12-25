@@ -108,7 +108,9 @@ world args game =
                         (String.fromFloat (Config.cellSize * toFloat y) ++ "px")
                     , Html.Attributes.style "transition" "left 0.2s,top 0.2s"
                     ]
-                    { frame = args.frame }
+                    { frame = args.frame
+                    , playerDirection = game.playerDirection
+                    }
                     cell.entity
                 )
             )
