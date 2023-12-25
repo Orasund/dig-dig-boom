@@ -280,7 +280,7 @@ subscriptions _ =
 
 viewGame : Model -> Html Msg
 viewGame model =
-    if model.game.player.lifes > 0 then
+    if model.game.lifes > 0 then
         Screen.world
             { score = model.score
             , onInput = Input

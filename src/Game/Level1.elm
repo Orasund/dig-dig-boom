@@ -30,6 +30,8 @@ level2 =
     , Crate
     , Crate
     , Crate
+    , Crate
+    , Crate
     , Player Down
     , Heart
     ]

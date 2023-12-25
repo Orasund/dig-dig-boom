@@ -106,6 +106,7 @@ world args game =
                         (String.fromFloat (Config.cellSize * toFloat x) ++ "px")
                     , Html.Attributes.style "top"
                         (String.fromFloat (Config.cellSize * toFloat y) ++ "px")
+                    , Html.Attributes.style "transition" "left 0.2s,top 0.2s"
                     ]
                     { frame = args.frame }
                     cell.entity
@@ -126,14 +127,14 @@ world args game =
                 )
             ]
     , [ View.Bomb.toHtml
-            |> List.repeat game.player.bombs
+            |> List.repeat game.bombs
             |> Layout.row []
       , Image.image [ Image.pixelated ]
             { url = "heart.png"
             , width = 64
             , height = 64
             }
-            |> List.repeat (game.player.lifes - 1)
+            |> List.repeat (game.lifes - 1)
             |> Layout.row []
       ]
         |> Layout.row [ Layout.contentWithSpaceBetween ]

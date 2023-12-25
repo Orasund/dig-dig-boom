@@ -6,7 +6,6 @@ import Enemy
 import Entity exposing (EnemyType(..), Entity(..))
 import Game exposing (Cell, Game)
 import Math
-import Player
 import Position
 
 
@@ -73,9 +72,6 @@ movePlayer worldSize ( ( position, direction ), game ) =
             direction
                 |> Direction.toVector
                 |> Position.addToVector position
-
-        playerData =
-            game.player
     in
     if outOfBound then
         game
@@ -83,9 +79,8 @@ movePlayer worldSize ( ( position, direction ), game ) =
     else
         case game.cells |> Dict.get newLocation |> Maybe.map .entity of
             Just InactiveBomb ->
-                { game
-                    | player = playerData |> Player.addBomb
-                }
+                game
+                    |> Game.addBomb
                     |> Game.remove newLocation
                     |> Game.move
                         { from = position
@@ -94,9 +89,8 @@ movePlayer worldSize ( ( position, direction ), game ) =
                     |> Maybe.withDefault game
 
             Just Heart ->
-                { game
-                    | player = playerData |> Player.addLife
-                }
+                game
+                    |> Game.addLife
                     |> Game.remove newLocation
                     |> Game.move { from = position, to = newLocation }
                     |> Maybe.withDefault game
@@ -124,9 +118,7 @@ movePlayer worldSize ( ( position, direction ), game ) =
                     |> Maybe.withDefault game
 
             Nothing ->
-                { game
-                    | player = playerData
-                }
+                game
                     |> Game.move { from = position, to = newLocation }
                     |> Maybe.withDefault game
 
@@ -180,12 +172,8 @@ applyBomb ( position, direction ) game =
 
 placeBombe : ( ( Int, Int ), Direction ) -> Game -> Maybe Game
 placeBombe playerCell game =
-    Player.removeBomb game.player
-        |> Maybe.andThen
-            (\playerData ->
-                { game | player = playerData }
-                    |> applyBomb playerCell
-            )
+    Game.removeBomb game
+        |> Maybe.andThen (applyBomb playerCell)
 
 
 pushCrate : ( Int, Int ) -> Direction -> Dict ( Int, Int ) Cell -> Maybe (Dict ( Int, Int ) Cell)

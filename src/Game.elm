@@ -1,5 +1,6 @@
-module Game exposing (Cell, Game, attackPlayer, face, findFirstInDirection, fromCells, getPlayerPosition, insert, move, remove, slide, update)
+module Game exposing (Cell, Game, addBomb, addLife, attackPlayer, face, findFirstInDirection, fromCells, getPlayerPosition, insert, move, remove, removeBomb, removeLife, slide, update)
 
+import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import Entity
@@ -9,7 +10,6 @@ import Entity
         , Entity(..)
         )
 import Math
-import Player exposing (PlayerData)
 import Position
 
 
@@ -18,9 +18,10 @@ type alias Cell =
 
 
 type alias Game =
-    { player : PlayerData
-    , cells : Dict ( Int, Int ) Cell
+    { cells : Dict ( Int, Int ) Cell
     , nextId : Int
+    , bombs : Int
+    , lifes : Int
     }
 
 
@@ -144,7 +145,8 @@ fromCells cells =
             |> Dict.toList
             |> List.indexedMap (\i ( pos, entity ) -> ( pos, { id = i, entity = entity } ))
             |> Dict.fromList
-    , player = Player.init
+    , bombs = 0
+    , lifes = 1
     , nextId = Dict.size cells
     }
 
@@ -152,8 +154,8 @@ fromCells cells =
 attackPlayer : ( Int, Int ) -> Game -> Maybe Game
 attackPlayer position game =
     let
-        player =
-            game.player |> Player.removeLife
+        newGame =
+            game |> removeLife
     in
     game.cells
         |> Dict.get position
@@ -161,14 +163,13 @@ attackPlayer position game =
             (\cell ->
                 case cell.entity of
                     Player _ ->
-                        { game
-                            | player = player
-                            , cells =
-                                if player.lifes > 0 then
-                                    game.cells
+                        { newGame
+                            | cells =
+                                if newGame.lifes > 0 then
+                                    newGame.cells
 
                                 else
-                                    game.cells
+                                    newGame.cells
                                         |> Dict.insert position { cell | entity = Particle Bone }
                         }
                             |> Just
@@ -186,3 +187,32 @@ face :
 face position direction game =
     game
         |> update position (\_ -> Player direction)
+
+
+removeLife : Game -> Game
+removeLife game =
+    { game | lifes = game.lifes - 1 |> max 0 }
+
+
+addLife : Game -> Game
+addLife player =
+    { player | lifes = player.lifes + 1 |> min Config.maxLifes }
+
+
+removeBomb : Game -> Maybe Game
+removeBomb playerData =
+    if playerData.bombs > 0 then
+        Just { playerData | bombs = playerData.bombs - 1 }
+
+    else
+        Nothing
+
+
+addBomb : Game -> Game
+addBomb playerData =
+    { playerData
+        | bombs =
+            playerData.bombs
+                + 1
+                |> min Config.maxBombs
+    }
