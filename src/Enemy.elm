@@ -1,24 +1,24 @@
 module Enemy exposing (..)
 
 import Direction exposing (Direction(..))
-import Entity exposing (EffectType(..), EnemyType(..), Entity(..))
+import Entity exposing (EffectType(..), Enemy(..), Entity(..))
 import Game exposing (Game)
 import Math
 import Position
 
 
-update : ( Int, Int ) -> EnemyType -> Game -> { game : Game, kill : List ( Int, Int ) }
-update currentLocation enemyType game =
+update : ( Int, Int ) -> Enemy -> Game -> { game : Game, kill : List ( Int, Int ) }
+update pos enemyType game =
     case enemyType of
         PlacedBomb ->
-            placedBombeBehavoiur currentLocation game
+            placedBombeBehavoiur pos game
 
-        _ ->
+        Rat ->
             [ Up, Down, Left, Right ]
                 |> List.foldl
                     (\dir out ->
                         if out == Nothing then
-                            monsterMoveInDir currentLocation
+                            monsterMoveInDir pos
                                 dir
                                 game
 
@@ -27,6 +27,56 @@ update currentLocation enemyType game =
                     )
                     Nothing
                 |> Maybe.withDefault { game = game, kill = [] }
+
+        Goblin dir ->
+            updateGoblin pos dir game
+
+
+updateGoblin : ( Int, Int ) -> Direction -> Game -> { game : Game, kill : List ( Int, Int ) }
+updateGoblin pos direction game =
+    let
+        newPos =
+            direction
+                |> Direction.toVector
+                |> Position.addToVector pos
+
+        backPos =
+            direction
+                |> Direction.mirror
+                |> Direction.toVector
+                |> Position.addToVector pos
+
+        moveToPosOr p fun g =
+            if Math.posIsValid p then
+                case Game.get p g of
+                    Just Player ->
+                        { game = g, kill = [ p ] }
+
+                    Just _ ->
+                        fun ()
+
+                    Nothing ->
+                        Game.move { from = pos, to = p } g
+                            |> Maybe.map (\newGame -> { game = newGame, kill = [] })
+                            |> Maybe.withDefault { game = g, kill = [] }
+
+            else
+                fun ()
+    in
+    moveToPosOr newPos
+        (\() ->
+            moveToPosOr backPos
+                (\() ->
+                    { game = game, kill = [] }
+                )
+                (Game.update pos
+                    (\_ ->
+                        Enemy (Goblin (Direction.mirror direction))
+                    )
+                    game
+                )
+        )
+        game
 
 
 monsterMoveInDir : ( Int, Int ) -> Direction -> Game -> Maybe { game : Game, kill : List ( Int, Int ) }

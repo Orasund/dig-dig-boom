@@ -6,7 +6,7 @@ import Direction exposing (Direction(..))
 import Entity
     exposing
         ( EffectType(..)
-        , EnemyType(..)
+        , Enemy(..)
         , Entity(..)
         )
 import Math

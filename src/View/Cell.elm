@@ -2,7 +2,7 @@ module View.Cell exposing (..)
 
 import Config
 import Direction exposing (Direction(..))
-import Entity exposing (EffectType(..), EnemyType(..), Entity(..))
+import Entity exposing (EffectType(..), Enemy(..), Entity(..))
 import Html exposing (Attribute, Html)
 import Image
 
@@ -63,17 +63,14 @@ toHtml attrs args cell =
         |> sprite attrs
 
 
-fromEnemy : { frame : Int } -> EnemyType -> ( Int, Int )
+fromEnemy : { frame : Int } -> Enemy -> ( Int, Int )
 fromEnemy args enemy =
     case enemy of
         PlacedBomb ->
             ( 2 + args.frame, 1 )
 
-        Oger ->
-            ( 0 + args.frame, 0 )
-
-        Goblin ->
-            ( 3 + args.frame, 0 )
+        Goblin _ ->
+            ( 2 + args.frame, 0 )
 
         Rat ->
             ( 0 + args.frame, 1 )

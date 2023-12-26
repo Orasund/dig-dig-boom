@@ -6,7 +6,7 @@ import Dict
 import Direction exposing (Direction(..))
 import Entity
     exposing
-        ( EnemyType(..)
+        ( Enemy(..)
         , Entity(..)
         )
 import Game exposing (Game)

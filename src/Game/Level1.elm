@@ -2,7 +2,7 @@ module Game.Level1 exposing (..)
 
 import Dict
 import Direction exposing (Direction(..))
-import Entity exposing (EnemyType(..), Entity(..))
+import Entity exposing (Enemy(..), Entity(..))
 import Game.Level as Level exposing (Level)
 
 
@@ -33,6 +33,20 @@ level2 =
         |> Level.new validator
 
 
+level3 : Level
+level3 =
+    [ List.repeat 3 InactiveBomb
+    , List.repeat 5 Crate
+    , [ Player
+      , Heart
+      , Enemy (Goblin Left)
+      , Enemy (Goblin Right)
+      ]
+    ]
+        |> List.concat
+        |> Level.new validator
+
+
 validator =
     \dict ->
         dict
@@ -44,7 +58,7 @@ validator =
                             Level.count ((==) (Just InactiveBomb))
                                 (Level.neighbors4 pos dict)
                                 < 1
-                                && (Level.diagNeighbors pos dict
+                                && (Level.neighbors4 pos dict
                                         |> List.all
                                             (\c ->
                                                 case c of

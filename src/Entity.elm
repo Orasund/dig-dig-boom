@@ -1,14 +1,15 @@
 module Entity exposing
     ( EffectType(..)
-    , EnemyType(..)
+    , Enemy(..)
     , Entity(..)
     )
 
+import Direction exposing (Direction)
 
-type EnemyType
+
+type Enemy
     = PlacedBomb
-    | Oger
-    | Goblin
+    | Goblin Direction
     | Rat
 
 
@@ -20,8 +21,8 @@ type EffectType
 type Entity
     = Player
     | Crate
-    | Enemy EnemyType
-    | Stunned EnemyType
+    | Enemy Enemy
+    | Stunned Enemy
     | InactiveBomb
     | Heart
     | Particle EffectType

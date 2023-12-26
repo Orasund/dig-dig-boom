@@ -2,7 +2,7 @@ module View.Screen exposing (death, menu, world)
 
 import Config
 import Dict
-import Entity exposing (EnemyType(..), Entity(..))
+import Entity exposing (Enemy(..), Entity(..))
 import Game exposing (Game)
 import Html exposing (Html)
 import Html.Attributes

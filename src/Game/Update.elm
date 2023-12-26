@@ -3,7 +3,7 @@ module Game.Update exposing (movePlayerInDirectionAndUpdateGame, placeBombe)
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import Enemy
-import Entity exposing (EffectType(..), EnemyType(..), Entity(..))
+import Entity exposing (EffectType(..), Enemy(..), Entity(..))
 import Game exposing (Cell, Game)
 import Math
 import Position

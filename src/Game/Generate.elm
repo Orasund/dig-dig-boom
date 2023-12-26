@@ -3,7 +3,7 @@ module Game.Generate exposing (..)
 import Config
 import Dict
 import Direction exposing (Direction(..))
-import Entity exposing (EnemyType(..), Entity(..))
+import Entity exposing (Enemy(..), Entity(..))
 import Game exposing (Game)
 import Game.Level exposing (Level)
 import Game.Level1
@@ -26,7 +26,7 @@ new =
                     )
     in
     Random.uniform
-        Game.Level1.level2
+        Game.Level1.level3
         []
         |> Random.andThen rec
 
