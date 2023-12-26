@@ -22,19 +22,14 @@ new =
 
 level2 : Level
 level2 =
-    [ Enemy Rat
-    , Enemy Rat
-    , InactiveBomb
-    , InactiveBomb
-    , InactiveBomb
-    , Crate
-    , Crate
-    , Crate
-    , Crate
-    , Crate
-    , Player
-    , Heart
+    [ List.repeat 3 (Enemy Rat)
+    , List.repeat 3 InactiveBomb
+    , List.repeat 5 Crate
+    , [ Player
+      , Heart
+      ]
     ]
+        |> List.concat
         |> Level.new validator
 
 
@@ -49,6 +44,17 @@ validator =
                             Level.count ((==) (Just InactiveBomb))
                                 (Level.neighbors4 pos dict)
                                 < 1
+                                && (Level.diagNeighbors pos dict
+                                        |> List.all
+                                            (\c ->
+                                                case c of
+                                                    Just (Enemy _) ->
+                                                        False
+
+                                                    _ ->
+                                                        True
+                                            )
+                                   )
 
                         Player ->
                             (Level.count ((==) Nothing)

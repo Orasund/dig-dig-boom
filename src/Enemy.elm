@@ -1,6 +1,5 @@
 module Enemy exposing (..)
 
-import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (EffectType(..), EnemyType(..), Entity(..))
 import Game exposing (Game)
@@ -8,22 +7,11 @@ import Math
 import Position
 
 
-enemyBehaviour : ( Int, Int ) -> EnemyType -> Game -> Game
-enemyBehaviour currentLocation enemyType game =
+update : ( Int, Int ) -> EnemyType -> Game -> { game : Game, kill : List ( Int, Int ) }
+update currentLocation enemyType game =
     case enemyType of
         PlacedBomb ->
-            [ Up, Down, Left, Right ]
-                |> List.foldl
-                    (placedBombeBehavoiur currentLocation)
-                    game
-                |> (\g ->
-                        { g
-                            | cells =
-                                g.cells
-                                    |> Dict.update currentLocation
-                                        (Maybe.map (\cell -> { cell | entity = Particle Smoke }))
-                        }
-                   )
+            placedBombeBehavoiur currentLocation game
 
         _ ->
             [ Up, Down, Left, Right ]
@@ -38,59 +26,81 @@ enemyBehaviour currentLocation enemyType game =
                             out
                     )
                     Nothing
-                |> Maybe.withDefault game
+                |> Maybe.withDefault { game = game, kill = [] }
 
 
-monsterMoveInDir : ( Int, Int ) -> Direction -> Game -> Maybe Game
+monsterMoveInDir : ( Int, Int ) -> Direction -> Game -> Maybe { game : Game, kill : List ( Int, Int ) }
 monsterMoveInDir position direction game =
     case Game.findFirstInDirection position direction game of
         Just Player ->
+            case
+                game
+                    |> Game.move
+                        { from = position
+                        , to =
+                            Direction.toVector direction
+                                |> Position.addToVector position
+                        }
+            of
+                Just g ->
+                    { game = g, kill = [] } |> Just
+
+                Nothing ->
+                    { game = game
+                    , kill =
+                        [ Direction.toVector direction
+                            |> Position.addToVector position
+                        ]
+                    }
+                        |> Just
+
+        Just (Enemy PlacedBomb) ->
             game
                 |> Game.move
                     { from = position
                     , to =
-                        Direction.toVector direction
+                        direction
+                            |> Direction.mirror
+                            |> Direction.toVector
                             |> Position.addToVector position
                     }
+                |> Maybe.map
+                    (\g ->
+                        { game = g
+                        , kill = []
+                        }
+                    )
 
         _ ->
             Nothing
 
 
-placedBombeBehavoiur : ( Int, Int ) -> Direction -> Game -> Game
-placedBombeBehavoiur location direction game =
-    let
-        newLocation =
-            direction
-                |> Direction.toVector
-                |> Position.addToVector location
-    in
-    if Math.posIsValid newLocation then
-        case
-            game.cells
-                |> Dict.get
-                    newLocation
-        of
-            Just elem ->
-                case elem.entity of
-                    Enemy _ ->
-                        game.cells
-                            |> Dict.insert newLocation { elem | entity = Particle Bone }
-                            |> (\cells -> { game | cells = cells })
+placedBombeBehavoiur : ( Int, Int ) -> Game -> { game : Game, kill : List ( Int, Int ) }
+placedBombeBehavoiur location game =
+    [ Up, Down, Left, Right ]
+        |> List.foldl
+            (\direction output ->
+                let
+                    newLocation =
+                        direction
+                            |> Direction.toVector
+                            |> Position.addToVector location
+                in
+                if Math.posIsValid newLocation then
+                    if Game.get newLocation output.game == Nothing then
+                        { output
+                            | game =
+                                output.game
+                                    |> Game.insert newLocation (Particle Smoke)
+                        }
 
-                    Crate ->
-                        game.cells
-                            |> Dict.insert newLocation { elem | entity = Particle Smoke }
-                            |> (\cells -> { game | cells = cells })
+                    else
+                        { output | kill = newLocation :: output.kill }
 
-                    _ ->
-                        game
-
-            Nothing ->
-                game |> Game.insert newLocation (Particle Smoke)
-
-    else
-        game
+                else
+                    output
+            )
+            { game = game, kill = [ location ] }
 
 
 tryAttacking : ( Int, Int ) -> Game -> Maybe Game

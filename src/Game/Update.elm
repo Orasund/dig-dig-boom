@@ -3,7 +3,7 @@ module Game.Update exposing (movePlayerInDirectionAndUpdateGame, placeBombe)
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import Enemy
-import Entity exposing (EnemyType(..), Entity(..))
+import Entity exposing (EffectType(..), EnemyType(..), Entity(..))
 import Game exposing (Cell, Game)
 import Math
 import Position
@@ -23,9 +23,11 @@ updateCell ( position, cell ) game =
     case cell.entity of
         Enemy enemy ->
             game
-                |> Enemy.tryAttacking position
-                |> Maybe.withDefault game
-                |> Enemy.enemyBehaviour position enemy
+                |> Enemy.update position enemy
+                |> (\out ->
+                        out.kill
+                            |> List.foldl kill out.game
+                   )
 
         Particle _ ->
             game |> Game.remove position
@@ -171,3 +173,38 @@ pushCrate pos dir cells =
                 else
                     Nothing
             )
+
+
+kill : ( Int, Int ) -> Game -> Game
+kill pos game =
+    game.cells
+        |> Dict.get pos
+        |> Maybe.map
+            (\cell ->
+                case cell.entity of
+                    Player ->
+                        Game.attackPlayer pos game
+                            |> Maybe.withDefault game
+
+                    Crate ->
+                        { game
+                            | cells =
+                                game.cells |> Dict.insert pos { cell | entity = Particle Bone }
+                        }
+
+                    Enemy PlacedBomb ->
+                        { game
+                            | cells =
+                                game.cells |> Dict.insert pos { cell | entity = Particle Smoke }
+                        }
+
+                    Enemy _ ->
+                        { game
+                            | cells =
+                                game.cells |> Dict.insert pos { cell | entity = Particle Bone }
+                        }
+
+                    _ ->
+                        game
+            )
+        |> Maybe.withDefault game
