@@ -26,6 +26,20 @@ type alias Game =
     }
 
 
+fromCells : Dict ( Int, Int ) Entity -> Game
+fromCells cells =
+    { cells =
+        cells
+            |> Dict.toList
+            |> List.indexedMap (\i ( pos, entity ) -> ( pos, { id = i, entity = entity } ))
+            |> Dict.fromList
+    , bombs = 0
+    , lifes = 1
+    , nextId = Dict.size cells
+    , playerDirection = Down
+    }
+
+
 get : ( Int, Int ) -> Game -> Maybe Entity
 get pos game =
     game.cells |> Dict.get pos |> Maybe.map .entity
@@ -132,20 +146,6 @@ slide position direction game =
 
         Nothing ->
             game
-
-
-fromCells : Dict ( Int, Int ) Entity -> Game
-fromCells cells =
-    { cells =
-        cells
-            |> Dict.toList
-            |> List.indexedMap (\i ( pos, entity ) -> ( pos, { id = i, entity = entity } ))
-            |> Dict.fromList
-    , bombs = 0
-    , lifes = 1
-    , nextId = Dict.size cells
-    , playerDirection = Down
-    }
 
 
 attackPlayer : ( Int, Int ) -> Game -> Maybe Game

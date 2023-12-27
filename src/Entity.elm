@@ -2,6 +2,7 @@ module Entity exposing
     ( EffectType(..)
     , Enemy(..)
     , Entity(..)
+    , Item(..)
     )
 
 import Direction exposing (Direction)
@@ -18,11 +19,15 @@ type EffectType
     | Bone
 
 
+type Item
+    = Heart
+    | InactiveBomb
+
+
 type Entity
     = Player
     | Crate
     | Enemy Enemy
     | Stunned Enemy
-    | InactiveBomb
-    | Heart
+    | Item Item
     | Particle EffectType

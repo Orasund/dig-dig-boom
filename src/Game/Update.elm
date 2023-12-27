@@ -3,7 +3,7 @@ module Game.Update exposing (movePlayerInDirectionAndUpdateGame, placeBombe)
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import Enemy
-import Entity exposing (EffectType(..), Enemy(..), Entity(..))
+import Entity exposing (EffectType(..), Enemy(..), Entity(..), Item(..))
 import Game exposing (Cell, Game)
 import Math
 import Position
@@ -58,7 +58,7 @@ movePlayer position game =
     in
     if Math.posIsValid newLocation then
         case game.cells |> Dict.get newLocation |> Maybe.map .entity of
-            Just InactiveBomb ->
+            Just (Item InactiveBomb) ->
                 game
                     |> Game.addBomb
                     |> Game.remove newLocation
@@ -68,7 +68,7 @@ movePlayer position game =
                         }
                     |> Maybe.withDefault game
 
-            Just Heart ->
+            Just (Item Heart) ->
                 game
                     |> Game.addLife
                     |> Game.remove newLocation

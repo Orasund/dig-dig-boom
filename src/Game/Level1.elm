@@ -2,20 +2,20 @@ module Game.Level1 exposing (..)
 
 import Dict
 import Direction exposing (Direction(..))
-import Entity exposing (Enemy(..), Entity(..))
+import Entity exposing (Enemy(..), Entity(..), Item(..))
 import Game.Level as Level exposing (Level)
 
 
 new : Level
 new =
     [ Enemy Rat
-    , InactiveBomb
-    , InactiveBomb
+    , Item InactiveBomb
+    , Item InactiveBomb
     , Crate
     , Crate
     , Crate
     , Player
-    , Heart
+    , Item Heart
     ]
         |> Level.new validator
 
@@ -23,10 +23,10 @@ new =
 level2 : Level
 level2 =
     [ List.repeat 3 (Enemy Rat)
-    , List.repeat 3 InactiveBomb
+    , List.repeat 3 (Item InactiveBomb)
     , List.repeat 5 Crate
     , [ Player
-      , Heart
+      , Item Heart
       ]
     ]
         |> List.concat
@@ -35,10 +35,10 @@ level2 =
 
 level3 : Level
 level3 =
-    [ List.repeat 3 InactiveBomb
+    [ List.repeat 3 (Item InactiveBomb)
     , List.repeat 5 Crate
     , [ Player
-      , Heart
+      , Item Heart
       , Enemy (Goblin Left)
       , Enemy (Goblin Right)
       , Enemy (Goblin Down)
@@ -56,7 +56,7 @@ validator =
                 (\( pos, cell ) ->
                     case cell.entity of
                         Enemy _ ->
-                            Level.count ((==) (Just InactiveBomb))
+                            Level.count ((==) (Just (Item InactiveBomb)))
                                 (Level.neighbors4 pos dict)
                                 < 1
                                 && (Level.neighbors4 pos dict

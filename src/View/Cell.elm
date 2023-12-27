@@ -2,7 +2,7 @@ module View.Cell exposing (..)
 
 import Config
 import Direction exposing (Direction(..))
-import Entity exposing (EffectType(..), Enemy(..), Entity(..))
+import Entity exposing (EffectType(..), Enemy(..), Entity(..), Item(..))
 import Html exposing (Attribute, Html)
 import Image
 
@@ -32,10 +32,10 @@ toHtml attrs args cell =
         Crate ->
             ( 1, 3 )
 
-        InactiveBomb ->
+        Item InactiveBomb ->
             ( 0, 2 )
 
-        Heart ->
+        Item Heart ->
             ( 0, 3 )
 
         Enemy enemy ->

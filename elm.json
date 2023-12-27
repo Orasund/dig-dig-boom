@@ -9,7 +9,7 @@
     "elm-version": "0.19.1",
     "dependencies": {
         "direct": {
-            "Orasund/elm-layout": "2.0.0",
+            "Orasund/elm-layout": "2.1.0",
             "avh4/elm-color": "1.0.0",
             "dillonkearns/elm-ts-json": "2.1.1",
             "elm/browser": "1.0.2",

@@ -39,17 +39,26 @@ toHtml args =
                 }
             )
             ( 0, 0 )
-        , [ sprite [] ( 1, 0 )
-          , if args.bombs > 0 then
-                View.Bomb.toHtml
+        , (if args.bombs > 0 then
+            [ sprite [] ( 1, 0 )
+            , View.Bomb.toHtml
+                [ Html.Attributes.style "position" "absolute"
+                , Html.Attributes.style "top" "8px"
+                , Html.Attributes.style "left" "8px"
+                ]
+            , String.fromInt args.bombs
+                |> Layout.text
                     [ Html.Attributes.style "position" "absolute"
-                    , Html.Attributes.style "top" "8px"
-                    , Html.Attributes.style "left" "8px"
+                    , Html.Attributes.style "right" "8px"
+                    , Html.Attributes.style "bottom" "4px"
+                    , Html.Attributes.style "color" "white"
+                    , Html.Attributes.style "font-size" "20px"
                     ]
+            ]
 
-            else
-                Html.text ""
-          ]
+           else
+            [ sprite [] ( 1, 0 ) ]
+          )
             |> Html.div
                 (Html.Attributes.style "position" "relative"
                     :: Layout.asButton

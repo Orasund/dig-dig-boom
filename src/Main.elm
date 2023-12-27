@@ -9,8 +9,10 @@ import Game exposing (Game)
 import Game.Generate
 import Game.Update
 import Html exposing (Html)
+import Html.Style
 import Input exposing (Input(..))
 import Json.Decode as Decode
+import Layout
 import Random exposing (Seed)
 import Time
 import View.Screen as Screen
@@ -87,7 +89,7 @@ nextLevel model =
     { model
         | levelSeed = model.seed
         , seed = seed
-        , game = game
+        , game = { game | bombs = model.game.bombs, lifes = model.game.lifes }
         , overlay = Nothing
     }
 
@@ -104,7 +106,10 @@ gameWon model =
 
 gameLost : ModelContent -> ( Model, Cmd Msg )
 gameLost model =
-    ( { model | seed = model.levelSeed }
+    ( { model
+        | seed = model.levelSeed
+        , game = model.game |> (\game -> { game | lifes = 1, bombs = 0 })
+      }
         |> nextLevel
     , Cmd.none
     )
@@ -262,32 +267,39 @@ subscriptions _ =
 -------------------------------
 
 
-viewGame : Model -> Html Msg
-viewGame model =
-    if model.game.lifes > 0 then
-        Screen.world
+view : Model -> Html Msg
+view model =
+    [ View.Stylesheet.toHtml
+    , [ Screen.world
             { score = model.score
             , onInput = Input
             , frame = model.frame
             }
             model.game
+      , case model.overlay of
+            Nothing ->
+                if model.game.lifes > 0 then
+                    Layout.none
 
-    else
-        Screen.death { onClick = Input InputA }
+                else
+                    Screen.death
+                        [ Html.Style.positionAbsolute
+                        , Html.Style.top "0"
+                        ]
+                        { onClick = Input InputA }
 
-
-view : Model -> Html Msg
-view model =
-    [ View.Stylesheet.toHtml
-    , case model.overlay of
-        Nothing ->
-            viewGame model
-
-        Just Menu ->
-            Screen.menu
-                { frame = model.frame
-                , onClick = Input InputA
-                }
+            Just Menu ->
+                Screen.menu
+                    [ Html.Style.positionAbsolute
+                    , Html.Style.top "0"
+                    ]
+                    { frame = model.frame
+                    , onClick = Input InputA
+                    }
+      ]
+        |> Html.div
+            [ Html.Style.positionRelative
+            ]
     ]
         |> Html.div []
 

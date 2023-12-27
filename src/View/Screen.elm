@@ -4,13 +4,12 @@ import Config
 import Dict
 import Entity exposing (Enemy(..), Entity(..))
 import Game exposing (Game)
-import Html exposing (Html)
+import Html exposing (Attribute, Html)
 import Html.Attributes
 import Html.Keyed
 import Image
 import Input exposing (Input)
 import Layout
-import View.Bomb
 import View.Cell
 import View.Controls
 
@@ -36,8 +35,8 @@ skull =
         }
 
 
-death : { onClick : msg } -> Html msg
-death args =
+death : List (Attribute msg) -> { onClick : msg } -> Html msg
+death attrs args =
     [ [ "You have" |> Layout.text [ Layout.contentCentered ]
       , "died" |> Layout.text [ Layout.contentCentered ]
       ]
@@ -56,11 +55,12 @@ death args =
                     { label = "Next Level"
                     , onPress = Just args.onClick
                     }
+                ++ attrs
             )
 
 
-menu : { frame : Int, onClick : msg } -> Html msg
-menu args =
+menu : List (Attribute msg) -> { frame : Int, onClick : msg } -> Html msg
+menu attrs args =
     [ [ "DIG" |> Layout.text [ Layout.contentCentered ]
       , "DIG" |> Layout.text [ Layout.contentCentered ]
       , "BOOM" |> Layout.text [ Layout.contentCentered ]
@@ -76,6 +76,7 @@ menu args =
                 { label = "Next Level"
                 , onPress = Just args.onClick
                 }
+                ++ attrs
             )
 
 
