@@ -77,7 +77,12 @@ movePlayer position game =
 
             Just (Enemy enemy) ->
                 game
-                    |> Game.update newLocation (\_ -> Stunned enemy)
+                    |> Game.update newLocation
+                        (\_ ->
+                            enemy
+                                |> Enemy.stun game.playerDirection
+                                |> Stunned
+                        )
                     |> Game.slide newLocation game.playerDirection
 
             Just (Particle _) ->

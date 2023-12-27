@@ -5,6 +5,7 @@ import Html.Attributes
 import Image
 import Input exposing (Input(..))
 import Layout
+import View.Bomb
 
 
 sprite : List (Attribute msg) -> ( Int, Int ) -> Html msg
@@ -20,7 +21,7 @@ sprite attrs pos =
         }
 
 
-toHtml : { onInput : Input -> msg } -> Html msg
+toHtml : { onInput : Input -> msg, bombs : Int } -> Html msg
 toHtml args =
     [ sprite
         (Html.Attributes.style "transform" "rotate(90deg)"
@@ -38,13 +39,24 @@ toHtml args =
                 }
             )
             ( 0, 0 )
-        , sprite
-            (Layout.asButton
-                { onPress = args.onInput InputA |> Just
-                , label = "Place Bombe"
-                }
-            )
-            ( 1, 0 )
+        , [ sprite [] ( 1, 0 )
+          , if args.bombs > 0 then
+                View.Bomb.toHtml
+                    [ Html.Attributes.style "position" "absolute"
+                    , Html.Attributes.style "top" "8px"
+                    , Html.Attributes.style "left" "8px"
+                    ]
+
+            else
+                Html.text ""
+          ]
+            |> Html.div
+                (Html.Attributes.style "position" "relative"
+                    :: Layout.asButton
+                        { onPress = args.onInput InputA |> Just
+                        , label = "Place Bombe"
+                        }
+                )
         , sprite
             (Html.Attributes.style "transform" "rotate(180deg)"
                 :: Layout.asButton

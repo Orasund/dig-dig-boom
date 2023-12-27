@@ -182,3 +182,13 @@ tryAttacking position game =
                     game
             )
         |> List.head
+
+
+stun : Direction -> Enemy -> Enemy
+stun direction enemy =
+    case enemy of
+        Goblin _ ->
+            Goblin (Direction.mirror direction)
+
+        _ ->
+            enemy

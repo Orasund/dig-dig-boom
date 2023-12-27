@@ -8,7 +8,7 @@ mapSize =
 
 maxBombs : Int
 maxBombs =
-    3
+    1
 
 
 maxLifes : Int

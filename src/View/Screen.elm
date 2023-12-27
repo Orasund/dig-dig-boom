@@ -128,10 +128,7 @@ world args game =
                     ++ "px"
                 )
             ]
-    , [ View.Bomb.toHtml
-            |> List.repeat game.bombs
-            |> Layout.row []
-      , Image.image [ Image.pixelated ]
+    , [ Image.image [ Image.pixelated ]
             { url = "heart.png"
             , width = 64
             , height = 64
@@ -141,7 +138,9 @@ world args game =
       ]
         |> Layout.row [ Layout.contentWithSpaceBetween ]
     , View.Controls.toHtml
-        { onInput = args.onInput }
+        { onInput = args.onInput
+        , bombs = game.bombs
+        }
     ]
         |> Layout.column
             (Html.Attributes.style "width" "400px"

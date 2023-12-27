@@ -41,6 +41,7 @@ level3 =
       , Heart
       , Enemy (Goblin Left)
       , Enemy (Goblin Right)
+      , Enemy (Goblin Down)
       ]
     ]
         |> List.concat
