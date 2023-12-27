@@ -9,16 +9,30 @@ import Position
 
 update : ( Int, Int ) -> Enemy -> Game -> { game : Game, kill : List ( Int, Int ) }
 update pos enemyType game =
-    case enemyType of
+    let
+        neighboringPlayer =
+            Direction.asList
+                |> List.map
+                    (\dir ->
+                        dir
+                            |> Direction.toVector
+                            |> Position.addToVector pos
+                    )
+                |> List.filter
+                    (\newPos ->
+                        Game.get newPos game == Just Player
+                    )
+    in
+    (case enemyType of
         PlacedBomb ->
-            placedBombeBehavoiur pos game
+            updatePlacedBombe pos game
 
         Rat ->
             [ Up, Down, Left, Right ]
                 |> List.foldl
                     (\dir out ->
                         if out == Nothing then
-                            monsterMoveInDir pos
+                            tryMovingRat pos
                                 dir
                                 game
 
@@ -30,6 +44,8 @@ update pos enemyType game =
 
         Goblin dir ->
             updateGoblin pos dir game
+    )
+        |> (\out -> { out | kill = neighboringPlayer ++ out.kill })
 
 
 updateGoblin : ( Int, Int ) -> Direction -> Game -> { game : Game, kill : List ( Int, Int ) }
@@ -79,8 +95,8 @@ updateGoblin pos direction game =
         game
 
 
-monsterMoveInDir : ( Int, Int ) -> Direction -> Game -> Maybe { game : Game, kill : List ( Int, Int ) }
-monsterMoveInDir position direction game =
+tryMovingRat : ( Int, Int ) -> Direction -> Game -> Maybe { game : Game, kill : List ( Int, Int ) }
+tryMovingRat position direction game =
     case Game.findFirstInDirection position direction game of
         Just Player ->
             case
@@ -125,8 +141,8 @@ monsterMoveInDir position direction game =
             Nothing
 
 
-placedBombeBehavoiur : ( Int, Int ) -> Game -> { game : Game, kill : List ( Int, Int ) }
-placedBombeBehavoiur location game =
+updatePlacedBombe : ( Int, Int ) -> Game -> { game : Game, kill : List ( Int, Int ) }
+updatePlacedBombe location game =
     [ Up, Down, Left, Right ]
         |> List.foldl
             (\direction output ->

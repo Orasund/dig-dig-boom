@@ -4,11 +4,7 @@ import Browser
 import Browser.Events
 import Dict
 import Direction exposing (Direction(..))
-import Entity
-    exposing
-        ( Enemy(..)
-        , Entity(..)
-        )
+import Entity exposing (Enemy(..), Entity(..))
 import Game exposing (Game)
 import Game.Generate
 import Game.Update

@@ -13,7 +13,7 @@ sprite attrs pos =
         (Image.pixelated :: attrs)
         { pos = pos
         , sheetColumns = 4
-        , sheetRows = 6
+        , sheetRows = 8
         , url = "tileset.png"
         , height = Config.cellSize
         , width = Config.cellSize
@@ -24,18 +24,10 @@ toHtml : List (Attribute msg) -> { frame : Int, playerDirection : Direction } ->
 toHtml attrs args cell =
     (case cell of
         Player ->
-            case args.playerDirection of
-                Down ->
-                    ( 0 + args.frame, 4 )
-
-                Up ->
-                    ( 0 + args.frame, 5 )
-
-                Left ->
-                    ( 2 + args.frame, 4 )
-
-                Right ->
-                    ( 2 + args.frame, 5 )
+            directional ( 0, 4 )
+                { direction = args.playerDirection
+                , frame = args.frame
+                }
 
         Crate ->
             ( 1, 3 )
@@ -63,14 +55,33 @@ toHtml attrs args cell =
         |> sprite attrs
 
 
+directional : ( Int, Int ) -> { direction : Direction, frame : Int } -> ( Int, Int )
+directional ( x, y ) args =
+    case args.direction of
+        Down ->
+            ( x + args.frame, y )
+
+        Up ->
+            ( x + args.frame, y + 1 )
+
+        Left ->
+            ( x + 2 + args.frame, y )
+
+        Right ->
+            ( x + 2 + args.frame, y + 1 )
+
+
 fromEnemy : { frame : Int } -> Enemy -> ( Int, Int )
 fromEnemy args enemy =
     case enemy of
         PlacedBomb ->
             ( 2 + args.frame, 1 )
 
-        Goblin _ ->
-            ( 2 + args.frame, 0 )
+        Goblin dir ->
+            directional ( 0, 6 )
+                { direction = dir
+                , frame = args.frame
+                }
 
         Rat ->
             ( 0 + args.frame, 1 )
