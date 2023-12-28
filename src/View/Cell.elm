@@ -43,10 +43,18 @@ toHtml attrs args cell =
             ( 1, 3 )
 
         Enemy enemy ->
-            fromEnemy { frame = args.frame } enemy
+            fromEnemy
+                { frame = args.frame
+                , playerDirection = args.playerDirection
+                }
+                enemy
 
         Stunned enemy ->
-            fromEnemy { frame = args.frame } enemy
+            fromEnemy
+                { frame = args.frame
+                , playerDirection = args.playerDirection
+                }
+                enemy
 
         Particle effect ->
             case effect of
@@ -75,7 +83,7 @@ directional ( x, y ) args =
             ( x + 2 + args.frame, y + 1 )
 
 
-fromEnemy : { frame : Int } -> Enemy -> ( Int, Int )
+fromEnemy : { frame : Int, playerDirection : Direction } -> Enemy -> ( Int, Int )
 fromEnemy args enemy =
     case enemy of
         PlacedBomb ->
@@ -89,3 +97,9 @@ fromEnemy args enemy =
 
         Rat ->
             ( 0 + args.frame, 1 )
+
+        Golem ->
+            directional ( 0, 8 )
+                { direction = Direction.mirror args.playerDirection
+                , frame = args.frame
+                }

@@ -1,6 +1,6 @@
 module Game.Update exposing (movePlayerInDirectionAndUpdateGame, placeBombe)
 
-import Dict exposing (Dict)
+import Dict
 import Direction exposing (Direction(..))
 import Enemy
 import Entity exposing (EffectType(..), Enemy(..), Entity(..), Item(..))
@@ -24,7 +24,10 @@ updateCell ( position, cell ) game =
     case cell.entity of
         Enemy enemy ->
             game
-                |> Enemy.update position enemy
+                |> Enemy.update
+                    { pos = position
+                    , enemy = enemy
+                    }
                 |> (\out ->
                         out.kill
                             |> List.foldl kill out.game

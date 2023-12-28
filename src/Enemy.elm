@@ -8,8 +8,13 @@ import Position
 import Set
 
 
-update : ( Int, Int ) -> Enemy -> Game -> { game : Game, kill : List ( Int, Int ) }
-update pos enemyType game =
+update :
+    { pos : ( Int, Int )
+    , enemy : Enemy
+    }
+    -> Game
+    -> { game : Game, kill : List ( Int, Int ) }
+update args game =
     let
         neighboringPlayer =
             Direction.asList
@@ -17,23 +22,23 @@ update pos enemyType game =
                     (\dir ->
                         dir
                             |> Direction.toVector
-                            |> Position.addToVector pos
+                            |> Position.addToVector args.pos
                     )
                 |> List.filter
                     (\newPos ->
                         Game.get newPos game == Just Player
                     )
     in
-    (case enemyType of
+    (case args.enemy of
         PlacedBomb ->
-            updatePlacedBombe pos game
+            updatePlacedBombe args.pos game
 
         Rat ->
             [ Up, Down, Left, Right ]
                 |> List.foldl
                     (\dir out ->
                         if out == Nothing then
-                            tryMovingRat pos
+                            tryMovingRat args.pos
                                 dir
                                 game
 
@@ -44,9 +49,38 @@ update pos enemyType game =
                 |> Maybe.withDefault { game = game, kill = [] }
 
         Goblin dir ->
-            updateGoblin pos dir game
+            updateGoblin args.pos dir game
+
+        Golem ->
+            updateGolem args.pos game
     )
         |> (\out -> { out | kill = neighboringPlayer ++ out.kill })
+
+
+updateGolem : ( Int, Int ) -> Game -> { game : Game, kill : List ( Int, Int ) }
+updateGolem pos game =
+    let
+        newPos =
+            game.playerDirection
+                |> Direction.mirror
+                |> Direction.toVector
+                |> Position.addToVector pos
+    in
+    case game |> Game.get newPos of
+        Just Player ->
+            { game = game, kill = [ newPos ] }
+
+        Nothing ->
+            game
+                |> tryMoving
+                    { from = pos
+                    , to = newPos
+                    }
+                |> Maybe.map (\g -> { game = g, kill = [] })
+                |> Maybe.withDefault { game = game, kill = [] }
+
+        _ ->
+            { game = game, kill = [] }
 
 
 updateGoblin : ( Int, Int ) -> Direction -> Game -> { game : Game, kill : List ( Int, Int ) }

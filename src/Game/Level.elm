@@ -48,7 +48,7 @@ toGame level =
 generate : Generator Game
 generate =
     Random.uniform
-        level3
+        golemLevel
         []
         |> Random.andThen toGame
 
@@ -67,8 +67,8 @@ ratLevel =
         |> new validator
 
 
-level3 : Level
-level3 =
+goblinLevel : Level
+goblinLevel =
     [ List.repeat 5 (EntityBlock Crate)
     , [ Player |> EntityBlock
       , Enemy (Goblin Left) |> EntityBlock
@@ -78,6 +78,20 @@ level3 =
       , HoleBlock
       ]
     , List.repeat 3 (ItemBlock InactiveBomb)
+    ]
+        |> List.concat
+        |> new validator
+
+
+golemLevel : Level
+golemLevel =
+    [ List.repeat 3 (EntityBlock (Enemy Golem))
+    , List.repeat 3 (ItemBlock InactiveBomb)
+    , List.repeat 2 HoleBlock
+    , List.repeat 5 (EntityBlock Crate)
+    , [ ItemBlock Heart
+      , Player |> EntityBlock
+      ]
     ]
         |> List.concat
         |> new validator

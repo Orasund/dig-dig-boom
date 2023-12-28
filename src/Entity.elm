@@ -12,6 +12,7 @@ type Enemy
     = PlacedBomb
     | Goblin Direction
     | Rat
+    | Golem
 
 
 type EffectType
