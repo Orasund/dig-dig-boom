@@ -26,8 +26,8 @@ new validate blocks =
 toGame : Level -> Generator Game
 toGame level =
     Position.asGrid
-        { columns = Config.mapSize - 1
-        , rows = Config.mapSize - 1
+        { columns = Config.mapSize
+        , rows = Config.mapSize
         }
         |> shuffle
         |> Random.map
@@ -49,15 +49,18 @@ generate : Generator Game
 generate =
     Random.uniform
         golemLevel
-        []
+        [ ratLevel
+        , goblinLevel
+        , finalLevel
+        ]
         |> Random.andThen toGame
 
 
 ratLevel : Level
 ratLevel =
-    [ List.repeat 3 (EntityBlock (Enemy Rat))
-    , List.repeat 5 (EntityBlock Crate)
-    , List.repeat 3 (ItemBlock InactiveBomb)
+    [ List.repeat 4 (EntityBlock (Enemy Rat))
+    , List.repeat 6 (EntityBlock Crate)
+    , List.repeat 4 (ItemBlock InactiveBomb)
     , [ EntityBlock Player
       , ItemBlock Heart
       , HoleBlock
@@ -69,15 +72,16 @@ ratLevel =
 
 goblinLevel : Level
 goblinLevel =
-    [ List.repeat 5 (EntityBlock Crate)
+    [ List.repeat 6 (EntityBlock Crate)
     , [ Player |> EntityBlock
       , Enemy (Goblin Left) |> EntityBlock
       , Enemy (Goblin Right) |> EntityBlock
       , Enemy (Goblin Down) |> EntityBlock
+      , Enemy (Goblin Up) |> EntityBlock
       , ItemBlock Heart
       , HoleBlock
       ]
-    , List.repeat 3 (ItemBlock InactiveBomb)
+    , List.repeat 4 (ItemBlock InactiveBomb)
     ]
         |> List.concat
         |> new validator
@@ -88,9 +92,25 @@ golemLevel =
     [ List.repeat 3 (EntityBlock (Enemy Golem))
     , List.repeat 3 (ItemBlock InactiveBomb)
     , List.repeat 2 HoleBlock
+    , List.repeat 6 (EntityBlock Crate)
+    , [ ItemBlock Heart
+      , Player |> EntityBlock
+      ]
+    ]
+        |> List.concat
+        |> new validator
+
+
+finalLevel : Level
+finalLevel =
+    [ List.repeat 3 (ItemBlock InactiveBomb)
+    , List.repeat 2 HoleBlock
     , List.repeat 5 (EntityBlock Crate)
     , [ ItemBlock Heart
       , Player |> EntityBlock
+      , EntityBlock (Enemy Rat)
+      , Enemy (Goblin Left) |> EntityBlock
+      , EntityBlock (Enemy Golem)
       ]
     ]
         |> List.concat

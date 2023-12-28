@@ -167,7 +167,7 @@ update msg model =
                                 case input of
                                     InputA ->
                                         ( model.game
-                                            |> Game.Update.placeBombe playerPosition
+                                            |> Game.Update.placeBombeAndUpdateGame playerPosition
                                             |> Maybe.withDefault model.game
                                             |> setGame model
                                         , Cmd.none

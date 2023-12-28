@@ -1,4 +1,4 @@
-module Game.Update exposing (movePlayerInDirectionAndUpdateGame, placeBombe)
+module Game.Update exposing (movePlayerInDirectionAndUpdateGame, placeBombeAndUpdateGame)
 
 import Dict
 import Direction exposing (Direction(..))
@@ -130,7 +130,7 @@ applyBomb position game =
                 |> Position.addToVector position
 
         cell =
-            Enemy PlacedBomb
+            Stunned PlacedBomb
 
         map =
             game.cells
@@ -154,10 +154,11 @@ applyBomb position game =
         Nothing
 
 
-placeBombe : ( Int, Int ) -> Game -> Maybe Game
-placeBombe playerCell game =
+placeBombeAndUpdateGame : ( Int, Int ) -> Game -> Maybe Game
+placeBombeAndUpdateGame playerCell game =
     Game.removeBomb game
         |> Maybe.andThen (applyBomb playerCell)
+        |> Maybe.map updateGame
 
 
 pushCrate : ( Int, Int ) -> Direction -> Game -> Maybe Game
