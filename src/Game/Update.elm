@@ -58,23 +58,6 @@ movePlayer position game =
     in
     if Math.posIsValid newLocation then
         case game.cells |> Dict.get newLocation |> Maybe.map .entity of
-            Just (Item InactiveBomb) ->
-                game
-                    |> Game.addBomb
-                    |> Game.remove newLocation
-                    |> Game.move
-                        { from = position
-                        , to = newLocation
-                        }
-                    |> Maybe.withDefault game
-
-            Just (Item Heart) ->
-                game
-                    |> Game.addLife
-                    |> Game.remove newLocation
-                    |> Game.move { from = position, to = newLocation }
-                    |> Maybe.withDefault game
-
             Just (Enemy enemy) ->
                 game
                     |> Game.update newLocation
@@ -105,6 +88,7 @@ movePlayer position game =
             Nothing ->
                 game
                     |> Game.move { from = position, to = newLocation }
+                    |> Maybe.map (takeItem newLocation)
                     |> Maybe.withDefault game
 
             _ ->
@@ -112,6 +96,25 @@ movePlayer position game =
 
     else
         game
+
+
+takeItem : ( Int, Int ) -> Game -> Game
+takeItem pos game =
+    game.items
+        |> Dict.get pos
+        |> Maybe.map (\item -> addItem item game)
+        |> Maybe.map (\g -> { g | items = g.items |> Dict.remove pos })
+        |> Maybe.withDefault game
+
+
+addItem : Item -> Game -> Game
+addItem item =
+    case item of
+        InactiveBomb ->
+            Game.addBomb
+
+        Heart ->
+            Game.addLife
 
 
 applyBomb : ( Int, Int ) -> Game -> Maybe Game

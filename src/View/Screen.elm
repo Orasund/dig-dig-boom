@@ -7,11 +7,13 @@ import Game exposing (Game)
 import Html exposing (Attribute, Html)
 import Html.Attributes
 import Html.Keyed
+import Html.Style
 import Image
 import Input exposing (Input)
 import Layout
 import View.Cell
 import View.Controls
+import View.Item
 
 
 logo : Int -> Html msg
@@ -96,25 +98,42 @@ world args game =
             [ Layout.contentWithSpaceBetween
             , Html.Attributes.style "color" "white"
             ]
-    , game.cells
+    , (game.items
         |> Dict.toList
         |> List.map
-            (\( ( x, y ), cell ) ->
-                ( String.fromInt cell.id
-                , View.Cell.toHtml
-                    [ Html.Attributes.style "position" "absolute"
+            (\( ( x, y ), item ) ->
+                ( "0_" ++ String.fromInt x ++ "_" ++ String.fromInt y
+                , View.Item.toHtml
+                    [ Html.Style.positionAbsolute
                     , Html.Attributes.style "left"
                         (String.fromFloat (Config.cellSize * toFloat x) ++ "px")
                     , Html.Attributes.style "top"
                         (String.fromFloat (Config.cellSize * toFloat y) ++ "px")
-                    , Html.Attributes.style "transition" "left 0.2s,top 0.2s"
                     ]
-                    { frame = args.frame
-                    , playerDirection = game.playerDirection
-                    }
-                    cell.entity
+                    item
                 )
             )
+      )
+        ++ (game.cells
+                |> Dict.toList
+                |> List.map
+                    (\( ( x, y ), cell ) ->
+                        ( "1_" ++ String.fromInt cell.id
+                        , View.Cell.toHtml
+                            [ Html.Attributes.style "position" "absolute"
+                            , Html.Attributes.style "left"
+                                (String.fromFloat (Config.cellSize * toFloat x) ++ "px")
+                            , Html.Attributes.style "top"
+                                (String.fromFloat (Config.cellSize * toFloat y) ++ "px")
+                            , Html.Attributes.style "transition" "left 0.2s,top 0.2s"
+                            ]
+                            { frame = args.frame
+                            , playerDirection = game.playerDirection
+                            }
+                            cell.entity
+                        )
+                    )
+           )
         |> List.sortBy Tuple.first
         |> Html.Keyed.node "div"
             [ Html.Attributes.style "position" "relative"

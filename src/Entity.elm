@@ -29,5 +29,4 @@ type Entity
     | Crate
     | Enemy Enemy
     | Stunned Enemy
-    | Item Item
     | Particle EffectType

@@ -32,12 +32,6 @@ toHtml attrs args cell =
         Crate ->
             ( 1, 3 )
 
-        Item InactiveBomb ->
-            ( 0, 2 )
-
-        Item Heart ->
-            ( 0, 3 )
-
         Enemy enemy ->
             fromEnemy { frame = args.frame } enemy
 

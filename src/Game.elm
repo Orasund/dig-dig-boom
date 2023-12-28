@@ -8,17 +8,21 @@ import Entity
         ( EffectType(..)
         , Enemy(..)
         , Entity(..)
+        , Item(..)
         )
 import Math
 import Position
 
 
 type alias Cell =
-    { id : Int, entity : Entity }
+    { id : Int
+    , entity : Entity
+    }
 
 
 type alias Game =
     { cells : Dict ( Int, Int ) Cell
+    , items : Dict ( Int, Int ) Item
     , nextId : Int
     , bombs : Int
     , lifes : Int
@@ -26,13 +30,21 @@ type alias Game =
     }
 
 
-fromCells : Dict ( Int, Int ) Entity -> Game
-fromCells cells =
+fromCells : Dict ( Int, Int ) Entity -> Dict ( Int, Int ) Item -> Game
+fromCells cells items =
     { cells =
         cells
             |> Dict.toList
-            |> List.indexedMap (\i ( pos, entity ) -> ( pos, { id = i, entity = entity } ))
+            |> List.indexedMap
+                (\i ( pos, entity ) ->
+                    ( pos
+                    , { id = i
+                      , entity = entity
+                      }
+                    )
+                )
             |> Dict.fromList
+    , items = items
     , bombs = 0
     , lifes = 1
     , nextId = Dict.size cells
@@ -53,7 +65,12 @@ remove pos game =
 insert : ( Int, Int ) -> Entity -> Game -> Game
 insert pos entity game =
     { game
-        | cells = game.cells |> Dict.insert pos { id = game.nextId, entity = entity }
+        | cells =
+            game.cells
+                |> Dict.insert pos
+                    { id = game.nextId
+                    , entity = entity
+                    }
         , nextId = game.nextId + 1
     }
 

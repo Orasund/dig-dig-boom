@@ -1,11 +1,12 @@
 module View.Controls exposing (..)
 
+import Entity exposing (Item(..))
 import Html exposing (Attribute, Html)
 import Html.Attributes
 import Image
 import Input exposing (Input(..))
 import Layout
-import View.Bomb
+import View.Item
 
 
 sprite : List (Attribute msg) -> ( Int, Int ) -> Html msg
@@ -41,11 +42,12 @@ toHtml args =
             ( 0, 0 )
         , (if args.bombs > 0 then
             [ sprite [] ( 1, 0 )
-            , View.Bomb.toHtml
+            , View.Item.toHtml
                 [ Html.Attributes.style "position" "absolute"
-                , Html.Attributes.style "top" "8px"
-                , Html.Attributes.style "left" "8px"
+                , Html.Attributes.style "top" "11px"
+                , Html.Attributes.style "left" "11px"
                 ]
+                InactiveBomb
             , String.fromInt args.bombs
                 |> Layout.text
                     [ Html.Attributes.style "position" "absolute"

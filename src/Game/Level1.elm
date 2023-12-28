@@ -9,36 +9,31 @@ import Game.Level as Level exposing (Level)
 new : Level
 new =
     [ Enemy Rat
-    , Item InactiveBomb
-    , Item InactiveBomb
     , Crate
     , Crate
     , Crate
     , Player
-    , Item Heart
     ]
         |> Level.new validator
+            [ InactiveBomb, InactiveBomb, Heart ]
 
 
 level2 : Level
 level2 =
     [ List.repeat 3 (Enemy Rat)
-    , List.repeat 3 (Item InactiveBomb)
     , List.repeat 5 Crate
     , [ Player
-      , Item Heart
       ]
     ]
         |> List.concat
         |> Level.new validator
+            [ InactiveBomb, InactiveBomb, InactiveBomb, Heart ]
 
 
 level3 : Level
 level3 =
-    [ List.repeat 3 (Item InactiveBomb)
-    , List.repeat 5 Crate
+    [ List.repeat 5 Crate
     , [ Player
-      , Item Heart
       , Enemy (Goblin Left)
       , Enemy (Goblin Right)
       , Enemy (Goblin Down)
@@ -46,6 +41,7 @@ level3 =
     ]
         |> List.concat
         |> Level.new validator
+            [ InactiveBomb, InactiveBomb, InactiveBomb, Heart ]
 
 
 validator =
@@ -56,20 +52,16 @@ validator =
                 (\( pos, cell ) ->
                     case cell.entity of
                         Enemy _ ->
-                            Level.count ((==) (Just (Item InactiveBomb)))
-                                (Level.neighbors4 pos dict)
-                                < 1
-                                && (Level.neighbors4 pos dict
-                                        |> List.all
-                                            (\c ->
-                                                case c of
-                                                    Just (Enemy _) ->
-                                                        False
+                            Level.neighbors4 pos dict
+                                |> List.all
+                                    (\c ->
+                                        case c of
+                                            Just (Enemy _) ->
+                                                False
 
-                                                    _ ->
-                                                        True
-                                            )
-                                   )
+                                            _ ->
+                                                True
+                                    )
 
                         Player ->
                             (Level.count ((==) Nothing)

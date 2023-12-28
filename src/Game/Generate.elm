@@ -3,10 +3,11 @@ module Game.Generate exposing (..)
 import Config
 import Dict
 import Direction exposing (Direction(..))
-import Entity exposing (Enemy(..), Entity(..))
+import Entity exposing (Enemy(..), Entity(..), Item(..))
 import Game exposing (Game)
 import Game.Level exposing (Level)
 import Game.Level1
+import Position
 import Random exposing (Generator)
 
 
@@ -16,6 +17,7 @@ new =
         rec : Level -> Generator Game
         rec level =
             fromList level.content
+                level.items
                 |> Random.andThen
                     (\game ->
                         if level.valid game.cells then
@@ -31,23 +33,42 @@ new =
         |> Random.andThen rec
 
 
-fromList : List Entity -> Generator Game
-fromList cells =
-    Random.list (Config.mapSize * Config.mapSize) (Random.float 0 1)
+shuffle : List a -> Generator (List a)
+shuffle list =
+    Random.list (List.length list) (Random.float 0 1)
+        |> Random.map
+            (\rand ->
+                list
+                    |> List.map2 Tuple.pair rand
+                    |> List.sortBy Tuple.first
+                    |> List.map Tuple.second
+            )
+
+
+fromList : List Entity -> List Item -> Generator Game
+fromList entities items =
+    Position.asGrid
+        { columns = Config.mapSize - 1
+        , rows = Config.mapSize - 1
+        }
+        |> shuffle
         |> Random.map
             (\list ->
-                List.map2 Tuple.pair
-                    list
-                    (List.range 0 (Config.mapSize - 1)
-                        |> List.concatMap
-                            (\y ->
-                                List.range 0 (Config.mapSize - 1)
-                                    |> List.map (Tuple.pair y)
-                            )
-                    )
-                    |> List.sortBy Tuple.first
-                    |> List.map2 (\cell ( _, pos ) -> ( pos, cell ))
-                        cells
+                List.map2 Tuple.pair list entities
                     |> Dict.fromList
-                    |> Game.fromCells
+            )
+        |> Random.andThen
+            (\cells ->
+                Position.asGrid
+                    { columns = Config.mapSize
+                    , rows = Config.mapSize
+                    }
+                    |> List.filter (\pos -> Dict.member pos cells |> not)
+                    |> shuffle
+                    |> Random.map
+                        (\list ->
+                            List.map2 Tuple.pair list items
+                                |> Dict.fromList
+                                |> Game.fromCells cells
+                        )
             )

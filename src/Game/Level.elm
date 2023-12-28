@@ -1,20 +1,22 @@
 module Game.Level exposing (..)
 
 import Dict exposing (Dict)
-import Entity exposing (Entity(..))
+import Entity exposing (Entity(..), Item(..))
 import Game exposing (Cell)
 import Math
 
 
 type alias Level =
     { content : List Entity
+    , items : List Item
     , valid : Dict ( Int, Int ) Cell -> Bool
     }
 
 
-new : (Dict ( Int, Int ) Cell -> Bool) -> List Entity -> Level
-new validate content =
+new : (Dict ( Int, Int ) Cell -> Bool) -> List Item -> List Entity -> Level
+new validate items content =
     { content = content
+    , items = items
     , valid = validate
     }
 
