@@ -11,6 +11,8 @@ import Html.Style
 import Image
 import Input exposing (Input)
 import Layout
+import Position
+import Set
 import View.Cell
 import View.Controls
 import View.Item
@@ -52,6 +54,7 @@ death attrs args =
         |> Layout.column
             ([ Html.Attributes.style "font-size" "60px"
              , Html.Attributes.style "color" "white"
+             , Html.Attributes.class "dark-background"
              ]
                 ++ Layout.asButton
                     { label = "Next Level"
@@ -74,10 +77,11 @@ menu attrs args =
     , logo args.frame
     ]
         |> Layout.column
-            (Layout.asButton
-                { label = "Next Level"
-                , onPress = Just args.onClick
-                }
+            (Html.Attributes.class "dark-background"
+                :: Layout.asButton
+                    { label = "Next Level"
+                    , onPress = Just args.onClick
+                    }
                 ++ attrs
             )
 
@@ -98,19 +102,40 @@ world args game =
             [ Layout.contentWithSpaceBetween
             , Html.Attributes.style "color" "white"
             ]
-    , (game.items
-        |> Dict.toList
+    , (Position.asGrid
+        { rows = Config.mapSize
+        , columns = Config.mapSize
+        }
         |> List.map
-            (\( ( x, y ), item ) ->
+            (\( x, y ) ->
                 ( "0_" ++ String.fromInt x ++ "_" ++ String.fromInt y
-                , View.Item.toHtml
-                    [ Html.Style.positionAbsolute
-                    , Html.Attributes.style "left"
-                        (String.fromFloat (Config.cellSize * toFloat x) ++ "px")
-                    , Html.Attributes.style "top"
-                        (String.fromFloat (Config.cellSize * toFloat y) ++ "px")
-                    ]
-                    item
+                , [ if game.floor |> Set.member ( x, y ) then
+                        View.Cell.floor
+                            [ Html.Style.positionAbsolute
+                            , Html.Style.top "0"
+                            ]
+
+                    else
+                        View.Cell.hole []
+                  , game.items
+                        |> Dict.get ( x, y )
+                        |> Maybe.map
+                            (\item ->
+                                View.Item.toHtml
+                                    [ Html.Style.positionAbsolute
+                                    , Html.Style.top "0"
+                                    ]
+                                    item
+                            )
+                        |> Maybe.withDefault Layout.none
+                  ]
+                    |> Html.div
+                        [ Html.Style.positionAbsolute
+                        , Html.Attributes.style "left"
+                            (String.fromFloat (Config.cellSize * toFloat x) ++ "px")
+                        , Html.Attributes.style "top"
+                            (String.fromFloat (Config.cellSize * toFloat y) ++ "px")
+                        ]
                 )
             )
       )
@@ -139,14 +164,6 @@ world args game =
             [ Html.Attributes.style "position" "relative"
             , Html.Attributes.style "width" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")
             , Html.Attributes.style "height" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")
-            , Html.Attributes.style "background-image" "url('groundTile.png')"
-            , Html.Attributes.style "background-repeat" "repeat"
-            , Html.Attributes.style "background-size"
-                (String.fromFloat Config.cellSize
-                    ++ "px "
-                    ++ String.fromFloat Config.cellSize
-                    ++ "px"
-                )
             ]
     , [ Image.image [ Image.pixelated ]
             { url = "heart.png"

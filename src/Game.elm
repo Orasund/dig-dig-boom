@@ -1,4 +1,4 @@
-module Game exposing (Cell, Game, addBomb, addLife, attackPlayer, face, findFirstInDirection, fromCells, get, getPlayerPosition, insert, move, remove, removeBomb, removeLife, slide, update)
+module Game exposing (Cell, Game, addBomb, addFloor, addLife, attackPlayer, empty, face, findFirstInDirection, fromCells, get, getPlayerPosition, insert, move, placeItem, remove, removeBomb, removeFloor, removeLife, slide, update)
 
 import Config
 import Dict exposing (Dict)
@@ -12,6 +12,7 @@ import Entity
         )
 import Math
 import Position
+import Set exposing (Set)
 
 
 type alias Cell =
@@ -23,6 +24,7 @@ type alias Cell =
 type alias Game =
     { cells : Dict ( Int, Int ) Cell
     , items : Dict ( Int, Int ) Item
+    , floor : Set ( Int, Int )
     , nextId : Int
     , bombs : Int
     , lifes : Int
@@ -32,22 +34,37 @@ type alias Game =
 
 fromCells : Dict ( Int, Int ) Entity -> Dict ( Int, Int ) Item -> Game
 fromCells cells items =
-    { cells =
-        cells
-            |> Dict.toList
-            |> List.indexedMap
-                (\i ( pos, entity ) ->
-                    ( pos
-                    , { id = i
-                      , entity = entity
-                      }
+    { empty
+        | cells =
+            cells
+                |> Dict.toList
+                |> List.indexedMap
+                    (\i ( pos, entity ) ->
+                        ( pos
+                        , { id = i
+                          , entity = entity
+                          }
+                        )
                     )
-                )
-            |> Dict.fromList
-    , items = items
+                |> Dict.fromList
+        , items = items
+        , nextId = Dict.size cells
+    }
+
+
+empty : Game
+empty =
+    { cells = Dict.empty
+    , items = Dict.empty
+    , floor =
+        Position.asGrid
+            { columns = Config.mapSize
+            , rows = Config.mapSize
+            }
+            |> Set.fromList
     , bombs = 0
     , lifes = 1
-    , nextId = Dict.size cells
+    , nextId = 0
     , playerDirection = Down
     }
 
@@ -73,6 +90,21 @@ insert pos entity game =
                     }
         , nextId = game.nextId + 1
     }
+
+
+placeItem : ( Int, Int ) -> Item -> Game -> Game
+placeItem pos item game =
+    { game | items = game.items |> Dict.insert pos item }
+
+
+addFloor : ( Int, Int ) -> Game -> Game
+addFloor pos game =
+    { game | floor = game.floor |> Set.insert pos }
+
+
+removeFloor : ( Int, Int ) -> Game -> Game
+removeFloor pos game =
+    { game | floor = game.floor |> Set.remove pos }
 
 
 update : ( Int, Int ) -> (Entity -> Entity) -> Game -> Game

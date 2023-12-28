@@ -6,7 +6,7 @@ import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..))
 import Game exposing (Game)
-import Game.Generate
+import Game.Level
 import Game.Update
 import Html exposing (Html)
 import Html.Style
@@ -29,7 +29,7 @@ type Overlay
     = Menu
 
 
-type alias ModelContent =
+type alias Model =
     { game : Game
     , score : Int
     , levelSeed : Seed
@@ -37,10 +37,6 @@ type alias ModelContent =
     , overlay : Maybe Overlay
     , frame : Int
     }
-
-
-type alias Model =
-    ModelContent
 
 
 type Msg
@@ -60,7 +56,7 @@ init : flag -> ( Model, Cmd Msg )
 init _ =
     let
         ( game, seed ) =
-            Random.step Game.Generate.new
+            Random.step Game.Level.generate
                 (Random.initialSeed 42)
     in
     ( { levelSeed = seed
@@ -84,7 +80,7 @@ nextLevel : Model -> Model
 nextLevel model =
     let
         ( game, seed ) =
-            Random.step Game.Generate.new model.seed
+            Random.step Game.Level.generate model.seed
     in
     { model
         | levelSeed = model.seed
@@ -94,7 +90,7 @@ nextLevel model =
     }
 
 
-gameWon : ModelContent -> ( Model, Cmd Msg )
+gameWon : Model -> ( Model, Cmd Msg )
 gameWon model =
     ( { model
         | score = model.score + 1
@@ -104,7 +100,7 @@ gameWon model =
     )
 
 
-gameLost : ModelContent -> ( Model, Cmd Msg )
+gameLost : Model -> ( Model, Cmd Msg )
 gameLost model =
     ( { model
         | seed = model.levelSeed

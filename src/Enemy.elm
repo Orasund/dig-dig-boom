@@ -5,6 +5,7 @@ import Entity exposing (EffectType(..), Enemy(..), Entity(..))
 import Game exposing (Game)
 import Math
 import Position
+import Set
 
 
 update : ( Int, Int ) -> Enemy -> Game -> { game : Game, kill : List ( Int, Int ) }
@@ -72,9 +73,15 @@ updateGoblin pos direction game =
                         fun ()
 
                     Nothing ->
-                        Game.move { from = pos, to = p } g
-                            |> Maybe.map (\newGame -> { game = newGame, kill = [] })
-                            |> Maybe.withDefault { game = g, kill = [] }
+                        case
+                            tryMoving { from = pos, to = p } g
+                                |> Maybe.map (\newGame -> { game = newGame, kill = [] })
+                        of
+                            Just a ->
+                                a
+
+                            Nothing ->
+                                fun ()
 
             else
                 fun ()
@@ -95,13 +102,22 @@ updateGoblin pos direction game =
         game
 
 
+tryMoving : { from : ( Int, Int ), to : ( Int, Int ) } -> Game -> Maybe Game
+tryMoving args game =
+    if Set.member args.to game.floor then
+        Game.move args game
+
+    else
+        Nothing
+
+
 tryMovingRat : ( Int, Int ) -> Direction -> Game -> Maybe { game : Game, kill : List ( Int, Int ) }
 tryMovingRat position direction game =
     case Game.findFirstInDirection position direction game of
         Just Player ->
             case
                 game
-                    |> Game.move
+                    |> tryMoving
                         { from = position
                         , to =
                             Direction.toVector direction
@@ -122,7 +138,7 @@ tryMovingRat position direction game =
 
         Just (Enemy PlacedBomb) ->
             game
-                |> Game.move
+                |> tryMoving
                     { from = position
                     , to =
                         direction

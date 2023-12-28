@@ -7,6 +7,7 @@ import Entity exposing (EffectType(..), Enemy(..), Entity(..), Item(..))
 import Game exposing (Cell, Game)
 import Math
 import Position
+import Set
 
 
 updateGame : Game -> Game
@@ -75,21 +76,21 @@ movePlayer position game =
                     |> Maybe.withDefault game
 
             Just Crate ->
-                game.cells
+                game
                     |> pushCrate newLocation game.playerDirection
-                    |> Maybe.map
-                        (\cells ->
-                            { game | cells = cells }
-                                |> Game.move { from = position, to = newLocation }
-                                |> Maybe.withDefault game
-                        )
+                    |> Maybe.andThen (Game.move { from = position, to = newLocation })
+                    |> Maybe.map (takeItem newLocation)
                     |> Maybe.withDefault game
 
             Nothing ->
-                game
-                    |> Game.move { from = position, to = newLocation }
-                    |> Maybe.map (takeItem newLocation)
-                    |> Maybe.withDefault game
+                if Set.member newLocation game.floor then
+                    game
+                        |> Game.move { from = position, to = newLocation }
+                        |> Maybe.map (takeItem newLocation)
+                        |> Maybe.withDefault game
+
+                else
+                    game
 
             _ ->
                 game |> Game.face game.playerDirection
@@ -156,31 +157,32 @@ placeBombe playerCell game =
         |> Maybe.andThen (applyBomb playerCell)
 
 
-pushCrate : ( Int, Int ) -> Direction -> Dict ( Int, Int ) Cell -> Maybe (Dict ( Int, Int ) Cell)
-pushCrate pos dir cells =
+pushCrate : ( Int, Int ) -> Direction -> Game -> Maybe Game
+pushCrate pos dir game =
     let
         newPos =
             dir
                 |> Direction.toVector
                 |> Position.addToVector pos
     in
-    Dict.get pos cells
-        |> Maybe.andThen
-            (\from ->
-                if
-                    Dict.get newPos
-                        cells
-                        == Nothing
-                        && Math.posIsValid newPos
-                then
-                    cells
-                        |> Dict.insert newPos from
-                        |> Dict.remove pos
-                        |> Just
+    if
+        Game.get newPos
+            game
+            == Nothing
+            && Math.posIsValid newPos
+    then
+        if Set.member newPos game.floor then
+            game
+                |> Game.move { from = pos, to = newPos }
 
-                else
-                    Nothing
-            )
+        else
+            game
+                |> Game.addFloor newPos
+                |> Game.remove pos
+                |> Just
+
+    else
+        Nothing
 
 
 kill : ( Int, Int ) -> Game -> Game

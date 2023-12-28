@@ -13,11 +13,21 @@ sprite attrs pos =
         (Image.pixelated :: attrs)
         { pos = pos
         , sheetColumns = 4
-        , sheetRows = 8
+        , sheetRows = 10
         , url = "tileset.png"
         , height = Config.cellSize
         , width = Config.cellSize
         }
+
+
+floor : List (Attribute msg) -> Html msg
+floor attrs =
+    sprite attrs ( 0, 3 )
+
+
+hole : List (Attribute msg) -> Html msg
+hole attrs =
+    sprite attrs ( 0, 2 )
 
 
 toHtml : List (Attribute msg) -> { frame : Int, playerDirection : Direction } -> Entity -> Html msg

@@ -1,72 +1,141 @@
 module Game.Level exposing (..)
 
+import Config
 import Dict exposing (Dict)
-import Entity exposing (Entity(..), Item(..))
-import Game exposing (Cell)
-import Math
+import Direction exposing (Direction(..))
+import Entity exposing (Enemy(..), Entity(..), Item(..))
+import Game exposing (Cell, Game)
+import Game.Build exposing (BuildingBlock(..))
+import Position
+import Random exposing (Generator)
 
 
 type alias Level =
-    { content : List Entity
-    , items : List Item
+    { blocks : List BuildingBlock
     , valid : Dict ( Int, Int ) Cell -> Bool
     }
 
 
-new : (Dict ( Int, Int ) Cell -> Bool) -> List Item -> List Entity -> Level
-new validate items content =
-    { content = content
-    , items = items
+new : (Dict ( Int, Int ) Cell -> Bool) -> List BuildingBlock -> Level
+new validate blocks =
+    { blocks = blocks
     , valid = validate
     }
 
 
-neighbors4 : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)
-neighbors4 ( x, y ) dict =
-    [ ( x + 1, y )
-    , ( x - 1, y )
-    , ( x, y + 1 )
-    , ( x, y - 1 )
-    ]
-        |> List.filter Math.posIsValid
-        |> List.map
-            (\pos ->
-                dict |> Dict.get pos |> Maybe.map .entity
+toGame : Level -> Generator Game
+toGame level =
+    Position.asGrid
+        { columns = Config.mapSize - 1
+        , rows = Config.mapSize - 1
+        }
+        |> shuffle
+        |> Random.map
+            (\list ->
+                List.map2 Tuple.pair list level.blocks
+            )
+        |> Random.map Game.Build.fromBlocks
+        |> Random.andThen
+            (\game ->
+                if level.valid game.cells then
+                    Random.constant game
+
+                else
+                    Random.lazy (\() -> toGame level)
             )
 
 
-neighbors8 : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)
-neighbors8 ( x, y ) dict =
-    [ ( x + 1, y )
-    , ( x - 1, y )
-    , ( x, y + 1 )
-    , ( x, y - 1 )
-    , ( x + 1, y + 1 )
-    , ( x + 1, y - 1 )
-    , ( x - 1, y + 1 )
-    , ( x - 1, y - 1 )
+generate : Generator Game
+generate =
+    Random.uniform
+        level3
+        []
+        |> Random.andThen toGame
+
+
+ratLevel : Level
+ratLevel =
+    [ List.repeat 3 (EntityBlock (Enemy Rat))
+    , List.repeat 5 (EntityBlock Crate)
+    , List.repeat 3 (ItemBlock InactiveBomb)
+    , [ EntityBlock Player
+      , ItemBlock Heart
+      , HoleBlock
+      ]
     ]
-        |> List.filter Math.posIsValid
-        |> List.map
-            (\pos ->
-                dict |> Dict.get pos |> Maybe.map .entity
-            )
+        |> List.concat
+        |> new validator
 
 
-diagNeighbors : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)
-diagNeighbors ( x, y ) dict =
-    [ ( x + 1, y + 1 )
-    , ( x + 1, y - 1 )
-    , ( x - 1, y + 1 )
-    , ( x - 1, y - 1 )
+level3 : Level
+level3 =
+    [ List.repeat 5 (EntityBlock Crate)
+    , [ Player |> EntityBlock
+      , Enemy (Goblin Left) |> EntityBlock
+      , Enemy (Goblin Right) |> EntityBlock
+      , Enemy (Goblin Down) |> EntityBlock
+      , ItemBlock Heart
+      , HoleBlock
+      ]
+    , List.repeat 3 (ItemBlock InactiveBomb)
     ]
-        |> List.filter Math.posIsValid
-        |> List.map
-            (\pos ->
-                dict |> Dict.get pos |> Maybe.map .entity
+        |> List.concat
+        |> new validator
+
+
+validator =
+    \dict ->
+        dict
+            |> Dict.toList
+            |> List.all
+                (\( pos, cell ) ->
+                    case cell.entity of
+                        Enemy _ ->
+                            Game.Build.neighbors4 pos dict
+                                |> List.all
+                                    (\c ->
+                                        case c of
+                                            Just (Enemy _) ->
+                                                False
+
+                                            _ ->
+                                                True
+                                    )
+
+                        Player ->
+                            (Game.Build.count ((==) Nothing)
+                                (Game.Build.neighbors4 pos dict)
+                                > 1
+                            )
+                                && (Game.Build.diagNeighbors pos dict
+                                        |> List.all
+                                            (\c ->
+                                                case c of
+                                                    Just (Enemy _) ->
+                                                        False
+
+                                                    _ ->
+                                                        True
+                                            )
+                                   )
+
+                        Crate ->
+                            Game.Build.count ((==) (Just Crate))
+                                (Game.Build.neighbors4 pos dict)
+                                < 1
+
+                        _ ->
+                            True
+                )
+
+
+shuffle : List a -> Generator (List a)
+shuffle list =
+    Random.list (List.length list) (Random.float 0 1)
+        |> Random.map
+            (\rand ->
+                list
+                    |> List.map2 Tuple.pair rand
+                    |> List.sortBy Tuple.first
+                    |> List.map Tuple.second
             )
-
-
-count : (a -> Bool) -> List a -> Int
-count fun list =
-    list |> List.filter fun |> List.length
