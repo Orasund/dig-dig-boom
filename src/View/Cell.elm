@@ -12,8 +12,8 @@ sprite attrs pos =
     Image.sprite
         (Image.pixelated :: attrs)
         { pos = pos
-        , sheetColumns = 4
-        , sheetRows = 10
+        , sheetColumns = 8
+        , sheetRows = 8
         , url = "tileset.png"
         , height = Config.cellSize
         , width = Config.cellSize
@@ -59,7 +59,7 @@ toHtml attrs args cell =
         Particle effect ->
             case effect of
                 Smoke ->
-                    ( 2, 2 )
+                    ( 0, 0 )
 
                 Bone ->
                     ( 2, 3 )
@@ -90,7 +90,7 @@ fromEnemy args enemy =
             ( 2 + args.frame, 1 )
 
         Goblin dir ->
-            directional ( 0, 6 )
+            directional ( 4, 0 )
                 { direction = dir
                 , frame = args.frame
                 }
@@ -99,7 +99,7 @@ fromEnemy args enemy =
             ( 0 + args.frame, 1 )
 
         Golem ->
-            directional ( 0, 8 )
+            directional ( 4, 2 )
                 { direction = Direction.mirror args.playerDirection
                 , frame = args.frame
                 }

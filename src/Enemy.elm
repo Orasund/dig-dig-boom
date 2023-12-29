@@ -190,15 +190,19 @@ updatePlacedBombe location game =
                             |> Position.addToVector location
                 in
                 if Math.posIsValid newLocation then
-                    if Game.get newLocation output.game == Nothing then
-                        { output
-                            | game =
-                                output.game
-                                    |> Game.insert newLocation (Particle Smoke)
-                        }
+                    case Game.get newLocation output.game of
+                        Nothing ->
+                            { output
+                                | game =
+                                    output.game
+                                        |> Game.insert newLocation (Particle Smoke)
+                            }
 
-                    else
-                        { output | kill = newLocation :: output.kill }
+                        Just Player ->
+                            output
+
+                        _ ->
+                            { output | kill = newLocation :: output.kill }
 
                 else
                     output

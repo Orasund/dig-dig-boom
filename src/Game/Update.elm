@@ -158,9 +158,13 @@ applyBomb position game =
     if Math.posIsValid newPosition then
         case game.cells |> Dict.get newPosition |> Maybe.map .entity of
             Nothing ->
-                game
-                    |> Game.insert newPosition cell
-                    |> Just
+                if Set.member newPosition game.floor then
+                    game
+                        |> Game.insert newPosition cell
+                        |> Just
+
+                else
+                    Nothing
 
             Just (Particle _) ->
                 game

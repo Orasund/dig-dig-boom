@@ -212,7 +212,19 @@ update msg model =
                                                 ( model, Cmd.none )
 
                             Nothing ->
-                                gameLost model
+                                case input of
+                                    InputUndo ->
+                                        case model.history of
+                                            head :: tail ->
+                                                ( { model | game = head, history = tail }
+                                                , Cmd.none
+                                                )
+
+                                            [] ->
+                                                ( model, Cmd.none )
+
+                                    _ ->
+                                        gameLost model
 
         NextFrameRequested ->
             ( nextFrameRequested model

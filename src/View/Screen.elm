@@ -46,8 +46,9 @@ death attrs args =
       ]
         |> Layout.column []
     , skull
-    , [ "Press any" |> Layout.text [ Layout.contentCentered ]
-      , "button" |> Layout.text [ Layout.contentCentered ]
+    , [ "R to undo" |> Layout.text [ Layout.contentCentered ]
+      , "or" |> Layout.text [ Layout.contentCentered ]
+      , "Space to retry" |> Layout.text [ Layout.contentCentered ]
       ]
         |> Layout.column []
     ]
