@@ -1,120 +1,186 @@
 module Game.Level exposing (..)
 
 import Config
-import Dict exposing (Dict)
+import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item(..))
-import Game exposing (Cell, Game)
+import Game exposing (Game)
 import Game.Build exposing (BuildingBlock(..))
 import Position
 import Random exposing (Generator)
 
 
-type alias Level =
-    { blocks : List BuildingBlock
-    , valid : Dict ( Int, Int ) Cell -> Bool
-    }
+toGame : List String -> List BuildingBlock -> Generator Game
+toGame emojis blocks =
+    let
+        dict =
+            Game.Build.fromEmojis emojis
 
+        rec () =
+            Position.asGrid
+                { columns = Config.mapSize
+                , rows = Config.mapSize
+                }
+                |> List.filter
+                    (\pos ->
+                        Dict.member pos dict |> not
+                    )
+                |> shuffle
+                |> Random.map
+                    (\list ->
+                        List.map2 Tuple.pair list blocks
+                            ++ Dict.toList dict
+                    )
+                |> Random.map Game.Build.fromBlocks
+                |> Random.andThen
+                    (\game ->
+                        if validator game.cells then
+                            Random.constant game
 
-new : (Dict ( Int, Int ) Cell -> Bool) -> List BuildingBlock -> Level
-new validate blocks =
-    { blocks = blocks
-    , valid = validate
-    }
-
-
-toGame : Level -> Generator Game
-toGame level =
-    Position.asGrid
-        { columns = Config.mapSize
-        , rows = Config.mapSize
-        }
-        |> shuffle
-        |> Random.map
-            (\list ->
-                List.map2 Tuple.pair list level.blocks
-            )
-        |> Random.map Game.Build.fromBlocks
-        |> Random.andThen
-            (\game ->
-                if level.valid game.cells then
-                    Random.constant game
-
-                else
-                    Random.lazy (\() -> toGame level)
-            )
+                        else
+                            Random.lazy rec
+                    )
+    in
+    rec ()
 
 
 generate : Generator Game
 generate =
     Random.uniform
         golemLevel
-        [ ratLevel
+        []
+        {--[ ratLevel
         , goblinLevel
         , finalLevel
+        ]--}
+        |> Random.andThen identity
+
+
+randomLayout : Generator (List String)
+randomLayout =
+    Random.uniform
+        [ "❌⬜⬜⬜❌"
+        , "⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜"
+        , "❌⬜😊⬜❌"
         ]
-        |> Random.andThen toGame
+        [ [ "⬜⬜⬜⬜⬜"
+          , "⬜⬜⬜⬜⬜"
+          , "❌❌❌❌❌"
+          , "⬜⬜📦⬜⬜"
+          , "⬜⬜😊⬜⬜"
+          ]
+        , [ "⬜❌⬜❌⬜"
+          , "⬜⬜❌⬜⬜"
+          , "⬜⬜📦⬜⬜"
+          , "⬜⬜⬜⬜⬜"
+          , "⬜⬜😊⬜⬜"
+          ]
+        , [ "❌⬜⬜⬜❌"
+          , "❌⬜⬜⬜❌"
+          , "❌⬜⬜⬜❌"
+          , "❌⬜⬜⬜❌"
+          , "❌⬜😊⬜❌"
+          ]
+        , [ "⬜⬜⬜⬜⬜"
+          , "⬜⬜❌⬜⬜"
+          , "⬜❌⬜❌⬜"
+          , "⬜⬜❌⬜⬜"
+          , "⬜⬜😊⬜⬜"
+          ]
+        , [ "⬜❌⬜❌⬜"
+          , "❌⬜⬜⬜❌"
+          , "⬜⬜📦⬜⬜"
+          , "❌⬜⬜⬜❌"
+          , "⬜❌😊❌⬜"
+          ]
+        , [ "📦⬜⬜⬜📦"
+          , "📦⬜⬜⬜📦"
+          , "📦⬜⬜⬜📦"
+          , "📦⬜⬜⬜📦"
+          , "📦⬜😊⬜📦"
+          ]
+        ]
 
 
-ratLevel : Level
+ratLevel : Generator Game
 ratLevel =
-    [ List.repeat 4 (EntityBlock (Enemy Rat))
-    , List.repeat 6 (EntityBlock Crate)
-    , List.repeat 4 (ItemBlock InactiveBomb)
-    , [ EntityBlock Player
-      , ItemBlock Heart
-      , HoleBlock
-      ]
-    ]
-        |> List.concat
-        |> new validator
+    randomLayout
+        |> Random.andThen
+            (\layout ->
+                [ List.repeat 4 (EntityBlock (Enemy Rat))
+                , List.repeat 3 (EntityBlock Crate)
+                , List.repeat 4 (ItemBlock InactiveBomb)
+                , [ ItemBlock Heart
+                  , HoleBlock
+                  ]
+                ]
+                    |> List.concat
+                    |> toGame layout
+            )
 
 
-goblinLevel : Level
+goblinLevel : Generator Game
 goblinLevel =
-    [ List.repeat 6 (EntityBlock Crate)
-    , [ Player |> EntityBlock
-      , Enemy (Goblin Left) |> EntityBlock
-      , Enemy (Goblin Right) |> EntityBlock
-      , Enemy (Goblin Down) |> EntityBlock
-      , Enemy (Goblin Up) |> EntityBlock
-      , ItemBlock Heart
-      , HoleBlock
-      ]
-    , List.repeat 4 (ItemBlock InactiveBomb)
-    ]
-        |> List.concat
-        |> new validator
+    randomLayout
+        |> Random.andThen
+            (\layout ->
+                [ List.repeat 3 (EntityBlock Crate)
+                , [ Enemy (Goblin Left) |> EntityBlock
+                  , Enemy (Goblin Right) |> EntityBlock
+                  , Enemy (Goblin Down) |> EntityBlock
+                  , Enemy (Goblin Up) |> EntityBlock
+                  , ItemBlock Heart
+                  , HoleBlock
+                  ]
+                , List.repeat 4 (ItemBlock InactiveBomb)
+                ]
+                    |> List.concat
+                    |> toGame layout
+            )
 
 
-golemLevel : Level
+emptyLevel : Generator Game
+emptyLevel =
+    randomLayout
+        |> Random.andThen (\layout -> toGame layout [])
+
+
+golemLevel : Generator Game
 golemLevel =
-    [ List.repeat 3 (EntityBlock (Enemy Golem))
-    , List.repeat 3 (ItemBlock InactiveBomb)
-    , List.repeat 2 HoleBlock
-    , List.repeat 6 (EntityBlock Crate)
-    , [ ItemBlock Heart
-      , Player |> EntityBlock
-      ]
-    ]
-        |> List.concat
-        |> new validator
+    randomLayout
+        |> Random.andThen
+            (\layout ->
+                [ List.repeat 3 (EntityBlock (Enemy Golem))
+                , List.repeat 3 (ItemBlock InactiveBomb)
+                , List.repeat 3 (EntityBlock Crate)
+                , [ ItemBlock Heart
+                  , HoleBlock
+                  ]
+                ]
+                    |> List.concat
+                    |> toGame layout
+            )
 
 
-finalLevel : Level
+finalLevel : Generator Game
 finalLevel =
-    [ List.repeat 3 (ItemBlock InactiveBomb)
-    , List.repeat 2 HoleBlock
-    , List.repeat 5 (EntityBlock Crate)
-    , [ ItemBlock Heart
-      , Player |> EntityBlock
-      , EntityBlock (Enemy Rat)
-      , Enemy (Goblin Left) |> EntityBlock
-      , EntityBlock (Enemy Golem)
-      ]
-    ]
-        |> List.concat
-        |> new validator
+    randomLayout
+        |> Random.andThen
+            (\layout ->
+                [ List.repeat 3 (ItemBlock InactiveBomb)
+                , List.repeat 3 (EntityBlock Crate)
+                , [ ItemBlock Heart
+                  , EntityBlock (Enemy Rat)
+                  , Enemy (Goblin Left) |> EntityBlock
+                  , EntityBlock (Enemy Golem)
+                  , HoleBlock
+                  ]
+                ]
+                    |> List.concat
+                    |> toGame layout
+            )
 
 
 validator =

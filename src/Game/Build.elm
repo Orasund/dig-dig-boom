@@ -12,6 +12,49 @@ type BuildingBlock
     | HoleBlock
 
 
+fromEmojis : List String -> Dict ( Int, Int ) BuildingBlock
+fromEmojis rows =
+    rows
+        |> List.indexedMap
+            (\y strings ->
+                strings
+                    |> String.toList
+                    |> List.indexedMap
+                        (\x string ->
+                            parseEmoji string
+                                |> Maybe.map (\block -> ( ( x, y ), block ))
+                        )
+                    |> List.filterMap identity
+            )
+        |> List.concat
+        |> Dict.fromList
+
+
+parseEmoji : Char -> Maybe BuildingBlock
+parseEmoji string =
+    case string of
+        '😊' ->
+            EntityBlock Player |> Just
+
+        '📦' ->
+            EntityBlock Crate |> Just
+
+        '💚' ->
+            ItemBlock Heart |> Just
+
+        '💣' ->
+            ItemBlock InactiveBomb |> Just
+
+        '❌' ->
+            HoleBlock |> Just
+
+        '⬜' ->
+            Nothing
+
+        _ ->
+            Nothing
+
+
 fromBlocks : List ( ( Int, Int ), BuildingBlock ) -> Game
 fromBlocks blocks =
     blocks
