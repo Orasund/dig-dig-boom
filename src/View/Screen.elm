@@ -87,22 +87,13 @@ menu attrs args =
 
 
 world :
-    { score : Int
-    , onInput : Input -> msg
+    { onInput : Input -> msg
     , frame : Int
     }
     -> Game
     -> Html msg
 world args game =
-    [ [ "Score:"
-            ++ String.fromInt args.score
-            |> Layout.text [ Html.Attributes.style "font-size" "32px" ]
-      ]
-        |> Layout.row
-            [ Layout.contentWithSpaceBetween
-            , Html.Attributes.style "color" "white"
-            ]
-    , (Position.asGrid
+    [ (Position.asGrid
         { rows = Config.mapSize
         , columns = Config.mapSize
         }
@@ -165,18 +156,10 @@ world args game =
             , Html.Attributes.style "width" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")
             , Html.Attributes.style "height" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")
             ]
-    , [ Image.image [ Image.pixelated ]
-            { url = "heart.png"
-            , width = 64
-            , height = 64
-            }
-            |> List.repeat (game.lifes - 1)
-            |> Layout.row []
-      ]
-        |> Layout.row [ Layout.contentWithSpaceBetween ]
     , View.Controls.toHtml
         { onInput = args.onInput
         , bombs = game.bombs
+        , lifes = game.lifes
         }
     ]
         |> Layout.column

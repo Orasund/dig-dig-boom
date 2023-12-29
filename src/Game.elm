@@ -1,4 +1,4 @@
-module Game exposing (Cell, Game, addBomb, addFloor, addLife, attackPlayer, empty, face, findFirstInDirection, fromCells, get, getPlayerPosition, insert, move, placeItem, remove, removeBomb, removeFloor, removeLife, slide, update)
+module Game exposing (Cell, Game, addBomb, addFloor, addLife, attackPlayer, empty, face, findFirstEmptyCellInDirection, findFirstInDirection, fromCells, get, getPlayerPosition, insert, move, placeItem, remove, removeBomb, removeFloor, removeLife, update)
 
 import Config
 import Dict exposing (Dict)
@@ -174,27 +174,25 @@ getPlayerPosition game =
         |> List.head
 
 
-slide : ( Int, Int ) -> Direction -> Game -> Game
-slide position direction game =
+findFirstEmptyCellInDirection : ( Int, Int ) -> Direction -> Game -> ( Int, Int )
+findFirstEmptyCellInDirection pos direction game =
     let
-        newLocation : ( Int, Int )
-        newLocation =
+        newPos : ( Int, Int )
+        newPos =
             direction
                 |> Direction.toVector
-                |> Position.addToVector position
+                |> Position.addToVector pos
     in
-    case
-        game
-            |> move
-                { from = position
-                , to = newLocation
-                }
-    of
-        Just a ->
-            slide newLocation direction a
+    if Math.posIsValid newPos then
+        case get newPos game of
+            Just _ ->
+                pos
 
-        Nothing ->
-            game
+            Nothing ->
+                findFirstEmptyCellInDirection newPos direction game
+
+    else
+        pos
 
 
 attackPlayer : ( Int, Int ) -> Game -> Maybe Game

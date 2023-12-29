@@ -31,11 +31,11 @@ type Overlay
 
 type alias Model =
     { game : Game
-    , score : Int
     , levelSeed : Seed
     , seed : Seed
     , overlay : Maybe Overlay
     , frame : Int
+    , history : List Game
     }
 
 
@@ -63,8 +63,8 @@ init _ =
       , seed = seed
       , game = game
       , overlay = Just Menu
-      , score = 0
       , frame = 0
+      , history = []
       }
     , Random.generate GotSeed Random.independentSeed
     )
@@ -92,9 +92,7 @@ nextLevel model =
 
 gameWon : Model -> ( Model, Cmd Msg )
 gameWon model =
-    ( { model
-        | score = model.score + 1
-      }
+    ( { model | history = [] }
         |> nextLevel
     , Cmd.none
     )
@@ -105,6 +103,7 @@ gameLost model =
     ( { model
         | seed = model.levelSeed
         , game = model.game |> (\game -> { game | lifes = 1, bombs = 0 })
+        , history = []
       }
         |> nextLevel
     , Cmd.none
@@ -115,6 +114,7 @@ setGame : Model -> Game -> Model
 setGame model game =
     { model
         | game = game
+        , history = model.game :: model.history
     }
 
 
@@ -165,7 +165,7 @@ update msg model =
                                             game
                                 in
                                 case input of
-                                    InputA ->
+                                    InputActivate ->
                                         ( model.game
                                             |> Game.Update.placeBombeAndUpdateGame playerPosition
                                             |> Maybe.withDefault model.game
@@ -200,6 +200,16 @@ update msg model =
                                             |> setGame model
                                         , Cmd.none
                                         )
+
+                                    InputUndo ->
+                                        case model.history of
+                                            head :: tail ->
+                                                ( { model | game = head, history = tail }
+                                                , Cmd.none
+                                                )
+
+                                            [] ->
+                                                ( model, Cmd.none )
 
                             Nothing ->
                                 gameLost model
@@ -242,8 +252,11 @@ toDirection string =
         "s" ->
             Input InputDown
 
+        "r" ->
+            Input InputUndo
+
         " " ->
-            Input InputA
+            Input InputActivate
 
         _ ->
             NoOps
@@ -267,8 +280,7 @@ view : Model -> Html Msg
 view model =
     [ View.Stylesheet.toHtml
     , [ Screen.world
-            { score = model.score
-            , onInput = Input
+            { onInput = Input
             , frame = model.frame
             }
             model.game
@@ -282,7 +294,7 @@ view model =
                         [ Html.Style.positionAbsolute
                         , Html.Style.top "0"
                         ]
-                        { onClick = Input InputA }
+                        { onClick = Input InputActivate }
 
             Just Menu ->
                 Screen.menu
@@ -290,7 +302,7 @@ view model =
                     , Html.Style.top "0"
                     ]
                     { frame = model.frame
-                    , onClick = Input InputA
+                    , onClick = Input InputActivate
                     }
       ]
         |> Html.div

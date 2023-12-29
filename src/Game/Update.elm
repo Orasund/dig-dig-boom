@@ -5,6 +5,7 @@ import Direction exposing (Direction(..))
 import Enemy
 import Entity exposing (EffectType(..), Enemy(..), Entity(..), Item(..))
 import Game exposing (Cell, Game)
+import Game.Kill exposing (GameAndKill)
 import Math
 import Position
 import Set
@@ -28,10 +29,7 @@ updateCell ( position, cell ) game =
                     { pos = position
                     , enemy = enemy
                     }
-                |> (\out ->
-                        out.kill
-                            |> List.foldl kill out.game
-                   )
+                |> Game.Kill.apply
 
         Particle _ ->
             game |> Game.remove position
@@ -48,10 +46,11 @@ movePlayerInDirectionAndUpdateGame dir location game =
     game
         |> Game.face dir
         |> movePlayer location
-        |> updateGame
+        |> Game.Kill.map updateGame
+        |> Game.Kill.apply
 
 
-movePlayer : ( Int, Int ) -> Game -> Game
+movePlayer : ( Int, Int ) -> Game -> GameAndKill
 movePlayer position game =
     let
         newLocation : ( Int, Int )
@@ -63,43 +62,67 @@ movePlayer position game =
     if Math.posIsValid newLocation then
         case game.cells |> Dict.get newLocation |> Maybe.map .entity of
             Just (Enemy enemy) ->
-                game
-                    |> Game.update newLocation
-                        (\_ ->
-                            enemy
-                                |> Enemy.stun game.playerDirection
-                                |> Stunned
-                        )
-                    |> Game.slide newLocation game.playerDirection
+                let
+                    newPos =
+                        game |> Game.findFirstEmptyCellInDirection newLocation game.playerDirection
+                in
+                { game =
+                    game
+                        |> Game.update newLocation
+                            (\_ ->
+                                enemy
+                                    |> Enemy.stun game.playerDirection
+                                    |> Stunned
+                            )
+                        |> Game.move { from = newLocation, to = newPos }
+                        |> Maybe.withDefault game
+                , kill =
+                    if game.floor |> Set.member newPos then
+                        []
+
+                    else
+                        [ newPos ]
+                }
 
             Just (Particle _) ->
-                game
-                    |> Game.remove newLocation
-                    |> Game.move { from = position, to = newLocation }
-                    |> Maybe.withDefault game
+                { game =
+                    game
+                        |> Game.remove newLocation
+                        |> Game.move { from = position, to = newLocation }
+                        |> Maybe.withDefault game
+                , kill = []
+                }
 
             Just Crate ->
-                game
-                    |> pushCrate newLocation game.playerDirection
-                    |> Maybe.andThen (Game.move { from = position, to = newLocation })
-                    |> Maybe.map (takeItem newLocation)
-                    |> Maybe.withDefault game
-
-            Nothing ->
-                if Set.member newLocation game.floor then
+                { game =
                     game
-                        |> Game.move { from = position, to = newLocation }
+                        |> pushCrate newLocation game.playerDirection
+                        |> Maybe.andThen (Game.move { from = position, to = newLocation })
                         |> Maybe.map (takeItem newLocation)
                         |> Maybe.withDefault game
+                , kill = []
+                }
 
-                else
-                    game
+            Nothing ->
+                { game =
+                    if Set.member newLocation game.floor then
+                        game
+                            |> Game.move { from = position, to = newLocation }
+                            |> Maybe.map (takeItem newLocation)
+                            |> Maybe.withDefault game
+
+                    else
+                        game
+                , kill = []
+                }
 
             _ ->
-                game |> Game.face game.playerDirection
+                { game = game |> Game.face game.playerDirection
+                , kill = []
+                }
 
     else
-        game
+        { game = game, kill = [] }
 
 
 takeItem : ( Int, Int ) -> Game -> Game
@@ -131,12 +154,9 @@ applyBomb position game =
 
         cell =
             Stunned PlacedBomb
-
-        map =
-            game.cells
     in
     if Math.posIsValid newPosition then
-        case map |> Dict.get newPosition |> Maybe.map .entity of
+        case game.cells |> Dict.get newPosition |> Maybe.map .entity of
             Nothing ->
                 game
                     |> Game.insert newPosition cell
@@ -187,38 +207,3 @@ pushCrate pos dir game =
 
     else
         Nothing
-
-
-kill : ( Int, Int ) -> Game -> Game
-kill pos game =
-    game.cells
-        |> Dict.get pos
-        |> Maybe.map
-            (\cell ->
-                case cell.entity of
-                    Player ->
-                        Game.attackPlayer pos game
-                            |> Maybe.withDefault game
-
-                    Crate ->
-                        { game
-                            | cells =
-                                game.cells |> Dict.insert pos { cell | entity = Particle Bone }
-                        }
-
-                    Enemy PlacedBomb ->
-                        { game
-                            | cells =
-                                game.cells |> Dict.insert pos { cell | entity = Particle Smoke }
-                        }
-
-                    Enemy _ ->
-                        { game
-                            | cells =
-                                game.cells |> Dict.insert pos { cell | entity = Particle Bone }
-                        }
-
-                    _ ->
-                        game
-            )
-        |> Maybe.withDefault game

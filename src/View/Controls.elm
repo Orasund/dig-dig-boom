@@ -3,6 +3,7 @@ module View.Controls exposing (..)
 import Entity exposing (Item(..))
 import Html exposing (Attribute, Html)
 import Html.Attributes
+import Html.Style
 import Image
 import Input exposing (Input(..))
 import Layout
@@ -22,25 +23,45 @@ sprite attrs pos =
         }
 
 
-toHtml : { onInput : Input -> msg, bombs : Int } -> Html msg
+toHtml : { onInput : Input -> msg, bombs : Int, lifes : Int } -> Html msg
 toHtml args =
-    [ sprite
-        (Html.Attributes.style "transform" "rotate(90deg)"
-            :: Layout.asButton
-                { onPress = args.onInput InputUp |> Just
-                , label = "Move Up"
+    [ [ (if args.lifes > 1 then
+            Image.image [ Image.pixelated ]
+                { url = "heart.png"
+                , width = 64
+                , height = 64
                 }
+
+         else
+            Layout.none
         )
-        ( 0, 0 )
-    , Layout.row []
-        [ sprite
+            |> Layout.el
+                [ Html.Style.width "72px"
+                , Html.Style.height "72px"
+                ]
+      , sprite
+            (Html.Attributes.style "transform" "rotate(90deg)"
+                :: Layout.asButton
+                    { onPress = args.onInput InputUp |> Just
+                    , label = "Move Up"
+                    }
+            )
+            ( 0, 0 )
+      , Layout.el
+            [ Html.Style.width "72px"
+            , Html.Style.height "72px"
+            ]
+            Layout.none
+      ]
+        |> Layout.row []
+    , [ sprite
             (Layout.asButton
                 { onPress = args.onInput InputLeft |> Just
                 , label = "Move Left"
                 }
             )
             ( 0, 0 )
-        , (if args.bombs > 0 then
+      , (if args.bombs > 0 then
             [ sprite [] ( 1, 0 )
             , View.Item.toHtml
                 [ Html.Attributes.style "position" "absolute"
@@ -58,17 +79,17 @@ toHtml args =
                     ]
             ]
 
-           else
+         else
             [ sprite [] ( 1, 0 ) ]
-          )
+        )
             |> Html.div
                 (Html.Attributes.style "position" "relative"
                     :: Layout.asButton
-                        { onPress = args.onInput InputA |> Just
+                        { onPress = args.onInput InputActivate |> Just
                         , label = "Place Bombe"
                         }
                 )
-        , sprite
+      , sprite
             (Html.Attributes.style "transform" "rotate(180deg)"
                 :: Layout.asButton
                     { onPress = args.onInput InputRight |> Just
@@ -76,7 +97,8 @@ toHtml args =
                     }
             )
             ( 0, 0 )
-        ]
+      ]
+        |> Layout.row []
     , sprite
         (Html.Attributes.style "transform" "rotate(-90deg)"
             :: Layout.asButton

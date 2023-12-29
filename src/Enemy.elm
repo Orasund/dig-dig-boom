@@ -3,6 +3,7 @@ module Enemy exposing (..)
 import Direction exposing (Direction(..))
 import Entity exposing (EffectType(..), Enemy(..), Entity(..))
 import Game exposing (Game)
+import Game.Kill exposing (GameAndKill)
 import Math
 import Position
 import Set
@@ -13,7 +14,7 @@ update :
     , enemy : Enemy
     }
     -> Game
-    -> { game : Game, kill : List ( Int, Int ) }
+    -> GameAndKill
 update args game =
     let
         neighboringPlayer =
@@ -34,19 +35,7 @@ update args game =
             updatePlacedBombe args.pos game
 
         Rat ->
-            [ Up, Down, Left, Right ]
-                |> List.foldl
-                    (\dir out ->
-                        if out == Nothing then
-                            tryMovingRat args.pos
-                                dir
-                                game
-
-                        else
-                            out
-                    )
-                    Nothing
-                |> Maybe.withDefault { game = game, kill = [] }
+            updateRat args.pos game |> Game.Kill.none
 
         Goblin dir ->
             updateGoblin args.pos dir game
@@ -57,7 +46,7 @@ update args game =
         |> (\out -> { out | kill = neighboringPlayer ++ out.kill })
 
 
-updateGolem : ( Int, Int ) -> Game -> { game : Game, kill : List ( Int, Int ) }
+updateGolem : ( Int, Int ) -> Game -> GameAndKill
 updateGolem pos game =
     let
         newPos =
@@ -83,7 +72,7 @@ updateGolem pos game =
             { game = game, kill = [] }
 
 
-updateGoblin : ( Int, Int ) -> Direction -> Game -> { game : Game, kill : List ( Int, Int ) }
+updateGoblin : ( Int, Int ) -> Direction -> Game -> GameAndKill
 updateGoblin pos direction game =
     let
         newPos =
@@ -136,6 +125,23 @@ updateGoblin pos direction game =
         game
 
 
+updateRat : ( Int, Int ) -> Game -> Game
+updateRat pos game =
+    [ Up, Down, Left, Right ]
+        |> List.foldl
+            (\dir out ->
+                if out == Nothing then
+                    tryMovingRat pos
+                        dir
+                        game
+
+                else
+                    out
+            )
+            Nothing
+        |> Maybe.withDefault game
+
+
 tryMoving : { from : ( Int, Int ), to : ( Int, Int ) } -> Game -> Maybe Game
 tryMoving args game =
     if Set.member args.to game.floor then
@@ -145,30 +151,17 @@ tryMoving args game =
         Nothing
 
 
-tryMovingRat : ( Int, Int ) -> Direction -> Game -> Maybe { game : Game, kill : List ( Int, Int ) }
+tryMovingRat : ( Int, Int ) -> Direction -> Game -> Maybe Game
 tryMovingRat position direction game =
     case Game.findFirstInDirection position direction game of
         Just Player ->
-            case
-                game
-                    |> tryMoving
-                        { from = position
-                        , to =
-                            Direction.toVector direction
-                                |> Position.addToVector position
-                        }
-            of
-                Just g ->
-                    { game = g, kill = [] } |> Just
-
-                Nothing ->
-                    { game = game
-                    , kill =
-                        [ Direction.toVector direction
+            game
+                |> tryMoving
+                    { from = position
+                    , to =
+                        Direction.toVector direction
                             |> Position.addToVector position
-                        ]
                     }
-                        |> Just
 
         Just (Enemy PlacedBomb) ->
             game
@@ -180,18 +173,12 @@ tryMovingRat position direction game =
                             |> Direction.toVector
                             |> Position.addToVector position
                     }
-                |> Maybe.map
-                    (\g ->
-                        { game = g
-                        , kill = []
-                        }
-                    )
 
         _ ->
             Nothing
 
 
-updatePlacedBombe : ( Int, Int ) -> Game -> { game : Game, kill : List ( Int, Int ) }
+updatePlacedBombe : ( Int, Int ) -> Game -> GameAndKill
 updatePlacedBombe location game =
     [ Up, Down, Left, Right ]
         |> List.foldl

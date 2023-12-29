@@ -6,4 +6,5 @@ type Input
     | InputLeft
     | InputRight
     | InputDown
-    | InputA
+    | InputActivate
+    | InputUndo
