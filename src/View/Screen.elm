@@ -108,7 +108,10 @@ world args game =
                             ]
 
                     else
-                        View.Cell.hole []
+                        View.Cell.hole
+                            [ Html.Style.positionAbsolute
+                            , Html.Style.top "0"
+                            ]
                   , game.items
                         |> Dict.get ( x, y )
                         |> Maybe.map
@@ -121,6 +124,12 @@ world args game =
                             )
                         |> Maybe.withDefault Layout.none
                   ]
+                    ++ (if game.floor |> Set.member ( x, y ) |> not then
+                            View.Cell.borders ( x, y ) game
+
+                        else
+                            []
+                       )
                     |> Html.div
                         [ Html.Style.positionAbsolute
                         , Html.Attributes.style "left"
@@ -156,6 +165,7 @@ world args game =
             [ Html.Attributes.style "position" "relative"
             , Html.Attributes.style "width" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")
             , Html.Attributes.style "height" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")
+            , Html.Attributes.style "border" "4px solid white"
             ]
     , View.Controls.toHtml
         { onInput = args.onInput

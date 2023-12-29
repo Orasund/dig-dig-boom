@@ -17,4 +17,4 @@ maxLifes =
 
 
 cellSize =
-    50
+    64

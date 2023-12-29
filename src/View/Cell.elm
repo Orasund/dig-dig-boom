@@ -3,8 +3,13 @@ module View.Cell exposing (..)
 import Config
 import Direction exposing (Direction(..))
 import Entity exposing (EffectType(..), Enemy(..), Entity(..), Item(..))
+import Game exposing (Game)
 import Html exposing (Attribute, Html)
+import Html.Attributes
+import Html.Style
 import Image
+import Layout
+import Set
 
 
 sprite : List (Attribute msg) -> ( Int, Int ) -> Html msg
@@ -20,6 +25,19 @@ sprite attrs pos =
         }
 
 
+border : List (Attribute msg) -> ( Int, Int ) -> Html msg
+border attrs pos =
+    Image.sprite
+        (Image.pixelated :: attrs)
+        { pos = pos
+        , sheetColumns = 2
+        , sheetRows = 2
+        , url = "border.png"
+        , height = Config.cellSize
+        , width = Config.cellSize
+        }
+
+
 floor : List (Attribute msg) -> Html msg
 floor attrs =
     sprite attrs ( 0, 3 )
@@ -27,7 +45,7 @@ floor attrs =
 
 hole : List (Attribute msg) -> Html msg
 hole attrs =
-    sprite attrs ( 0, 2 )
+    sprite attrs ( 1, 2 )
 
 
 toHtml : List (Attribute msg) -> { frame : Int, playerDirection : Direction } -> Entity -> Html msg
@@ -103,3 +121,36 @@ fromEnemy args enemy =
                 { direction = Direction.mirror args.playerDirection
                 , frame = args.frame
                 }
+
+
+borders : ( Int, Int ) -> Game -> List (Html msg)
+borders ( x, y ) game =
+    let
+        attrs =
+            [ Html.Style.positionAbsolute
+            , Html.Style.top "0"
+            ]
+    in
+    [ if Set.member ( x, y - 1 ) game.floor then
+        border attrs ( 0, 0 )
+            |> Just
+
+      else
+        Nothing
+    , if Set.member ( x - 1, y ) game.floor then
+        border attrs ( 0, 1 ) |> Just
+
+      else
+        Nothing
+    , if Set.member ( x, y + 1 ) game.floor then
+        border attrs ( 1, 1 ) |> Just
+
+      else
+        Nothing
+    , if Set.member ( x + 1, y ) game.floor then
+        border attrs ( 1, 0 ) |> Just
+
+      else
+        Nothing
+    ]
+        |> List.filterMap identity
