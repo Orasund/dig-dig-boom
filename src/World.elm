@@ -2,7 +2,6 @@ module World exposing (..)
 
 import Dict exposing (Dict)
 import Direction exposing (Direction)
-import Game.Build exposing (neighbors4)
 import Game.Level exposing (Level)
 import Position
 import Random exposing (Generator, Seed)
@@ -20,6 +19,7 @@ type Node
 type alias World =
     { nodes : Dict ( Int, Int ) Node
     , player : ( Int, Int )
+    , stages : Dict Int Int
     }
 
 
@@ -34,6 +34,7 @@ new seed =
                 |> Room
             )
     , player = ( 0, 0 )
+    , stages = Dict.empty
     }
 
 
@@ -61,40 +62,41 @@ solveRoom world =
     in
     [ ( x + 1, y ), ( x - 1, y ), ( x, y + 1 ), ( x, y - 1 ) ]
         |> List.filter (\( posX, posY ) -> Dict.member ( posX, posY ) world.nodes |> not)
-        |> List.foldl
-            (\pos ->
-                Random.andThen
-                    (\dict ->
-                        generateNode pos world
-                            |> Random.map
-                                (\node ->
-                                    Dict.insert pos node dict
-                                )
-                    )
-            )
-            (Random.constant world.nodes)
+        |> List.foldl (\pos -> Random.andThen (insertRandomNode pos))
+            (Random.constant world)
         |> Random.map
-            (Dict.update ( x, y )
-                (\maybe ->
-                    maybe
-                        |> Maybe.map
-                            (\node ->
-                                case node of
-                                    Room room ->
-                                        Room { room | solved = True }
+            (\w ->
+                { w
+                    | nodes =
+                        w.nodes
+                            |> Dict.update ( x, y )
+                                (\maybe ->
+                                    maybe
+                                        |> Maybe.map
+                                            (\node ->
+                                                case node of
+                                                    Room room ->
+                                                        Room { room | solved = True }
 
-                                    _ ->
-                                        node
-                            )
-                )
+                                                    _ ->
+                                                        node
+                                            )
+                                )
+                }
             )
-        |> Random.map (\nodes -> { world | nodes = nodes })
 
 
-generateNode : ( Int, Int ) -> World -> Generator Node
-generateNode ( x, y ) world =
+insertRandomNode : ( Int, Int ) -> World -> Generator World
+insertRandomNode ( x, y ) world =
+    let
+        dungeon =
+            abs y // 2
+
+        stage =
+            (Dict.get dungeon world.stages |> Maybe.withDefault 0) + 1
+    in
     if y >= 0 then
-        Random.constant Wall
+        { world | nodes = world.nodes |> Dict.insert ( x, y ) Wall } |> Random.constant
 
     else
         let
@@ -126,19 +128,26 @@ generateNode ( x, y ) world =
             , Random.independentSeed
                 |> Random.map
                     (\seed ->
-                        { seed = seed
-                        , level = { dungeon = 42, stage = 42 }
-                        , solved = False
+                        { world
+                            | nodes =
+                                world.nodes
+                                    |> Dict.insert ( x, y )
+                                        ({ seed = seed
+                                         , level = { dungeon = dungeon, stage = stage }
+                                         , solved = False
+                                         }
+                                            |> Room
+                                        )
+                            , stages = world.stages |> Dict.insert dungeon stage
                         }
-                            |> Room
                     )
             )
             [ ( if (y == -1) && abs x == 1 then
                     0
 
                 else
-                    toFloat (1 + abs (x // 2))
-              , Random.constant Wall
+                    toFloat (1 + abs x)
+              , { world | nodes = world.nodes |> Dict.insert ( x, y ) Wall } |> Random.constant
               )
             ]
             |> Random.andThen identity

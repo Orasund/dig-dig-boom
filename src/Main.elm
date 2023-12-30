@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Browser.Events
-import Dict exposing (Dict)
+import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..))
 import Game exposing (Game)
@@ -13,13 +13,12 @@ import Html.Style
 import Input exposing (Input(..))
 import Json.Decode as Decode
 import Layout
-import Position
 import Random exposing (Seed)
 import Time
 import View.Screen as Screen
 import View.Stylesheet
 import View.World
-import World exposing (World)
+import World exposing (Node(..), World)
 
 
 
@@ -87,40 +86,37 @@ init _ =
 -------------------------------
 
 
-generateLevel : Model -> Model
-generateLevel model =
+generateLevel : Seed -> Level -> Model -> Model
+generateLevel seed level model =
     let
-        ( game, seed ) =
-            Random.step (Game.Level.generate model.level) model.seed
+        ( game, _ ) =
+            Random.step (Game.Level.generate level) seed
     in
     { model
-        | levelSeed = model.seed
-        , seed = seed
+        | levelSeed = seed
         , game = { game | bombs = model.game.bombs, lifes = model.game.lifes }
+        , level = level
         , overlay = Nothing
     }
 
 
 gameWon : Model -> ( Model, Cmd Msg )
 gameWon model =
-    let
-        level =
-            Game.Level.next model.level
-    in
-    ( { model | history = [], level = level }
-        |> generateLevel
-    , Cmd.none
-    )
+    Random.step (World.solveRoom model.world) model.seed
+        |> (\( world, seed ) ->
+                ( { model | world = world, seed = seed, overlay = Just WorldMap, history = [] }
+                , Cmd.none
+                )
+           )
 
 
 gameLost : Model -> ( Model, Cmd Msg )
 gameLost model =
     ( { model
-        | seed = model.levelSeed
-        , game = model.game |> (\game -> { game | lifes = 1, bombs = 0 })
+        | game = model.game |> (\game -> { game | lifes = 1, bombs = 0 })
         , history = []
       }
-        |> generateLevel
+        |> generateLevel model.levelSeed model.level
     , Cmd.none
     )
 
@@ -152,7 +148,7 @@ update msg model =
                     updateWorldMap input model
 
                 Just Menu ->
-                    ( generateLevel model
+                    ( generateLevel model.seed model.level model
                     , Cmd.none
                     )
 
@@ -227,12 +223,12 @@ updateWorldMap : Input -> Model -> ( Model, Cmd Msg )
 updateWorldMap input model =
     case input of
         InputActivate ->
-            Random.step (World.solveRoom model.world) model.seed
-                |> (\( world, seed ) ->
-                        ( { model | world = world, seed = seed }
-                        , Cmd.none
-                        )
-                   )
+            case model.world.nodes |> Dict.get model.world.player of
+                Just (Room { level, seed }) ->
+                    ( generateLevel seed level model, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
         InputDir dir ->
             ( World.move dir model.world

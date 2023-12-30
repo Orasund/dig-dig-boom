@@ -18,3 +18,7 @@ maxLifes =
 
 cellSize =
     64
+
+
+stageRepetition =
+    2

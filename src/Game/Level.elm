@@ -66,13 +66,13 @@ generate : Level -> Generator Game
 generate level =
     case level.dungeon of
         0 ->
-            golemDungeon level.stage
+            tutorialDungeon level.stage
 
         1 ->
             goblinDungeon level.stage
 
         2 ->
-            tutorialDungeon level.stage
+            golemDungeon level.stage
 
         _ ->
             Random.map2 toGame
@@ -89,7 +89,7 @@ generate level =
 
 golemDungeon : Int -> Generator Game
 golemDungeon stage =
-    case stage of
+    case stage // Config.stageRepetition of
         0 ->
             [ List.repeat 1 (EntityBlock (Enemy Golem))
             , List.repeat 1 (EntityBlock Crate)
@@ -107,7 +107,7 @@ golemDungeon stage =
 
         1 ->
             [ List.repeat 2 (EntityBlock (Enemy Golem))
-            , List.repeat 2 (EntityBlock Crate)
+            , List.repeat 1 (EntityBlock Crate)
             , List.repeat 1 (ItemBlock Heart)
             ]
                 |> List.concat
@@ -161,12 +161,6 @@ golemDungeon stage =
                   , "⬜⬜⬜⬜⬜"
                   , "❌⬜😊⬜❌"
                   ]
-                , [ "⬜⬜⬜⬜❌"
-                  , "⬜⬜⬜❌⬜"
-                  , "❌⬜⬜⬜❌"
-                  , "⬜❌⬜⬜⬜"
-                  , "❌⬜😊⬜⬜"
-                  ]
                 , [ "⬜❌⬜❌⬜"
                   , "❌⬜⬜⬜❌"
                   , "⬜⬜📦⬜⬜"
@@ -209,7 +203,7 @@ golemDungeon stage =
 
 goblinDungeon : Int -> Generator Game
 goblinDungeon stage =
-    case stage of
+    case stage // Config.stageRepetition of
         0 ->
             [ List.repeat 1 (EntityBlock (Enemy (Goblin Left)))
             , List.repeat 1 HoleBlock
@@ -243,13 +237,12 @@ goblinDungeon stage =
             , List.repeat 1 (EntityBlock (Enemy (Goblin Left)))
             , List.repeat 1 (EntityBlock (Enemy (Goblin Down)))
             , List.repeat 2 HoleBlock
-            , List.repeat 1 (ItemBlock Heart)
             ]
                 |> List.concat
                 |> toGame
                     [ "❌❌❌❌❌"
                     , "⬜⬜📦⬜⬜"
-                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜💚⬜⬜"
                     , "⬜⬜⬜⬜⬜"
                     , "⬜⬜😊⬜⬜"
                     ]
@@ -328,7 +321,7 @@ holeChallenge =
 
 tutorialDungeon : Int -> Generator Game
 tutorialDungeon stage =
-    case stage of
+    case stage // Config.stageRepetition of
         0 ->
             [ List.repeat 1 (EntityBlock (Enemy Rat))
             , List.repeat 2 (ItemBlock InactiveBomb)
