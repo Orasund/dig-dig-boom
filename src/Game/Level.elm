@@ -66,6 +66,12 @@ generate : Level -> Generator Game
 generate level =
     case level.dungeon of
         0 ->
+            golemDungeon level.stage
+
+        1 ->
+            goblinDungeon level.stage
+
+        2 ->
             tutorialDungeon level.stage
 
         _ ->
@@ -73,13 +79,251 @@ generate level =
                 randomLayout
                 (Random.uniform
                     golemLevel
-                    []
-                 {--[ ratLevel
-                , goblinLevel
-                , finalLevel
-                ]--}
+                    [ ratLevel
+                    , goblinLevel
+                    , finalLevel
+                    ]
                 )
                 |> Random.andThen identity
+
+
+golemDungeon : Int -> Generator Game
+golemDungeon stage =
+    case stage of
+        0 ->
+            [ List.repeat 1 (EntityBlock (Enemy Golem))
+            , List.repeat 1 (EntityBlock Crate)
+            , List.repeat 1 (ItemBlock InactiveBomb)
+            , List.repeat 1 HoleBlock
+            ]
+                |> List.concat
+                |> toGame
+                    [ "❌⬜⬜⬜❌"
+                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜💚⬜⬜"
+                    , "⬜⬜⬜⬜⬜"
+                    , "❌⬜😊⬜❌"
+                    ]
+
+        1 ->
+            [ List.repeat 2 (EntityBlock (Enemy Golem))
+            , List.repeat 2 (EntityBlock Crate)
+            , List.repeat 1 (ItemBlock Heart)
+            ]
+                |> List.concat
+                |> toGame
+                    [ "⬜⬜⬜⬜⬜"
+                    , "⬜📦❌⬜⬜"
+                    , "⬜❌📦❌⬜"
+                    , "⬜⬜❌⬜⬜"
+                    , "⬜⬜😊⬜⬜"
+                    ]
+
+        2 ->
+            [ List.repeat 3 (EntityBlock (Enemy Golem))
+            , List.repeat 2 (EntityBlock Crate)
+            , List.repeat 1 (ItemBlock Heart)
+            , List.repeat 1 (ItemBlock InactiveBomb)
+            ]
+                |> List.concat
+                |> toGame
+                    [ "📦⬜⬜⬜📦"
+                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜💣⬜⬜"
+                    , "⬜⬜⬜⬜⬜"
+                    , "📦⬜😊⬜📦"
+                    ]
+
+        3 ->
+            [ List.repeat 1 (EntityBlock (Enemy Golem))
+            , List.repeat 1 (ItemBlock InactiveBomb)
+            ]
+                |> List.concat
+                |> toGame
+                    [ "⬜⬜⬜⬜⬜"
+                    , "⬜⬜📦⬜⬜"
+                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜😊⬜⬜"
+                    ]
+
+        _ ->
+            Random.uniform
+                [ "❌⬜⬜⬜❌"
+                , "⬜⬜⬜⬜⬜"
+                , "⬜⬜⬜⬜⬜"
+                , "⬜⬜⬜⬜⬜"
+                , "❌⬜😊⬜❌"
+                ]
+                [ [ "⬜❌⬜❌⬜"
+                  , "⬜⬜❌⬜⬜"
+                  , "⬜⬜📦⬜⬜"
+                  , "⬜⬜⬜⬜⬜"
+                  , "❌⬜😊⬜❌"
+                  ]
+                , [ "⬜⬜⬜⬜❌"
+                  , "⬜⬜⬜❌⬜"
+                  , "❌⬜⬜⬜❌"
+                  , "⬜❌⬜⬜⬜"
+                  , "❌⬜😊⬜⬜"
+                  ]
+                , [ "⬜❌⬜❌⬜"
+                  , "❌⬜⬜⬜❌"
+                  , "⬜⬜📦⬜⬜"
+                  , "⬜⬜⬜⬜⬜"
+                  , "⬜⬜😊⬜⬜"
+                  ]
+                ]
+                |> Random.andThen
+                    (\layout ->
+                        Random.uniform
+                            ([ List.repeat 3 (Enemy Golem |> EntityBlock)
+                             , List.repeat 3 (ItemBlock InactiveBomb)
+                             , List.repeat 3 (EntityBlock Crate)
+                             , List.repeat 1 (ItemBlock Heart)
+                             , List.repeat 1 HoleBlock
+                             ]
+                                |> List.concat
+                            )
+                            [ [ List.repeat 1 (Enemy Golem |> EntityBlock)
+                              , List.repeat 1 (Enemy (Goblin Down) |> EntityBlock)
+                              , List.repeat 1 (Enemy (Goblin Left) |> EntityBlock)
+                              , List.repeat 3 (ItemBlock InactiveBomb)
+                              , List.repeat 3 (EntityBlock Crate)
+                              , List.repeat 1 (ItemBlock Heart)
+                              , List.repeat 1 HoleBlock
+                              ]
+                                |> List.concat
+                            , [ List.repeat 1 (Enemy Golem |> EntityBlock)
+                              , List.repeat 2 (Enemy Rat |> EntityBlock)
+                              , List.repeat 3 (ItemBlock InactiveBomb)
+                              , List.repeat 3 (EntityBlock Crate)
+                              , List.repeat 1 (ItemBlock Heart)
+                              , List.repeat 1 HoleBlock
+                              ]
+                                |> List.concat
+                            ]
+                            |> Random.andThen (toGame layout)
+                    )
+
+
+goblinDungeon : Int -> Generator Game
+goblinDungeon stage =
+    case stage of
+        0 ->
+            [ List.repeat 1 (EntityBlock (Enemy (Goblin Left)))
+            , List.repeat 1 HoleBlock
+            ]
+                |> List.concat
+                |> toGame
+                    [ "❌⬜💚⬜❌"
+                    , "❌⬜⬜⬜❌"
+                    , "❌⬜⬜⬜❌"
+                    , "❌⬜⬜⬜❌"
+                    , "❌⬜😊⬜❌"
+                    ]
+
+        1 ->
+            [ List.repeat 1 (EntityBlock (Enemy (Goblin Down)))
+            , List.repeat 1 (EntityBlock (Enemy (Goblin Up)))
+            , List.repeat 1 HoleBlock
+            , List.repeat 1 (ItemBlock Heart)
+            ]
+                |> List.concat
+                |> toGame
+                    [ "❌❌❌❌❌"
+                    , "❌⬜📦⬜❌"
+                    , "❌⬜⬜⬜❌"
+                    , "❌⬜⬜⬜❌"
+                    , "❌⬜😊⬜❌"
+                    ]
+
+        2 ->
+            [ List.repeat 1 (EntityBlock (Enemy (Goblin Right)))
+            , List.repeat 1 (EntityBlock (Enemy (Goblin Left)))
+            , List.repeat 1 (EntityBlock (Enemy (Goblin Down)))
+            , List.repeat 2 HoleBlock
+            , List.repeat 1 (ItemBlock Heart)
+            ]
+                |> List.concat
+                |> toGame
+                    [ "❌❌❌❌❌"
+                    , "⬜⬜📦⬜⬜"
+                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜😊⬜⬜"
+                    ]
+
+        3 ->
+            holeChallenge
+
+        _ ->
+            Random.uniform
+                [ "❌⬜⬜⬜❌"
+                , "❌⬜⬜⬜❌"
+                , "❌⬜⬜⬜❌"
+                , "❌⬜⬜⬜❌"
+                , "❌⬜😊⬜❌"
+                ]
+                [ [ "⬜⬜⬜⬜⬜"
+                  , "⬜⬜⬜⬜⬜"
+                  , "❌❌❌❌❌"
+                  , "⬜⬜📦⬜⬜"
+                  , "⬜⬜😊⬜⬜"
+                  ]
+                , [ "❌⬜⬜⬜❌"
+                  , "⬜⬜⬜⬜⬜"
+                  , "⬜⬜⬜⬜⬜"
+                  , "⬜⬜⬜⬜⬜"
+                  , "❌⬜😊⬜❌"
+                  ]
+                ]
+                |> Random.andThen
+                    (\layout ->
+                        Random.uniform
+                            ([ List.repeat 1 (EntityBlock (Enemy (Goblin Right)))
+                             , List.repeat 1 (EntityBlock (Enemy (Goblin Left)))
+                             , List.repeat 1 (EntityBlock (Enemy (Goblin Down)))
+                             , List.repeat 2 (ItemBlock InactiveBomb)
+                             , List.repeat 2 (EntityBlock Crate)
+                             , List.repeat 1 (ItemBlock Heart)
+                             ]
+                                |> List.concat
+                            )
+                            [ [ List.repeat 1 (EntityBlock (Enemy (Goblin Right)))
+                              , List.repeat 1 (EntityBlock (Enemy (Goblin Left)))
+                              , List.repeat 2 (ItemBlock InactiveBomb)
+                              , List.repeat 3 (EntityBlock Crate)
+                              , List.repeat 1 (ItemBlock Heart)
+                              ]
+                                |> List.concat
+                            , [ List.repeat 1 (EntityBlock (Enemy (Goblin Down)))
+                              , List.repeat 1 (EntityBlock (Enemy Rat))
+                              , List.repeat 2 (ItemBlock InactiveBomb)
+                              , List.repeat 3 (EntityBlock Crate)
+                              , List.repeat 1 (ItemBlock Heart)
+                              ]
+                                |> List.concat
+                            ]
+                            |> Random.andThen (toGame layout)
+                    )
+
+
+holeChallenge : Generator Game
+holeChallenge =
+    [ List.repeat 1 (EntityBlock (Enemy (Goblin Left)))
+    , List.repeat 1 (EntityBlock (Enemy (Goblin Down)))
+    , List.repeat 1 (EntityBlock Crate)
+    , List.repeat 2 (ItemBlock Heart)
+    ]
+        |> List.concat
+        |> toGame
+            [ "⬜⬜⬜⬜⬜"
+            , "⬜📦⬜⬜⬜"
+            , "⬜⬜❌⬜⬜"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜😊⬜⬜"
+            ]
 
 
 tutorialDungeon : Int -> Generator Game
@@ -102,7 +346,7 @@ tutorialDungeon stage =
         1 ->
             [ List.repeat 2 (EntityBlock (Enemy Rat))
             , List.repeat 5 (ItemBlock InactiveBomb)
-            , List.repeat 3 (EntityBlock Crate)
+            , List.repeat 4 (EntityBlock Crate)
             ]
                 |> List.concat
                 |> toGame

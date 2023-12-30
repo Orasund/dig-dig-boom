@@ -95,8 +95,11 @@ movePlayer position game =
                                 |> Enemy.stun game.playerDirection
                                 |> Stunned
                         )
-                    |> Game.move { from = newLocation, to = newPos }
-                    |> Maybe.withDefault game
+                    |> (\g ->
+                            g
+                                |> Game.move { from = newLocation, to = newPos }
+                                |> Maybe.withDefault g
+                       )
             , kill =
                 if game.floor |> Set.member newPos then
                     []
