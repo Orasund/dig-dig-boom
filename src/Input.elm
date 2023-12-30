@@ -1,10 +1,9 @@
 module Input exposing (..)
 
+import Direction exposing (Direction)
+
 
 type Input
-    = InputUp
-    | InputLeft
-    | InputRight
-    | InputDown
+    = InputDir Direction
     | InputActivate
     | InputUndo

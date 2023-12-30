@@ -1,5 +1,6 @@
 module View.Controls exposing (..)
 
+import Direction exposing (Direction(..))
 import Entity exposing (Item(..))
 import Html exposing (Attribute, Html)
 import Html.Attributes
@@ -42,7 +43,7 @@ toHtml args =
       , sprite
             (Html.Attributes.style "transform" "rotate(90deg)"
                 :: Layout.asButton
-                    { onPress = args.onInput InputUp |> Just
+                    { onPress = args.onInput (InputDir Up) |> Just
                     , label = "Move Up"
                     }
             )
@@ -56,7 +57,7 @@ toHtml args =
         |> Layout.row []
     , [ sprite
             (Layout.asButton
-                { onPress = args.onInput InputLeft |> Just
+                { onPress = args.onInput (InputDir Left) |> Just
                 , label = "Move Left"
                 }
             )
@@ -92,7 +93,7 @@ toHtml args =
       , sprite
             (Html.Attributes.style "transform" "rotate(180deg)"
                 :: Layout.asButton
-                    { onPress = args.onInput InputRight |> Just
+                    { onPress = args.onInput (InputDir Right) |> Just
                     , label = "Move Right"
                     }
             )
@@ -102,7 +103,7 @@ toHtml args =
     , sprite
         (Html.Attributes.style "transform" "rotate(-90deg)"
             :: Layout.asButton
-                { onPress = args.onInput InputDown |> Just
+                { onPress = args.onInput (InputDir Down) |> Just
                 , label = "Move Down"
                 }
         )

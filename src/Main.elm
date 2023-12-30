@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Browser.Events
+import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..))
 import Game exposing (Game)
@@ -12,10 +13,13 @@ import Html.Style
 import Input exposing (Input(..))
 import Json.Decode as Decode
 import Layout
+import Position
 import Random exposing (Seed)
 import Time
 import View.Screen as Screen
 import View.Stylesheet
+import View.World
+import World exposing (World)
 
 
 
@@ -26,6 +30,7 @@ import View.Stylesheet
 
 type Overlay
     = Menu
+    | WorldMap
 
 
 type alias Model =
@@ -36,6 +41,7 @@ type alias Model =
     , frame : Int
     , history : List Game
     , level : Level
+    , world : World
     }
 
 
@@ -65,10 +71,11 @@ init _ =
     ( { levelSeed = seed
       , seed = seed
       , game = game
-      , overlay = Just Menu
+      , overlay = Just WorldMap --Just Menu
       , frame = 0
       , history = []
       , level = level
+      , world = World.new seed
       }
     , Random.generate GotSeed Random.independentSeed
     )
@@ -141,6 +148,9 @@ update msg model =
     case msg of
         Input input ->
             case model.overlay of
+                Just WorldMap ->
+                    updateWorldMap input model
+
                 Just Menu ->
                     ( generateLevel model
                     , Cmd.none
@@ -169,30 +179,9 @@ update msg model =
                                         , Cmd.none
                                         )
 
-                                    InputUp ->
+                                    InputDir dir ->
                                         ( model.game
-                                            |> updateDirection Up
-                                            |> setGame model
-                                        , Cmd.none
-                                        )
-
-                                    InputLeft ->
-                                        ( model.game
-                                            |> updateDirection Left
-                                            |> setGame model
-                                        , Cmd.none
-                                        )
-
-                                    InputDown ->
-                                        ( model.game
-                                            |> updateDirection Down
-                                            |> setGame model
-                                        , Cmd.none
-                                        )
-
-                                    InputRight ->
-                                        ( model.game
-                                            |> updateDirection Right
+                                            |> updateDirection dir
                                             |> setGame model
                                         , Cmd.none
                                         )
@@ -234,6 +223,28 @@ update msg model =
             ( model, Cmd.none )
 
 
+updateWorldMap : Input -> Model -> ( Model, Cmd Msg )
+updateWorldMap input model =
+    case input of
+        InputActivate ->
+            Random.step (World.solveRoom model.world) model.seed
+                |> (\( world, seed ) ->
+                        ( { model | world = world, seed = seed }
+                        , Cmd.none
+                        )
+                   )
+
+        InputDir dir ->
+            ( World.move dir model.world
+                |> Maybe.map (\world -> { model | world = world })
+                |> Maybe.withDefault model
+            , Cmd.none
+            )
+
+        _ ->
+            ( model, Cmd.none )
+
+
 
 -------------------------------
 -- SUBSCRIPTIONS
@@ -249,16 +260,16 @@ toDirection : String -> Msg
 toDirection string =
     case string of
         "a" ->
-            Input InputLeft
+            Input (InputDir Left)
 
         "d" ->
-            Input InputRight
+            Input (InputDir Right)
 
         "w" ->
-            Input InputUp
+            Input (InputDir Up)
 
         "s" ->
-            Input InputDown
+            Input (InputDir Down)
 
         "r" ->
             Input InputUndo
@@ -303,6 +314,13 @@ view model =
                         , Html.Style.top "0"
                         ]
                         { onClick = Input InputActivate }
+
+            Just WorldMap ->
+                View.World.toHtml
+                    [ Html.Style.positionAbsolute
+                    , Html.Style.top "0"
+                    ]
+                    model.world
 
             Just Menu ->
                 Screen.menu
