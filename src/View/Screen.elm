@@ -56,6 +56,7 @@ death attrs args =
             ([ Html.Attributes.style "font-size" "60px"
              , Html.Attributes.style "color" "white"
              , Html.Attributes.class "dark-background"
+             , Html.Style.width "400px"
              ]
                 ++ Layout.asButton
                     { label = "Next Level"
@@ -67,23 +68,26 @@ death attrs args =
 
 menu : List (Attribute msg) -> { frame : Int, onClick : msg } -> Html msg
 menu attrs args =
-    [ [ "DIG" |> Layout.text [ Layout.contentCentered ]
-      , "DIG" |> Layout.text [ Layout.contentCentered ]
-      , "BOOM" |> Layout.text [ Layout.contentCentered ]
+    [ [ "Dungeon" |> Layout.text [ Layout.contentCentered ]
+      , "Demolition" |> Layout.text [ Layout.contentCentered ]
       ]
         |> Layout.column
-            [ Html.Attributes.style "font-size" "60px"
+            [ Html.Attributes.style "font-size" "46px"
             , Html.Attributes.style "color" "white"
             ]
     , logo args.frame
     ]
         |> Layout.column
-            (Html.Attributes.class "dark-background"
-                :: Layout.asButton
+            ([ Html.Attributes.class "dark-background"
+             , Html.Style.width "400px"
+             , Html.Style.height "700px"
+             ]
+                ++ Layout.asButton
                     { label = "Next Level"
                     , onPress = Just args.onClick
                     }
                 ++ attrs
+                ++ Layout.centered
             )
 
 
@@ -174,6 +178,8 @@ world args game =
         }
     ]
         |> Layout.column
-            (Html.Attributes.style "width" "400px"
-                :: Layout.centered
+            ([ Html.Attributes.style "width" "400px"
+             , Html.Attributes.style "padding" (String.fromInt Config.cellSize ++ "px 0")
+             ]
+                ++ Layout.centered
             )

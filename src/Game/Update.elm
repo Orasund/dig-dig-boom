@@ -1,4 +1,4 @@
-module Game.Update exposing (movePlayerInDirectionAndUpdateGame, placeBombeAndUpdateGame)
+module Game.Update exposing (checkIfWon, movePlayerInDirectionAndUpdateGame, placeBombeAndUpdateGame)
 
 import Dict
 import Direction exposing (Direction(..))
@@ -15,9 +15,31 @@ updateGame : Game -> Game
 updateGame game =
     game.cells
         |> Dict.toList
-        |> List.foldl
-            updateCell
-            game
+        |> List.foldl updateCell game
+        |> checkIfWon
+
+
+checkIfWon : Game -> Game
+checkIfWon game =
+    if
+        (Game.get ( 2, -1 ) game == Nothing)
+            && (game.cells
+                    |> Dict.filter
+                        (\_ cell ->
+                            case cell.entity of
+                                Enemy _ ->
+                                    True
+
+                                _ ->
+                                    False
+                        )
+                    |> (==) Dict.empty
+               )
+    then
+        game |> Game.insert ( 2, -1 ) Door
+
+    else
+        game
 
 
 updateCell : ( ( Int, Int ), Cell ) -> Game -> Game
@@ -59,70 +81,84 @@ movePlayer position game =
                 |> Direction.toVector
                 |> Position.addToVector position
     in
-    if Math.posIsValid newLocation then
-        case game.cells |> Dict.get newLocation |> Maybe.map .entity of
-            Just (Enemy enemy) ->
-                let
-                    newPos =
-                        game |> Game.findFirstEmptyCellInDirection newLocation game.playerDirection
-                in
-                { game =
-                    game
-                        |> Game.update newLocation
-                            (\_ ->
-                                enemy
-                                    |> Enemy.stun game.playerDirection
-                                    |> Stunned
-                            )
-                        |> Game.move { from = newLocation, to = newPos }
-                        |> Maybe.withDefault game
-                , kill =
-                    if game.floor |> Set.member newPos then
-                        []
+    case game.cells |> Dict.get newLocation |> Maybe.map .entity of
+        Just (Enemy enemy) ->
+            let
+                newPos =
+                    game |> Game.findFirstEmptyCellInDirection newLocation game.playerDirection
+            in
+            { game =
+                game
+                    |> Game.update newLocation
+                        (\_ ->
+                            enemy
+                                |> Enemy.stun game.playerDirection
+                                |> Stunned
+                        )
+                    |> Game.move { from = newLocation, to = newPos }
+                    |> Maybe.withDefault game
+            , kill =
+                if game.floor |> Set.member newPos then
+                    []
 
-                    else
-                        [ newPos ]
+                else
+                    [ newPos ]
+            }
+
+        Just (Particle _) ->
+            { game =
+                game
+                    |> Game.remove newLocation
+                    |> Game.move { from = position, to = newLocation }
+                    |> Maybe.withDefault game
+            , kill = []
+            }
+
+        Just Crate ->
+            { game =
+                game
+                    |> pushCrate newLocation game.playerDirection
+                    |> Maybe.andThen (Game.move { from = position, to = newLocation })
+                    |> Maybe.map (takeItem newLocation)
+                    |> Maybe.withDefault game
+            , kill = []
+            }
+
+        Just Door ->
+            { game =
+                { game
+                    | won = True
+                    , cells =
+                        game.cells
+                            |> Dict.get position
+                            |> Maybe.map
+                                (\a ->
+                                    game.cells
+                                        |> Dict.insert newLocation a
+                                        |> Dict.remove position
+                                )
+                            |> Maybe.withDefault game.cells
                 }
+            , kill = []
+            }
 
-            Just (Particle _) ->
-                { game =
+        Nothing ->
+            { game =
+                if Math.posIsValid newLocation && Set.member newLocation game.floor then
                     game
-                        |> Game.remove newLocation
                         |> Game.move { from = position, to = newLocation }
-                        |> Maybe.withDefault game
-                , kill = []
-                }
-
-            Just Crate ->
-                { game =
-                    game
-                        |> pushCrate newLocation game.playerDirection
-                        |> Maybe.andThen (Game.move { from = position, to = newLocation })
                         |> Maybe.map (takeItem newLocation)
                         |> Maybe.withDefault game
-                , kill = []
-                }
 
-            Nothing ->
-                { game =
-                    if Set.member newLocation game.floor then
-                        game
-                            |> Game.move { from = position, to = newLocation }
-                            |> Maybe.map (takeItem newLocation)
-                            |> Maybe.withDefault game
+                else
+                    game
+            , kill = []
+            }
 
-                    else
-                        game
-                , kill = []
-                }
-
-            _ ->
-                { game = game |> Game.face game.playerDirection
-                , kill = []
-                }
-
-    else
-        { game = game, kill = [] }
+        _ ->
+            { game = game |> Game.face game.playerDirection
+            , kill = []
+            }
 
 
 takeItem : ( Int, Int ) -> Game -> Game

@@ -10,6 +10,24 @@ import Position
 import Random exposing (Generator)
 
 
+type alias Level =
+    { dungeon : Int
+    , stage : Int
+    }
+
+
+first : Level
+first =
+    { dungeon = 0
+    , stage = 0
+    }
+
+
+next : Level -> Level
+next level =
+    { level | stage = level.stage + 1 }
+
+
 toGame : List String -> List BuildingBlock -> Generator Game
 toGame emojis blocks =
     let
@@ -44,16 +62,138 @@ toGame emojis blocks =
     rec ()
 
 
-generate : Generator Game
-generate =
-    Random.uniform
-        golemLevel
-        []
-        {--[ ratLevel
-        , goblinLevel
-        , finalLevel
-        ]--}
-        |> Random.andThen identity
+generate : Level -> Generator Game
+generate level =
+    case level.dungeon of
+        0 ->
+            tutorialDungeon level.stage
+
+        _ ->
+            Random.map2 toGame
+                randomLayout
+                (Random.uniform
+                    golemLevel
+                    []
+                 {--[ ratLevel
+                , goblinLevel
+                , finalLevel
+                ]--}
+                )
+                |> Random.andThen identity
+
+
+tutorialDungeon : Int -> Generator Game
+tutorialDungeon stage =
+    case stage of
+        0 ->
+            [ List.repeat 1 (EntityBlock (Enemy Rat))
+            , List.repeat 2 (ItemBlock InactiveBomb)
+            , List.repeat 1 (ItemBlock Heart)
+            ]
+                |> List.concat
+                |> toGame
+                    [ "💣⬜⬜⬜💣"
+                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜⬜⬜⬜"
+                    , "💣⬜😊⬜💣"
+                    ]
+
+        1 ->
+            [ List.repeat 2 (EntityBlock (Enemy Rat))
+            , List.repeat 5 (ItemBlock InactiveBomb)
+            , List.repeat 3 (EntityBlock Crate)
+            ]
+                |> List.concat
+                |> toGame
+                    [ "📦⬜⬜⬜📦"
+                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜⬜⬜⬜"
+                    , "📦⬜😊⬜📦"
+                    ]
+
+        2 ->
+            [ List.repeat 3 (EntityBlock (Enemy Rat))
+            , List.repeat 3 (ItemBlock InactiveBomb)
+            , List.repeat 2 (EntityBlock Crate)
+            , List.repeat 1 (ItemBlock Heart)
+            ]
+                |> List.concat
+                |> toGame
+                    [ "📦⬜⬜⬜💣"
+                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜⬜⬜⬜"
+                    , "⬜⬜⬜⬜⬜"
+                    , "💣⬜😊⬜📦"
+                    ]
+
+        3 ->
+            ratChallenge
+
+        _ ->
+            Random.uniform
+                [ "💣⬜⬜⬜💣"
+                , "⬜⬜⬜⬜⬜"
+                , "⬜⬜⬜⬜⬜"
+                , "⬜⬜⬜⬜⬜"
+                , "💣⬜😊⬜💣"
+                ]
+                [ [ "📦⬜⬜⬜📦"
+                  , "⬜⬜⬜⬜⬜"
+                  , "⬜⬜⬜⬜⬜"
+                  , "⬜⬜⬜⬜⬜"
+                  , "📦⬜😊⬜📦"
+                  ]
+                , [ "📦⬜⬜⬜💣"
+                  , "⬜⬜⬜⬜⬜"
+                  , "⬜⬜⬜⬜⬜"
+                  , "⬜⬜⬜⬜⬜"
+                  , "💣⬜😊⬜📦"
+                  ]
+                ]
+                |> Random.andThen
+                    (\layout ->
+                        Random.uniform
+                            ([ List.repeat 3 (Enemy Rat |> EntityBlock)
+                             , List.repeat 4 (ItemBlock InactiveBomb)
+                             , List.repeat 2 (EntityBlock Crate)
+                             , List.repeat 1 (ItemBlock Heart)
+                             ]
+                                |> List.concat
+                            )
+                            [ [ List.repeat 3 (Enemy Rat |> EntityBlock)
+                              , List.repeat 2 (ItemBlock InactiveBomb)
+                              , List.repeat 4 (EntityBlock Crate)
+                              , List.repeat 1 (ItemBlock Heart)
+                              ]
+                                |> List.concat
+                            , [ List.repeat 2 (Enemy Rat |> EntityBlock)
+                              , List.repeat 1 (Enemy (Goblin Down) |> EntityBlock)
+                              , List.repeat 3 (ItemBlock InactiveBomb)
+                              , List.repeat 3 (EntityBlock Crate)
+                              , List.repeat 1 (ItemBlock Heart)
+                              ]
+                                |> List.concat
+                            ]
+                            |> Random.andThen (toGame layout)
+                    )
+
+
+ratChallenge : Generator Game
+ratChallenge =
+    [ List.repeat 2 (EntityBlock (Enemy Rat))
+    , List.repeat 2 (ItemBlock InactiveBomb)
+    , List.repeat 1 (ItemBlock Heart)
+    ]
+        |> List.concat
+        |> toGame
+            [ "⬜⬜⬜⬜⬜"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜📦⬜📦⬜"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜😊⬜⬜"
+            ]
 
 
 randomLayout : Generator (List String)
@@ -98,83 +238,57 @@ randomLayout =
         ]
 
 
-ratLevel : Generator Game
+ratLevel : List BuildingBlock
 ratLevel =
-    randomLayout
-        |> Random.andThen
-            (\layout ->
-                [ List.repeat 4 (EntityBlock (Enemy Rat))
-                , List.repeat 3 (EntityBlock Crate)
-                , List.repeat 4 (ItemBlock InactiveBomb)
-                , [ ItemBlock Heart
-                  , HoleBlock
-                  ]
-                ]
-                    |> List.concat
-                    |> toGame layout
-            )
+    [ List.repeat 4 (EntityBlock (Enemy Rat))
+    , List.repeat 3 (EntityBlock Crate)
+    , List.repeat 4 (ItemBlock InactiveBomb)
+    , [ ItemBlock Heart
+      , HoleBlock
+      ]
+    ]
+        |> List.concat
 
 
-goblinLevel : Generator Game
+goblinLevel : List BuildingBlock
 goblinLevel =
-    randomLayout
-        |> Random.andThen
-            (\layout ->
-                [ List.repeat 3 (EntityBlock Crate)
-                , [ Enemy (Goblin Left) |> EntityBlock
-                  , Enemy (Goblin Right) |> EntityBlock
-                  , Enemy (Goblin Down) |> EntityBlock
-                  , Enemy (Goblin Up) |> EntityBlock
-                  , ItemBlock Heart
-                  , HoleBlock
-                  ]
-                , List.repeat 4 (ItemBlock InactiveBomb)
-                ]
-                    |> List.concat
-                    |> toGame layout
-            )
+    [ List.repeat 3 (EntityBlock Crate)
+    , [ Enemy (Goblin Left) |> EntityBlock
+      , Enemy (Goblin Right) |> EntityBlock
+      , Enemy (Goblin Down) |> EntityBlock
+      , Enemy (Goblin Up) |> EntityBlock
+      , ItemBlock Heart
+      , HoleBlock
+      ]
+    , List.repeat 4 (ItemBlock InactiveBomb)
+    ]
+        |> List.concat
 
 
-emptyLevel : Generator Game
-emptyLevel =
-    randomLayout
-        |> Random.andThen (\layout -> toGame layout [])
-
-
-golemLevel : Generator Game
+golemLevel : List BuildingBlock
 golemLevel =
-    randomLayout
-        |> Random.andThen
-            (\layout ->
-                [ List.repeat 3 (EntityBlock (Enemy Golem))
-                , List.repeat 3 (ItemBlock InactiveBomb)
-                , List.repeat 3 (EntityBlock Crate)
-                , [ ItemBlock Heart
-                  , HoleBlock
-                  ]
-                ]
-                    |> List.concat
-                    |> toGame layout
-            )
+    [ List.repeat 3 (EntityBlock (Enemy Golem))
+    , List.repeat 3 (ItemBlock InactiveBomb)
+    , List.repeat 3 (EntityBlock Crate)
+    , [ ItemBlock Heart
+      , HoleBlock
+      ]
+    ]
+        |> List.concat
 
 
-finalLevel : Generator Game
+finalLevel : List BuildingBlock
 finalLevel =
-    randomLayout
-        |> Random.andThen
-            (\layout ->
-                [ List.repeat 3 (ItemBlock InactiveBomb)
-                , List.repeat 3 (EntityBlock Crate)
-                , [ ItemBlock Heart
-                  , EntityBlock (Enemy Rat)
-                  , Enemy (Goblin Left) |> EntityBlock
-                  , EntityBlock (Enemy Golem)
-                  , HoleBlock
-                  ]
-                ]
-                    |> List.concat
-                    |> toGame layout
-            )
+    [ List.repeat 3 (ItemBlock InactiveBomb)
+    , List.repeat 3 (EntityBlock Crate)
+    , [ ItemBlock Heart
+      , EntityBlock (Enemy Rat)
+      , Enemy (Goblin Left) |> EntityBlock
+      , EntityBlock (Enemy Golem)
+      , HoleBlock
+      ]
+    ]
+        |> List.concat
 
 
 validator =

@@ -1,4 +1,4 @@
-module Game exposing (Cell, Game, addBomb, addFloor, addLife, attackPlayer, empty, face, findFirstEmptyCellInDirection, findFirstInDirection, fromCells, get, getPlayerPosition, insert, move, placeItem, remove, removeBomb, removeFloor, removeLife, update)
+module Game exposing (Cell, Game, addBomb, addFloor, addLife, attackPlayer, empty, face, findFirstEmptyCellInDirection, findFirstInDirection, fromCells, get, getPlayerPosition, insert, isLost, isWon, move, placeItem, remove, removeBomb, removeFloor, removeLife, update)
 
 import Config
 import Dict exposing (Dict)
@@ -29,6 +29,7 @@ type alias Game =
     , bombs : Int
     , lifes : Int
     , playerDirection : Direction
+    , won : Bool
     }
 
 
@@ -66,7 +67,18 @@ empty =
     , lifes = 1
     , nextId = 0
     , playerDirection = Down
+    , won = False
     }
+
+
+isWon : Game -> Bool
+isWon game =
+    game.won
+
+
+isLost : Game -> Bool
+isLost game =
+    game.lifes > 0
 
 
 get : ( Int, Int ) -> Game -> Maybe Entity

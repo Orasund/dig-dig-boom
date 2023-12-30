@@ -26,7 +26,8 @@ type Item
 
 
 type Entity
-    = Player
+    = Door
+    | Player
     | Crate
     | Enemy Enemy
     | Stunned Enemy

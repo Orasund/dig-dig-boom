@@ -5,10 +5,8 @@ import Direction exposing (Direction(..))
 import Entity exposing (EffectType(..), Enemy(..), Entity(..), Item(..))
 import Game exposing (Game)
 import Html exposing (Attribute, Html)
-import Html.Attributes
 import Html.Style
 import Image
-import Layout
 import Set
 
 
@@ -51,6 +49,9 @@ hole attrs =
 toHtml : List (Attribute msg) -> { frame : Int, playerDirection : Direction } -> Entity -> Html msg
 toHtml attrs args cell =
     (case cell of
+        Door ->
+            ( 2, 2 )
+
         Player ->
             directional ( 0, 4 )
                 { direction = args.playerDirection

@@ -2,11 +2,10 @@ module Main exposing (main)
 
 import Browser
 import Browser.Events
-import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..))
 import Game exposing (Game)
-import Game.Level
+import Game.Level exposing (Level)
 import Game.Update
 import Html exposing (Html)
 import Html.Style
@@ -36,6 +35,7 @@ type alias Model =
     , overlay : Maybe Overlay
     , frame : Int
     , history : List Game
+    , level : Level
     }
 
 
@@ -55,8 +55,11 @@ type Msg
 init : flag -> ( Model, Cmd Msg )
 init _ =
     let
+        level =
+            Game.Level.first
+
         ( game, seed ) =
-            Random.step Game.Level.generate
+            Random.step (Game.Level.generate level)
                 (Random.initialSeed 42)
     in
     ( { levelSeed = seed
@@ -65,6 +68,7 @@ init _ =
       , overlay = Just Menu
       , frame = 0
       , history = []
+      , level = level
       }
     , Random.generate GotSeed Random.independentSeed
     )
@@ -76,11 +80,11 @@ init _ =
 -------------------------------
 
 
-nextLevel : Model -> Model
-nextLevel model =
+generateLevel : Model -> Model
+generateLevel model =
     let
         ( game, seed ) =
-            Random.step Game.Level.generate model.seed
+            Random.step (Game.Level.generate model.level) model.seed
     in
     { model
         | levelSeed = model.seed
@@ -92,8 +96,12 @@ nextLevel model =
 
 gameWon : Model -> ( Model, Cmd Msg )
 gameWon model =
-    ( { model | history = [] }
-        |> nextLevel
+    let
+        level =
+            Game.Level.next model.level
+    in
+    ( { model | history = [], level = level }
+        |> generateLevel
     , Cmd.none
     )
 
@@ -105,7 +113,7 @@ gameLost model =
         , game = model.game |> (\game -> { game | lifes = 1, bombs = 0 })
         , history = []
       }
-        |> nextLevel
+        |> generateLevel
     , Cmd.none
     )
 
@@ -134,24 +142,12 @@ update msg model =
         Input input ->
             case model.overlay of
                 Just Menu ->
-                    ( nextLevel model
+                    ( generateLevel model
                     , Cmd.none
                     )
 
                 Nothing ->
-                    if
-                        Dict.filter
-                            (\_ cell ->
-                                case cell.entity of
-                                    Enemy _ ->
-                                        True
-
-                                    _ ->
-                                        False
-                            )
-                            model.game.cells
-                            |> Dict.isEmpty
-                    then
+                    if Game.isWon model.game then
                         gameWon model
 
                     else
