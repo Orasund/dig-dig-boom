@@ -127,6 +127,17 @@ world args game =
                                     item
                             )
                         |> Maybe.withDefault Layout.none
+                  , game.particles
+                        |> Dict.get ( x, y )
+                        |> Maybe.map
+                            (\particle ->
+                                View.Cell.particle
+                                    [ Html.Style.positionAbsolute
+                                    , Html.Style.top "0"
+                                    ]
+                                    particle
+                            )
+                        |> Maybe.withDefault Layout.none
                   ]
                     ++ (if game.floor |> Set.member ( x, y ) |> not then
                             View.Cell.borders ( x, y ) game

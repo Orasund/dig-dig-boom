@@ -1,14 +1,14 @@
-module Game exposing (Cell, Game, addBomb, addFloor, addLife, attackPlayer, empty, face, findFirstEmptyCellInDirection, findFirstInDirection, fromCells, get, getPlayerPosition, insert, isLost, isWon, move, placeItem, remove, removeBomb, removeFloor, removeLife, update)
+module Game exposing (Cell, Game, addBomb, addFloor, addLife, attackPlayer, clearParticles, empty, face, findFirstEmptyCellInDirection, findFirstInDirection, fromCells, get, getPlayerPosition, insert, isLost, isWon, move, placeItem, remove, removeBomb, removeFloor, removeLife, update)
 
 import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import Entity
     exposing
-        ( EffectType(..)
-        , Enemy(..)
+        ( Enemy(..)
         , Entity(..)
         , Item(..)
+        , ParticleSort(..)
         )
 import Math
 import Position
@@ -24,6 +24,7 @@ type alias Cell =
 type alias Game =
     { cells : Dict ( Int, Int ) Cell
     , items : Dict ( Int, Int ) Item
+    , particles : Dict ( Int, Int ) ParticleSort
     , floor : Set ( Int, Int )
     , nextId : Int
     , bombs : Int
@@ -31,6 +32,11 @@ type alias Game =
     , playerDirection : Direction
     , won : Bool
     }
+
+
+clearParticles : Game -> Game
+clearParticles game =
+    { game | particles = Dict.empty }
 
 
 fromCells : Dict ( Int, Int ) Entity -> Dict ( Int, Int ) Item -> Game
@@ -57,6 +63,7 @@ empty : Game
 empty =
     { cells = Dict.empty
     , items = Dict.empty
+    , particles = Dict.empty
     , floor =
         Position.asGrid
             { columns = Config.mapSize
@@ -219,16 +226,19 @@ attackPlayer position game =
             (\cell ->
                 case cell.entity of
                     Player ->
-                        { newGame
-                            | cells =
-                                if newGame.lifes > 0 then
-                                    newGame.cells
+                        if newGame.lifes > 0 then
+                            newGame |> Just
 
-                                else
+                        else
+                            { newGame
+                                | cells =
                                     newGame.cells
-                                        |> Dict.insert position { cell | entity = Particle Bone }
-                        }
-                            |> Just
+                                        |> Dict.remove position
+                                , particles =
+                                    newGame.particles
+                                        |> Dict.insert position Bone
+                            }
+                                |> Just
 
                     _ ->
                         Nothing
@@ -248,9 +258,13 @@ removeLife game =
     { game | lifes = game.lifes - 1 |> max 0 }
 
 
-addLife : Game -> Game
-addLife player =
-    { player | lifes = player.lifes + 1 |> min Config.maxLifes }
+addLife : Game -> Maybe Game
+addLife game =
+    if game.lifes < Config.maxLifes then
+        { game | lifes = game.lifes + 1 } |> Just
+
+    else
+        Nothing
 
 
 removeBomb : Game -> Maybe Game
@@ -262,11 +276,10 @@ removeBomb playerData =
         Nothing
 
 
-addBomb : Game -> Game
-addBomb playerData =
-    { playerData
-        | bombs =
-            playerData.bombs
-                + 1
-                |> min Config.maxBombs
-    }
+addBomb : Game -> Maybe Game
+addBomb game =
+    if game.bombs < Config.maxBombs then
+        { game | bombs = game.bombs + 1 } |> Just
+
+    else
+        Nothing

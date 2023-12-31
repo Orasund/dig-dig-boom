@@ -1,7 +1,8 @@
 module Enemy exposing (..)
 
+import Dict
 import Direction exposing (Direction(..))
-import Entity exposing (EffectType(..), Enemy(..), Entity(..))
+import Entity exposing (Enemy(..), Entity(..), ParticleSort(..))
 import Game exposing (Game)
 import Game.Kill exposing (GameAndKill)
 import Math
@@ -192,11 +193,18 @@ updatePlacedBombe location game =
                 if Math.posIsValid newLocation then
                     case Game.get newLocation output.game of
                         Nothing ->
-                            { output
-                                | game =
-                                    output.game
-                                        |> Game.insert newLocation (Particle Smoke)
-                            }
+                            output.game
+                                |> (\g ->
+                                        { output
+                                            | game =
+                                                { g
+                                                    | particles =
+                                                        g.particles
+                                                            |> Dict.insert newLocation Smoke
+                                                }
+                                                    |> Game.remove newLocation
+                                        }
+                                   )
 
                         Just Player ->
                             output

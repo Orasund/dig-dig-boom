@@ -1,8 +1,8 @@
 module Entity exposing
-    ( EffectType(..)
-    , Enemy(..)
+    ( Enemy(..)
     , Entity(..)
     , Item(..)
+    , ParticleSort(..)
     )
 
 import Direction exposing (Direction)
@@ -15,7 +15,7 @@ type Enemy
     | Golem
 
 
-type EffectType
+type ParticleSort
     = Smoke
     | Bone
 
@@ -31,4 +31,3 @@ type Entity
     | Crate
     | Enemy Enemy
     | Stunned Enemy
-    | Particle EffectType

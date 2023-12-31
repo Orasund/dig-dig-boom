@@ -3,7 +3,7 @@ module Game.Update exposing (checkIfWon, movePlayerInDirectionAndUpdateGame, pla
 import Dict
 import Direction exposing (Direction(..))
 import Enemy
-import Entity exposing (EffectType(..), Enemy(..), Entity(..), Item(..))
+import Entity exposing (Enemy(..), Entity(..), Item(..), ParticleSort(..))
 import Game exposing (Cell, Game)
 import Game.Kill exposing (GameAndKill)
 import Math
@@ -15,7 +15,7 @@ updateGame : Game -> Game
 updateGame game =
     game.cells
         |> Dict.toList
-        |> List.foldl updateCell game
+        |> List.foldl updateCell (game |> Game.clearParticles)
         |> checkIfWon
 
 
@@ -52,9 +52,6 @@ updateCell ( position, cell ) game =
                     , enemy = enemy
                     }
                 |> Game.Kill.apply
-
-        Particle _ ->
-            game |> Game.remove position
 
         Stunned enemy ->
             game |> Game.update position (\_ -> Enemy enemy)
@@ -108,15 +105,6 @@ movePlayer position game =
                     [ newPos ]
             }
 
-        Just (Particle _) ->
-            { game =
-                game
-                    |> Game.remove newLocation
-                    |> Game.move { from = position, to = newLocation }
-                    |> Maybe.withDefault game
-            , kill = []
-            }
-
         Just Crate ->
             { game =
                 game
@@ -168,12 +156,12 @@ takeItem : ( Int, Int ) -> Game -> Game
 takeItem pos game =
     game.items
         |> Dict.get pos
-        |> Maybe.map (\item -> addItem item game)
+        |> Maybe.andThen (\item -> addItem item game)
         |> Maybe.map (\g -> { g | items = g.items |> Dict.remove pos })
         |> Maybe.withDefault game
 
 
-addItem : Item -> Game -> Game
+addItem : Item -> Game -> Maybe Game
 addItem item =
     case item of
         InactiveBomb ->
@@ -204,11 +192,6 @@ applyBomb position game =
 
                 else
                     Nothing
-
-            Just (Particle _) ->
-                game
-                    |> Game.insert newPosition cell
-                    |> Just
 
             _ ->
                 Nothing

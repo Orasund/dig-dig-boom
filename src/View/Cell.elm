@@ -2,7 +2,7 @@ module View.Cell exposing (..)
 
 import Config
 import Direction exposing (Direction(..))
-import Entity exposing (EffectType(..), Enemy(..), Entity(..), Item(..))
+import Entity exposing (Enemy(..), Entity(..), Item(..), ParticleSort(..))
 import Game exposing (Game)
 import Html exposing (Attribute, Html)
 import Html.Style
@@ -46,6 +46,18 @@ hole attrs =
     sprite attrs ( 1, 2 )
 
 
+particle : List (Attribute msg) -> ParticleSort -> Html msg
+particle attrs particleSort =
+    (case particleSort of
+        Smoke ->
+            ( 0, 0 )
+
+        Bone ->
+            ( 2, 3 )
+    )
+        |> sprite attrs
+
+
 toHtml : List (Attribute msg) -> { frame : Int, playerDirection : Direction } -> Entity -> Html msg
 toHtml attrs args cell =
     (case cell of
@@ -74,14 +86,6 @@ toHtml attrs args cell =
                 , playerDirection = args.playerDirection
                 }
                 enemy
-
-        Particle effect ->
-            case effect of
-                Smoke ->
-                    ( 0, 0 )
-
-                Bone ->
-                    ( 2, 3 )
     )
         |> sprite attrs
 

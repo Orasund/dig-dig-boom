@@ -1,7 +1,7 @@
 module Game.Kill exposing (..)
 
 import Dict
-import Entity exposing (EffectType(..), Enemy(..), Entity(..))
+import Entity exposing (Enemy(..), Entity(..), ParticleSort(..))
 import Game exposing (Game)
 
 
@@ -50,21 +50,24 @@ kill pos game =
 
                     Crate ->
                         { game
-                            | cells =
-                                game.cells |> Dict.insert pos { cell | entity = Particle Bone }
+                            | particles =
+                                game.particles |> Dict.insert pos Bone
                         }
+                            |> Game.remove pos
 
                     Enemy PlacedBomb ->
                         { game
-                            | cells =
-                                game.cells |> Dict.insert pos { cell | entity = Particle Smoke }
+                            | particles =
+                                game.particles |> Dict.insert pos Smoke
                         }
+                            |> Game.remove pos
 
                     Enemy _ ->
                         { game
-                            | cells =
-                                game.cells |> Dict.insert pos { cell | entity = Particle Bone }
+                            | particles =
+                                game.particles |> Dict.insert pos Bone
                         }
+                            |> Game.remove pos
 
                     _ ->
                         game

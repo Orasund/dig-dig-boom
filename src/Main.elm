@@ -317,7 +317,9 @@ view model =
             model.game
       , case model.overlay of
             Nothing ->
-                if model.game.lifes > 0 then
+                Layout.none
+
+            {--if model.game.lifes > 0 then
                     Layout.none
 
                 else
@@ -325,8 +327,7 @@ view model =
                         [ Html.Style.positionAbsolute
                         , Html.Style.top "0"
                         ]
-                        { onClick = Input InputActivate }
-
+                        { onClick = Input InputActivate }--}
             Just WorldMap ->
                 View.World.toHtml
                     [ Html.Style.positionAbsolute
