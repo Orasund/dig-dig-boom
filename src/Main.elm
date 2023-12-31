@@ -62,7 +62,7 @@ init : flag -> ( Model, Cmd Msg )
 init _ =
     let
         room =
-            TrialRoom 0
+            Trial 0
 
         level =
             World.Trial.fromInt 0 |> Maybe.withDefault World.Level.empty
@@ -94,10 +94,10 @@ generateLevel seed sort model =
     let
         ( game, _ ) =
             case sort of
-                LevelRoom level ->
+                Stage level ->
                     Random.step (World.Level.generate level) seed
 
-                TrialRoom i ->
+                Trial i ->
                     Random.step
                         (World.Trial.fromInt i
                             |> Maybe.withDefault World.Level.empty
@@ -237,11 +237,12 @@ updateWorldMap input model =
         InputActivate ->
             case model.world.nodes |> Dict.get model.world.player of
                 Just (Room { sort, seed }) ->
-                    seed
+                    {--seed
                         |> Random.step (World.solveRoom model.world)
                         |> (\( w, s ) -> ( { model | world = w, seed = s }, Cmd.none ))
+                    --}
+                    ( generateLevel seed sort model, Cmd.none )
 
-                --( generateLevel seed sort model, Cmd.none )
                 _ ->
                     ( model, Cmd.none )
 

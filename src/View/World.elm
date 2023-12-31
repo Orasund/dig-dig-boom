@@ -51,7 +51,7 @@ toHtml attrs world =
 
                                 else
                                     case sort of
-                                        TrialRoom _ ->
+                                        Trial _ ->
                                             "yellow"
 
                                         _ ->

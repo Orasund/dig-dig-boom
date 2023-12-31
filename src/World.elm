@@ -8,8 +8,8 @@ import World.Level exposing (Level)
 
 
 type RoomSort
-    = TrialRoom Int
-    | LevelRoom Level
+    = Trial Int
+    | Stage Level
 
 
 type Node
@@ -25,6 +25,7 @@ type alias World =
     { nodes : Dict ( Int, Int ) Node
     , player : ( Int, Int )
     , stages : Dict Int Int
+    , trials : Int
     }
 
 
@@ -33,13 +34,14 @@ new seed =
     { nodes =
         Dict.singleton ( 0, 0 )
             ({ seed = seed
-             , sort = LevelRoom { dungeon = 0, stage = 0 }
+             , sort = Stage { dungeon = 0, stage = 0 }
              , solved = False
              }
                 |> Room
             )
     , player = ( 0, 0 )
     , stages = Dict.empty
+    , trials = 0
     }
 
 
@@ -91,15 +93,65 @@ solveRoom world =
             )
 
 
-insertRandomNode : ( Int, Int ) -> World -> Generator World
-insertRandomNode ( x, y ) world =
+insertWall : ( Int, Int ) -> World -> World
+insertWall ( x, y ) world =
+    { world
+        | nodes = world.nodes |> Dict.insert ( x, y ) Wall
+    }
+
+
+insertStage : ( Int, Int ) -> World -> Generator World
+insertStage ( x, y ) world =
     let
         dungeon =
             abs y // 2
 
         stage =
-            (Dict.get dungeon world.stages |> Maybe.withDefault 0) + 1
+            { dungeon = dungeon
+            , stage = (Dict.get dungeon world.stages |> Maybe.withDefault 0) + 1
+            }
+    in
+    Random.independentSeed
+        |> Random.map
+            (\seed ->
+                { world
+                    | nodes =
+                        world.nodes
+                            |> Dict.insert ( x, y )
+                                ({ seed = seed
+                                 , sort = Stage stage
+                                 , solved = False
+                                 }
+                                    |> Room
+                                )
+                    , stages = world.stages |> Dict.insert stage.dungeon stage.stage
+                }
+            )
 
+
+insertTrail : ( Int, Int ) -> World -> Generator World
+insertTrail pos world =
+    Random.independentSeed
+        |> Random.map
+            (\seed ->
+                { world
+                    | nodes =
+                        world.nodes
+                            |> Dict.insert pos
+                                ({ seed = seed
+                                 , sort = Trial world.trials
+                                 , solved = False
+                                 }
+                                    |> Room
+                                )
+                    , trials = world.trials + 1
+                }
+            )
+
+
+insertRandomNode : ( Int, Int ) -> World -> Generator World
+insertRandomNode ( x, y ) world =
+    let
         neighbors =
             [ ( x + 1, y ), ( x - 1, y ), ( x, y + 1 ), ( x, y - 1 ) ]
                 |> List.foldl
@@ -107,10 +159,10 @@ insertRandomNode ( x, y ) world =
                         case Dict.get pos world.nodes of
                             Just (Room { sort }) ->
                                 case sort of
-                                    LevelRoom _ ->
+                                    Stage _ ->
                                         { out | rooms = out.rooms + 1 }
 
-                                    TrialRoom _ ->
+                                    Trial _ ->
                                         { out | trails = out.trails + 1 }
 
                             Just Wall ->
@@ -123,51 +175,25 @@ insertRandomNode ( x, y ) world =
                     , wall = 0
                     , trails = 0
                     }
-
-        insertWall =
-            { world
-                | nodes = world.nodes |> Dict.insert ( x, y ) Wall
-            }
-                |> Random.constant
-
-        insertRoom room =
-            Random.independentSeed
-                |> Random.map
-                    (\seed ->
-                        { world
-                            | nodes =
-                                world.nodes
-                                    |> Dict.insert ( x, y )
-                                        ({ seed = seed
-                                         , sort = room
-                                         , solved = False
-                                         }
-                                            |> Room
-                                        )
-                            , stages = world.stages |> Dict.insert dungeon stage
-                        }
-                    )
     in
     if y >= 0 || neighbors.trails > 0 then
-        insertWall
+        insertWall ( x, y ) world |> Random.constant
 
     else
         Random.weighted
             ( 1
-            , insertWall
+            , insertWall ( x, y ) world |> Random.constant
             )
             [ ( if neighbors.rooms <= 1 then
                     3
 
                 else
                     0
-              , insertRoom
-                    (if neighbors.wall > 1 || abs x > 5 then
-                        TrialRoom 0
+              , if neighbors.wall > 1 || abs x > 5 then
+                    insertTrail ( x, y ) world
 
-                     else
-                        LevelRoom { dungeon = dungeon, stage = stage }
-                    )
+                else
+                    insertStage ( x, y ) world
               )
             ]
             |> Random.andThen identity
