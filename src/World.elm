@@ -2,15 +2,20 @@ module World exposing (..)
 
 import Dict exposing (Dict)
 import Direction exposing (Direction)
-import Game.Level exposing (Level)
 import Position
 import Random exposing (Generator, Seed)
+import World.Level exposing (Level)
+
+
+type RoomSort
+    = TrialRoom Int
+    | LevelRoom Level
 
 
 type Node
     = Room
         { seed : Seed
-        , level : Level
+        , sort : RoomSort
         , solved : Bool
         }
     | Wall
@@ -28,7 +33,7 @@ new seed =
     { nodes =
         Dict.singleton ( 0, 0 )
             ({ seed = seed
-             , level = { dungeon = 0, stage = 0 }
+             , sort = LevelRoom { dungeon = 0, stage = 0 }
              , solved = False
              }
                 |> Room
@@ -94,38 +99,39 @@ insertRandomNode ( x, y ) world =
 
         stage =
             (Dict.get dungeon world.stages |> Maybe.withDefault 0) + 1
-    in
-    if y >= 0 then
-        { world | nodes = world.nodes |> Dict.insert ( x, y ) Wall } |> Random.constant
 
-    else
-        let
-            neighbors =
-                [ ( x + 1, y ), ( x - 1, y ), ( x, y + 1 ), ( x, y - 1 ) ]
-                    |> List.foldl
-                        (\pos out ->
-                            case Dict.get pos world.nodes of
-                                Just (Room _) ->
-                                    { out | rooms = out.rooms + 1 }
+        neighbors =
+            [ ( x + 1, y ), ( x - 1, y ), ( x, y + 1 ), ( x, y - 1 ) ]
+                |> List.foldl
+                    (\pos out ->
+                        case Dict.get pos world.nodes of
+                            Just (Room { sort }) ->
+                                case sort of
+                                    LevelRoom _ ->
+                                        { out | rooms = out.rooms + 1 }
 
-                                Just Wall ->
-                                    { out | wall = out.wall + 1 }
+                                    TrialRoom _ ->
+                                        { out | trails = out.trails + 1 }
 
-                                _ ->
-                                    out
-                        )
-                        { rooms = 0, wall = 0 }
-        in
-        Random.weighted
-            ( if neighbors.rooms == 0 then
-                5
+                            Just Wall ->
+                                { out | wall = out.wall + 1 }
 
-              else if neighbors.rooms == 1 then
-                4
+                            _ ->
+                                out
+                    )
+                    { rooms = 0
+                    , wall = 0
+                    , trails = 0
+                    }
 
-              else
-                0
-            , Random.independentSeed
+        insertWall =
+            { world
+                | nodes = world.nodes |> Dict.insert ( x, y ) Wall
+            }
+                |> Random.constant
+
+        insertRoom room =
+            Random.independentSeed
                 |> Random.map
                     (\seed ->
                         { world
@@ -133,7 +139,7 @@ insertRandomNode ( x, y ) world =
                                 world.nodes
                                     |> Dict.insert ( x, y )
                                         ({ seed = seed
-                                         , level = { dungeon = dungeon, stage = stage }
+                                         , sort = room
                                          , solved = False
                                          }
                                             |> Room
@@ -141,13 +147,27 @@ insertRandomNode ( x, y ) world =
                             , stages = world.stages |> Dict.insert dungeon stage
                         }
                     )
+    in
+    if y >= 0 || neighbors.trails > 0 then
+        insertWall
+
+    else
+        Random.weighted
+            ( 1
+            , insertWall
             )
-            [ ( if (y == -1) && abs x == 1 then
-                    0
+            [ ( if neighbors.rooms <= 1 then
+                    3
 
                 else
-                    toFloat (1 + abs x)
-              , { world | nodes = world.nodes |> Dict.insert ( x, y ) Wall } |> Random.constant
+                    0
+              , insertRoom
+                    (if neighbors.wall > 1 || abs x > 5 then
+                        TrialRoom 0
+
+                     else
+                        LevelRoom { dungeon = dungeon, stage = stage }
+                    )
               )
             ]
             |> Random.andThen identity

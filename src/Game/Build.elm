@@ -1,15 +1,52 @@
-module Game.Build exposing (..)
+module Game.Build exposing (BuildingBlock(..), generator)
 
+import Config
 import Dict exposing (Dict)
 import Entity exposing (Entity(..), Item(..))
 import Game exposing (Cell, Game)
 import Math
+import Position
+import Random exposing (Generator)
 
 
 type BuildingBlock
     = EntityBlock Entity
     | ItemBlock Item
     | HoleBlock
+
+
+generator : List String -> List BuildingBlock -> Generator Game
+generator emojis blocks =
+    let
+        dict =
+            fromEmojis emojis
+
+        rec () =
+            Position.asGrid
+                { columns = Config.mapSize
+                , rows = Config.mapSize
+                }
+                |> List.filter
+                    (\pos ->
+                        Dict.member pos dict |> not
+                    )
+                |> shuffle
+                |> Random.map
+                    (\list ->
+                        List.map2 Tuple.pair list blocks
+                            ++ Dict.toList dict
+                    )
+                |> Random.map fromBlocks
+                |> Random.andThen
+                    (\game ->
+                        if validator game.cells then
+                            Random.constant game
+
+                        else
+                            Random.lazy rec
+                    )
+    in
+    rec ()
 
 
 fromEmojis : List String -> Dict ( Int, Int ) BuildingBlock
@@ -87,24 +124,6 @@ neighbors4 ( x, y ) dict =
             )
 
 
-neighbors8 : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)
-neighbors8 ( x, y ) dict =
-    [ ( x + 1, y )
-    , ( x - 1, y )
-    , ( x, y + 1 )
-    , ( x, y - 1 )
-    , ( x + 1, y + 1 )
-    , ( x + 1, y - 1 )
-    , ( x - 1, y + 1 )
-    , ( x - 1, y - 1 )
-    ]
-        |> List.filter Math.posIsValid
-        |> List.map
-            (\pos ->
-                dict |> Dict.get pos |> Maybe.map .entity
-            )
-
-
 diagNeighbors : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)
 diagNeighbors ( x, y ) dict =
     [ ( x + 1, y + 1 )
@@ -119,6 +138,64 @@ diagNeighbors ( x, y ) dict =
             )
 
 
+validator =
+    \dict ->
+        dict
+            |> Dict.toList
+            |> List.all
+                (\( pos, cell ) ->
+                    case cell.entity of
+                        Enemy _ ->
+                            neighbors4 pos dict
+                                |> List.all
+                                    (\c ->
+                                        case c of
+                                            Just (Enemy _) ->
+                                                False
+
+                                            _ ->
+                                                True
+                                    )
+
+                        Player ->
+                            (count ((==) Nothing)
+                                (neighbors4 pos dict)
+                                > 1
+                            )
+                                && (diagNeighbors pos dict
+                                        |> List.all
+                                            (\c ->
+                                                case c of
+                                                    Just (Enemy _) ->
+                                                        False
+
+                                                    _ ->
+                                                        True
+                                            )
+                                   )
+
+                        Crate ->
+                            count ((==) (Just Crate))
+                                (neighbors4 pos dict)
+                                < 1
+
+                        _ ->
+                            True
+                )
+
+
 count : (a -> Bool) -> List a -> Int
 count fun list =
     list |> List.filter fun |> List.length
+
+
+shuffle : List a -> Generator (List a)
+shuffle list =
+    Random.list (List.length list) (Random.float 0 1)
+        |> Random.map
+            (\rand ->
+                list
+                    |> List.map2 Tuple.pair rand
+                    |> List.sortBy Tuple.first
+                    |> List.map Tuple.second
+            )

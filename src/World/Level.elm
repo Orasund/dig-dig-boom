@@ -1,13 +1,12 @@
-module Game.Level exposing (..)
+module World.Level exposing (..)
 
 import Config
-import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item(..))
 import Game exposing (Game)
 import Game.Build exposing (BuildingBlock(..))
-import Position
 import Random exposing (Generator)
+import World.Trial
 
 
 type alias Level =
@@ -28,40 +27,6 @@ next level =
     { level | stage = level.stage + 1 }
 
 
-toGame : List String -> List BuildingBlock -> Generator Game
-toGame emojis blocks =
-    let
-        dict =
-            Game.Build.fromEmojis emojis
-
-        rec () =
-            Position.asGrid
-                { columns = Config.mapSize
-                , rows = Config.mapSize
-                }
-                |> List.filter
-                    (\pos ->
-                        Dict.member pos dict |> not
-                    )
-                |> shuffle
-                |> Random.map
-                    (\list ->
-                        List.map2 Tuple.pair list blocks
-                            ++ Dict.toList dict
-                    )
-                |> Random.map Game.Build.fromBlocks
-                |> Random.andThen
-                    (\game ->
-                        if validator game.cells then
-                            Random.constant game
-
-                        else
-                            Random.lazy rec
-                    )
-    in
-    rec ()
-
-
 generate : Level -> Generator Game
 generate level =
     case level.dungeon of
@@ -75,7 +40,7 @@ generate level =
             golemDungeon level.stage
 
         _ ->
-            Random.map2 toGame
+            Random.map2 Game.Build.generator
                 randomLayout
                 (Random.uniform
                     golemLevel
@@ -97,7 +62,7 @@ golemDungeon stage =
             , List.repeat 1 HoleBlock
             ]
                 |> List.concat
-                |> toGame
+                |> Game.Build.generator
                     [ "❌⬜⬜⬜❌"
                     , "⬜⬜⬜⬜⬜"
                     , "⬜⬜💚⬜⬜"
@@ -111,7 +76,7 @@ golemDungeon stage =
             , List.repeat 1 (ItemBlock Heart)
             ]
                 |> List.concat
-                |> toGame
+                |> Game.Build.generator
                     [ "⬜⬜⬜⬜⬜"
                     , "⬜📦❌⬜⬜"
                     , "⬜❌📦❌⬜"
@@ -126,7 +91,7 @@ golemDungeon stage =
             , List.repeat 1 (ItemBlock InactiveBomb)
             ]
                 |> List.concat
-                |> toGame
+                |> Game.Build.generator
                     [ "📦⬜⬜⬜📦"
                     , "⬜⬜⬜⬜⬜"
                     , "⬜⬜💣⬜⬜"
@@ -139,7 +104,7 @@ golemDungeon stage =
             , List.repeat 1 (ItemBlock InactiveBomb)
             ]
                 |> List.concat
-                |> toGame
+                |> Game.Build.generator
                     [ "⬜⬜⬜⬜⬜"
                     , "⬜⬜📦⬜⬜"
                     , "⬜⬜⬜⬜⬜"
@@ -197,7 +162,7 @@ golemDungeon stage =
                               ]
                                 |> List.concat
                             ]
-                            |> Random.andThen (toGame layout)
+                            |> Random.andThen (Game.Build.generator layout)
                     )
 
 
@@ -209,7 +174,7 @@ goblinDungeon stage =
             , List.repeat 1 HoleBlock
             ]
                 |> List.concat
-                |> toGame
+                |> Game.Build.generator
                     [ "❌⬜💚⬜❌"
                     , "❌⬜⬜⬜❌"
                     , "❌⬜⬜⬜❌"
@@ -224,7 +189,7 @@ goblinDungeon stage =
             , List.repeat 1 (ItemBlock Heart)
             ]
                 |> List.concat
-                |> toGame
+                |> Game.Build.generator
                     [ "❌❌❌❌❌"
                     , "❌⬜📦⬜❌"
                     , "❌⬜⬜⬜❌"
@@ -239,7 +204,7 @@ goblinDungeon stage =
             , List.repeat 2 HoleBlock
             ]
                 |> List.concat
-                |> toGame
+                |> Game.Build.generator
                     [ "❌❌❌❌❌"
                     , "⬜⬜📦⬜⬜"
                     , "⬜⬜💚⬜⬜"
@@ -298,7 +263,7 @@ goblinDungeon stage =
                               ]
                                 |> List.concat
                             ]
-                            |> Random.andThen (toGame layout)
+                            |> Random.andThen (Game.Build.generator layout)
                     )
 
 
@@ -310,7 +275,7 @@ holeChallenge =
     , List.repeat 2 (ItemBlock Heart)
     ]
         |> List.concat
-        |> toGame
+        |> Game.Build.generator
             [ "⬜⬜⬜⬜⬜"
             , "⬜📦⬜⬜⬜"
             , "⬜⬜❌⬜⬜"
@@ -323,50 +288,20 @@ tutorialDungeon : Int -> Generator Game
 tutorialDungeon stage =
     case stage // Config.stageRepetition of
         0 ->
-            [ List.repeat 1 (EntityBlock (Enemy Rat))
-            , List.repeat 2 (ItemBlock InactiveBomb)
-            , List.repeat 1 (ItemBlock Heart)
-            ]
-                |> List.concat
-                |> toGame
-                    [ "💣⬜⬜⬜💣"
-                    , "⬜⬜⬜⬜⬜"
-                    , "⬜⬜⬜⬜⬜"
-                    , "⬜⬜⬜⬜⬜"
-                    , "💣⬜😊⬜💣"
-                    ]
+            World.Trial.fromInt 0
+                |> Maybe.withDefault empty
 
         1 ->
-            [ List.repeat 2 (EntityBlock (Enemy Rat))
-            , List.repeat 5 (ItemBlock InactiveBomb)
-            , List.repeat 4 (EntityBlock Crate)
-            ]
-                |> List.concat
-                |> toGame
-                    [ "📦⬜⬜⬜📦"
-                    , "⬜⬜⬜⬜⬜"
-                    , "⬜⬜⬜⬜⬜"
-                    , "⬜⬜⬜⬜⬜"
-                    , "📦⬜😊⬜📦"
-                    ]
+            World.Trial.fromInt 1
+                |> Maybe.withDefault empty
 
         2 ->
-            [ List.repeat 3 (EntityBlock (Enemy Rat))
-            , List.repeat 3 (ItemBlock InactiveBomb)
-            , List.repeat 2 (EntityBlock Crate)
-            , List.repeat 1 (ItemBlock Heart)
-            ]
-                |> List.concat
-                |> toGame
-                    [ "📦⬜⬜⬜💣"
-                    , "⬜⬜⬜⬜⬜"
-                    , "⬜⬜⬜⬜⬜"
-                    , "⬜⬜⬜⬜⬜"
-                    , "💣⬜😊⬜📦"
-                    ]
+            World.Trial.fromInt 2
+                |> Maybe.withDefault empty
 
         3 ->
-            ratChallenge
+            World.Trial.fromInt 3
+                |> Maybe.withDefault empty
 
         _ ->
             Random.uniform
@@ -413,24 +348,8 @@ tutorialDungeon stage =
                               ]
                                 |> List.concat
                             ]
-                            |> Random.andThen (toGame layout)
+                            |> Random.andThen (Game.Build.generator layout)
                     )
-
-
-ratChallenge : Generator Game
-ratChallenge =
-    [ List.repeat 2 (EntityBlock (Enemy Rat))
-    , List.repeat 2 (ItemBlock InactiveBomb)
-    , List.repeat 1 (ItemBlock Heart)
-    ]
-        |> List.concat
-        |> toGame
-            [ "⬜⬜⬜⬜⬜"
-            , "⬜⬜⬜⬜⬜"
-            , "⬜📦⬜📦⬜"
-            , "⬜⬜⬜⬜⬜"
-            , "⬜⬜😊⬜⬜"
-            ]
 
 
 randomLayout : Generator (List String)
@@ -473,6 +392,18 @@ randomLayout =
           , "⬜⬜😊⬜⬜"
           ]
         ]
+
+
+empty : Generator Game
+empty =
+    Game.Build.generator
+        [ "⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜"
+        , "⬜⬜😊⬜⬜"
+        ]
+        []
 
 
 ratLevel : List BuildingBlock
@@ -526,61 +457,3 @@ finalLevel =
       ]
     ]
         |> List.concat
-
-
-validator =
-    \dict ->
-        dict
-            |> Dict.toList
-            |> List.all
-                (\( pos, cell ) ->
-                    case cell.entity of
-                        Enemy _ ->
-                            Game.Build.neighbors4 pos dict
-                                |> List.all
-                                    (\c ->
-                                        case c of
-                                            Just (Enemy _) ->
-                                                False
-
-                                            _ ->
-                                                True
-                                    )
-
-                        Player ->
-                            (Game.Build.count ((==) Nothing)
-                                (Game.Build.neighbors4 pos dict)
-                                > 1
-                            )
-                                && (Game.Build.diagNeighbors pos dict
-                                        |> List.all
-                                            (\c ->
-                                                case c of
-                                                    Just (Enemy _) ->
-                                                        False
-
-                                                    _ ->
-                                                        True
-                                            )
-                                   )
-
-                        Crate ->
-                            Game.Build.count ((==) (Just Crate))
-                                (Game.Build.neighbors4 pos dict)
-                                < 1
-
-                        _ ->
-                            True
-                )
-
-
-shuffle : List a -> Generator (List a)
-shuffle list =
-    Random.list (List.length list) (Random.float 0 1)
-        |> Random.map
-            (\rand ->
-                list
-                    |> List.map2 Tuple.pair rand
-                    |> List.sortBy Tuple.first
-                    |> List.map Tuple.second
-            )

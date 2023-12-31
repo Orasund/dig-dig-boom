@@ -6,7 +6,6 @@ import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..))
 import Game exposing (Game)
-import Game.Level exposing (Level)
 import Game.Update
 import Html exposing (Html)
 import Html.Style
@@ -18,7 +17,9 @@ import Time
 import View.Screen as Screen
 import View.Stylesheet
 import View.World
-import World exposing (Node(..), World)
+import World exposing (Node(..), RoomSort(..), World)
+import World.Level
+import World.Trial
 
 
 
@@ -39,7 +40,7 @@ type alias Model =
     , overlay : Maybe Overlay
     , frame : Int
     , history : List Game
-    , level : Level
+    , room : RoomSort
     , world : World
     }
 
@@ -60,20 +61,22 @@ type Msg
 init : flag -> ( Model, Cmd Msg )
 init _ =
     let
+        room =
+            TrialRoom 0
+
         level =
-            Game.Level.first
+            World.Trial.fromInt 0 |> Maybe.withDefault World.Level.empty
 
         ( game, seed ) =
-            Random.step (Game.Level.generate level)
-                (Random.initialSeed 42)
+            Random.step level (Random.initialSeed 42)
     in
     ( { levelSeed = seed
       , seed = seed
       , game = game
-      , overlay = Just WorldMap --Just Menu
+      , overlay = Just Menu
       , frame = 0
       , history = []
-      , level = level
+      , room = room
       , world = World.new seed
       }
     , Random.generate GotSeed Random.independentSeed
@@ -86,16 +89,25 @@ init _ =
 -------------------------------
 
 
-generateLevel : Seed -> Level -> Model -> Model
-generateLevel seed level model =
+generateLevel : Seed -> RoomSort -> Model -> Model
+generateLevel seed sort model =
     let
         ( game, _ ) =
-            Random.step (Game.Level.generate level) seed
+            case sort of
+                LevelRoom level ->
+                    Random.step (World.Level.generate level) seed
+
+                TrialRoom i ->
+                    Random.step
+                        (World.Trial.fromInt i
+                            |> Maybe.withDefault World.Level.empty
+                        )
+                        seed
     in
     { model
         | levelSeed = seed
         , game = { game | bombs = model.game.bombs, lifes = model.game.lifes }
-        , level = level
+        , room = sort
         , overlay = Nothing
     }
 
@@ -116,7 +128,7 @@ gameLost model =
         | game = model.game |> (\game -> { game | lifes = 1, bombs = 0 })
         , history = []
       }
-        |> generateLevel model.levelSeed model.level
+        |> generateLevel model.levelSeed model.room
     , Cmd.none
     )
 
@@ -148,7 +160,7 @@ update msg model =
                     updateWorldMap input model
 
                 Just Menu ->
-                    ( generateLevel model.seed model.level model
+                    ( generateLevel model.seed model.room model
                     , Cmd.none
                     )
 
@@ -224,9 +236,12 @@ updateWorldMap input model =
     case input of
         InputActivate ->
             case model.world.nodes |> Dict.get model.world.player of
-                Just (Room { level, seed }) ->
-                    ( generateLevel seed level model, Cmd.none )
+                Just (Room { sort, seed }) ->
+                    seed
+                        |> Random.step (World.solveRoom model.world)
+                        |> (\( w, s ) -> ( { model | world = w, seed = s }, Cmd.none ))
 
+                --( generateLevel seed sort model, Cmd.none )
                 _ ->
                     ( model, Cmd.none )
 

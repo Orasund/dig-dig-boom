@@ -6,7 +6,7 @@ import Html.Attributes
 import Html.Keyed
 import Html.Style
 import Layout
-import World exposing (Node(..), World)
+import World exposing (Node(..), RoomSort(..), World)
 
 
 toHtml : List (Attribute msg) -> World -> Html msg
@@ -42,7 +42,7 @@ toHtml attrs world =
                             Wall ->
                                 "white"
 
-                            Room { solved } ->
+                            Room { solved, sort } ->
                                 if world.player == ( x, y ) then
                                     "blue"
 
@@ -50,7 +50,12 @@ toHtml attrs world =
                                     "green"
 
                                 else
-                                    "red"
+                                    case sort of
+                                        TrialRoom _ ->
+                                            "yellow"
+
+                                        _ ->
+                                            "red"
                         )
                     ]
                     Layout.none
