@@ -1,72 +1,50 @@
-module Game.Update exposing (checkIfWon, movePlayerInDirectionAndUpdateGame, placeBombeAndUpdateGame)
+module Game.Update exposing (movePlayerInDirectionAndUpdateGame, placeBombeAndUpdateGame)
 
 import Dict
 import Direction exposing (Direction(..))
-import Enemy
 import Entity exposing (Enemy(..), Entity(..), Item(..), ParticleSort(..))
 import Game exposing (Cell, Game)
+import Game.Enemy
 import Game.Kill exposing (GameAndKill)
 import Math
 import Position
 import Set
 
 
-updateGame : Game -> Game
+updateGame : Game -> GameAndKill
 updateGame game =
     game.cells
         |> Dict.toList
-        |> List.foldl updateCell (game |> Game.clearParticles)
-        |> checkIfWon
+        |> List.foldl
+            (\tuple -> Game.Kill.andThen (updateCell tuple))
+            (game |> Game.clearParticles |> Game.Kill.none)
 
 
-checkIfWon : Game -> Game
-checkIfWon game =
-    if
-        (Game.get ( 2, -1 ) game == Nothing)
-            && (game.cells
-                    |> Dict.filter
-                        (\_ cell ->
-                            case cell.entity of
-                                Enemy _ ->
-                                    True
-
-                                _ ->
-                                    False
-                        )
-                    |> (==) Dict.empty
-               )
-    then
-        game |> Game.insert ( 2, -1 ) Door
-
-    else
-        game
-
-
-updateCell : ( ( Int, Int ), Cell ) -> Game -> Game
+updateCell : ( ( Int, Int ), Cell ) -> Game -> GameAndKill
 updateCell ( position, cell ) game =
     case cell.entity of
         Enemy enemy ->
             game
-                |> Enemy.update
+                |> Game.Enemy.update
                     { pos = position
                     , enemy = enemy
                     }
-                |> Game.Kill.apply
 
         Stunned enemy ->
-            game |> Game.update position (\_ -> Enemy enemy)
+            game
+                |> Game.update position (\_ -> Enemy enemy)
+                |> Game.Kill.none
 
         _ ->
-            game
+            game |> Game.Kill.none
 
 
-movePlayerInDirectionAndUpdateGame : Direction -> ( Int, Int ) -> Game -> Game
+movePlayerInDirectionAndUpdateGame : Direction -> ( Int, Int ) -> Game -> GameAndKill
 movePlayerInDirectionAndUpdateGame dir location game =
     game
         |> Game.face dir
         |> movePlayer location
-        |> Game.Kill.map updateGame
-        |> Game.Kill.apply
+        |> Game.Kill.andThen updateGame
 
 
 movePlayer : ( Int, Int ) -> Game -> GameAndKill
@@ -89,7 +67,7 @@ movePlayer position game =
                     |> Game.update newLocation
                         (\_ ->
                             enemy
-                                |> Enemy.stun game.playerDirection
+                                |> Game.Enemy.stun game.playerDirection
                                 |> Stunned
                         )
                     |> (\g ->
@@ -197,7 +175,7 @@ applyBomb position game =
         Nothing
 
 
-placeBombeAndUpdateGame : ( Int, Int ) -> Game -> Maybe Game
+placeBombeAndUpdateGame : ( Int, Int ) -> Game -> Maybe GameAndKill
 placeBombeAndUpdateGame playerCell game =
     case game.item of
         Just Bomb ->

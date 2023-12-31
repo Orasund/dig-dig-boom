@@ -1,4 +1,4 @@
-module Game.Kill exposing (..)
+module Game.Kill exposing (GameAndKill, andThen, apply, map, none)
 
 import Dict
 import Entity exposing (Enemy(..), Entity(..), ParticleSort(..))
@@ -14,10 +14,11 @@ none game =
     { game = game, kill = [] }
 
 
-apply : GameAndKill -> Game
-apply output =
-    output.kill
-        |> List.foldl kill output.game
+apply : List ( Int, Int ) -> Game -> Game
+apply kills game =
+    kills
+        |> List.foldl kill game
+        |> checkIfWon
 
 
 map : (Game -> Game) -> GameAndKill -> GameAndKill
@@ -39,40 +40,40 @@ andThen fun output =
 
 kill : ( Int, Int ) -> Game -> Game
 kill pos game =
-    game.cells
-        |> Dict.get pos
-        |> Maybe.map
-            (\cell ->
-                case cell.entity of
-                    Player ->
-                        attackPlayer pos game
-                            |> Maybe.withDefault game
+    case Game.get pos game of
+        Just Player ->
+            attackPlayer pos game
+                |> Maybe.withDefault game
 
-                    Crate ->
-                        { game
-                            | particles =
-                                game.particles |> Dict.insert pos Bone
-                        }
-                            |> Game.remove pos
+        Just Crate ->
+            { game
+                | particles =
+                    game.particles |> Dict.insert pos Bone
+            }
+                |> Game.remove pos
 
-                    Enemy PlacedBomb ->
-                        { game
-                            | particles =
-                                game.particles |> Dict.insert pos Smoke
-                        }
-                            |> Game.remove pos
+        Just (Enemy PlacedBomb) ->
+            { game
+                | particles =
+                    game.particles |> Dict.insert pos Smoke
+            }
+                |> Game.remove pos
 
-                    Enemy _ ->
-                        { game
-                            | particles =
-                                game.particles |> Dict.insert pos Bone
-                        }
-                            |> Game.remove pos
+        Just (Enemy _) ->
+            { game
+                | particles =
+                    game.particles |> Dict.insert pos Bone
+            }
+                |> Game.remove pos
 
-                    _ ->
-                        game
-            )
-        |> Maybe.withDefault game
+        Nothing ->
+            { game
+                | particles =
+                    game.particles |> Dict.insert pos Smoke
+            }
+
+        _ ->
+            game
 
 
 attackPlayer : ( Int, Int ) -> Game -> Maybe Game
@@ -106,3 +107,26 @@ attackPlayer position game =
                     _ ->
                         Nothing
             )
+
+
+checkIfWon : Game -> Game
+checkIfWon game =
+    if
+        (Game.get ( 2, -1 ) game == Nothing)
+            && (game.cells
+                    |> Dict.filter
+                        (\_ cell ->
+                            case cell.entity of
+                                Enemy _ ->
+                                    True
+
+                                _ ->
+                                    False
+                        )
+                    |> (==) Dict.empty
+               )
+    then
+        game |> Game.insert ( 2, -1 ) Door
+
+    else
+        game

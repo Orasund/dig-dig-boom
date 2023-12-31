@@ -1,4 +1,4 @@
-module Enemy exposing (..)
+module Game.Enemy exposing (..)
 
 import Dict
 import Direction exposing (Direction(..))
@@ -192,20 +192,6 @@ updatePlacedBombe location game =
                 in
                 if Math.posIsValid newLocation then
                     case Game.get newLocation output.game of
-                        Nothing ->
-                            output.game
-                                |> (\g ->
-                                        { output
-                                            | game =
-                                                { g
-                                                    | particles =
-                                                        g.particles
-                                                            |> Dict.insert newLocation Smoke
-                                                }
-                                                    |> Game.remove newLocation
-                                        }
-                                   )
-
                         Just Player ->
                             output
 
@@ -216,21 +202,6 @@ updatePlacedBombe location game =
                     output
             )
             { game = game, kill = [ location ] }
-
-
-tryAttacking : ( Int, Int ) -> Game -> Maybe Game
-tryAttacking position game =
-    [ Up, Down, Left, Right ]
-        |> List.filterMap
-            (\direction ->
-                Game.Kill.attackPlayer
-                    (direction
-                        |> Direction.toVector
-                        |> Position.addToVector position
-                    )
-                    game
-            )
-        |> List.head
 
 
 stun : Direction -> Enemy -> Enemy

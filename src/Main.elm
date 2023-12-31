@@ -6,13 +6,16 @@ import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item)
 import Game exposing (Game)
+import Game.Kill exposing (GameAndKill)
 import Game.Update
 import Html exposing (Html)
 import Html.Style
 import Input exposing (Input(..))
 import Json.Decode as Decode
 import Layout
+import Process
 import Random exposing (Seed)
+import Task
 import Time
 import View.Screen as Screen
 import View.Stylesheet
@@ -48,6 +51,7 @@ type alias Model =
 
 type Msg
     = Input Input
+    | ApplyKills (List ( Int, Int ))
     | GotSeed Seed
     | NextFrameRequested
     | NoOps
@@ -165,6 +169,14 @@ nextFrameRequested model =
     { model | frame = model.frame + 1 |> modBy 2 }
 
 
+applyGameAndKill : Model -> GameAndKill -> ( Model, Cmd Msg )
+applyGameAndKill model output =
+    ( setGame model output.game
+    , Process.sleep 100
+        |> Task.perform (\() -> ApplyKills output.kill)
+    )
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -185,28 +197,19 @@ update msg model =
                     else
                         case Game.getPlayerPosition model.game of
                             Just playerPosition ->
-                                let
-                                    updateDirection dir game =
-                                        Game.Update.movePlayerInDirectionAndUpdateGame
-                                            dir
-                                            playerPosition
-                                            game
-                                in
                                 case input of
                                     InputActivate ->
-                                        ( model.game
+                                        model.game
                                             |> Game.Update.placeBombeAndUpdateGame playerPosition
-                                            |> Maybe.withDefault model.game
-                                            |> setGame model
-                                        , Cmd.none
-                                        )
+                                            |> Maybe.map (applyGameAndKill model)
+                                            |> Maybe.withDefault ( model, Cmd.none )
 
                                     InputDir dir ->
-                                        ( model.game
-                                            |> updateDirection dir
-                                            |> setGame model
-                                        , Cmd.none
-                                        )
+                                        model.game
+                                            |> Game.Update.movePlayerInDirectionAndUpdateGame
+                                                dir
+                                                playerPosition
+                                            |> applyGameAndKill model
 
                                     InputUndo ->
                                         case model.history of
@@ -232,6 +235,11 @@ update msg model =
 
                                     _ ->
                                         restartRoom model
+
+        ApplyKills kills ->
+            ( { model | game = Game.Kill.apply kills model.game }
+            , Cmd.none
+            )
 
         NextFrameRequested ->
             ( nextFrameRequested model
