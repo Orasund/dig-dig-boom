@@ -73,12 +73,13 @@ menu attrs args =
             [ Html.Attributes.style "font-size" "46px"
             , Html.Attributes.style "color" "white"
             ]
-    , logo args.frame
+
+    --, logo args.frame
     ]
         |> Layout.column
             ([ Html.Attributes.class "dark-background"
              , Html.Style.width "400px"
-             , Html.Style.height "700px"
+             , Html.Style.height "400px"
              ]
                 ++ Layout.asButton
                     { label = "Next Level"
