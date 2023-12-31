@@ -9,12 +9,10 @@ import Html.Attributes
 import Html.Keyed
 import Html.Style
 import Image
-import Input exposing (Input)
 import Layout
 import Position
 import Set
 import View.Cell
-import View.Controls
 import View.Item
 
 

@@ -1,6 +1,5 @@
 module Game.Enemy exposing (..)
 
-import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), ParticleSort(..))
 import Game exposing (Game)
@@ -39,15 +38,15 @@ update args game =
             updateRat args.pos game |> Game.Kill.none
 
         Goblin dir ->
-            updateGoblin args.pos dir game
+            updateGoblin args.pos dir game |> Game.Kill.none
 
         Golem ->
-            updateGolem args.pos game
+            updateGolem args.pos game |> Game.Kill.none
     )
         |> (\out -> { out | kill = neighboringPlayer ++ out.kill })
 
 
-updateGolem : ( Int, Int ) -> Game -> GameAndKill
+updateGolem : ( Int, Int ) -> Game -> Game
 updateGolem pos game =
     let
         newPos =
@@ -58,7 +57,7 @@ updateGolem pos game =
     in
     case game |> Game.get newPos of
         Just Player ->
-            { game = game, kill = [ newPos ] }
+            game
 
         Nothing ->
             game
@@ -66,14 +65,13 @@ updateGolem pos game =
                     { from = pos
                     , to = newPos
                     }
-                |> Maybe.map (\g -> { game = g, kill = [] })
-                |> Maybe.withDefault { game = game, kill = [] }
+                |> Maybe.withDefault game
 
         _ ->
-            { game = game, kill = [] }
+            game
 
 
-updateGoblin : ( Int, Int ) -> Direction -> Game -> GameAndKill
+updateGoblin : ( Int, Int ) -> Direction -> Game -> Game
 updateGoblin pos direction game =
     let
         newPos =
@@ -90,16 +88,13 @@ updateGoblin pos direction game =
         moveToPosOr p fun g =
             if Math.posIsValid p then
                 case Game.get p g of
-                    Just Player ->
-                        { game = g, kill = [ p ] }
-
                     Just _ ->
                         fun ()
 
                     Nothing ->
                         case
                             tryMoving { from = pos, to = p } g
-                                |> Maybe.map (\newGame -> { game = newGame, kill = [] })
+                                |> Maybe.map (\newGame -> newGame)
                         of
                             Just a ->
                                 a
@@ -114,7 +109,7 @@ updateGoblin pos direction game =
         (\() ->
             moveToPosOr backPos
                 (\() ->
-                    { game = game, kill = [] }
+                    game
                 )
                 (Game.update pos
                     (\_ ->

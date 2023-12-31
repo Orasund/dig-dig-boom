@@ -11,7 +11,6 @@ import Game.Kill exposing (GameAndKill)
 import Game.Update
 import Html exposing (Html)
 import Html.Attributes
-import Html.Style
 import Input exposing (Input(..))
 import Json.Decode as Decode
 import Layout

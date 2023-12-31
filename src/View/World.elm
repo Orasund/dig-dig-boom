@@ -1,12 +1,31 @@
 module View.World exposing (..)
 
+import Config
 import Dict
 import Html exposing (Attribute, Html)
 import Html.Attributes
 import Html.Keyed
 import Html.Style
+import Image
 import Layout
 import World exposing (Node(..), RoomSort(..), World)
+
+
+nodeSize =
+    Config.cellSize // 2
+
+
+image : List (Attribute msg) -> ( Int, Int ) -> Html msg
+image attrs pos =
+    Image.sprite
+        (Image.pixelated :: attrs)
+        { pos = pos
+        , sheetColumns = 4
+        , sheetRows = 4
+        , url = "overworld.png"
+        , height = toFloat nodeSize
+        , width = toFloat nodeSize
+        }
 
 
 toHtml : List (Attribute msg) -> World -> Html msg
@@ -17,9 +36,6 @@ toHtml attrs world =
 
         scale =
             5
-
-        nodeSize =
-            32
 
         ( offsetX, offsetY ) =
             ( -nodeSize // 2, -nodeSize )
@@ -34,34 +50,35 @@ toHtml attrs world =
         |> List.map
             (\( ( x, y ), node ) ->
                 ( "node_" ++ String.fromInt x ++ "_" ++ String.fromInt y
-                , Layout.el
-                    [ Html.Style.width (String.fromInt nodeSize ++ "px")
-                    , Html.Style.height (String.fromInt nodeSize ++ "px")
-                    , Html.Style.top (String.fromInt ((y - centerY) * nodeSize + offsetY) ++ "px")
-                    , Html.Style.left (String.fromInt ((x - centerX) * nodeSize + offsetX) ++ "px")
-                    , Html.Style.positionAbsolute
-                    , Html.Attributes.style "background-color"
-                        (case node of
-                            Wall ->
-                                "white"
+                , (case node of
+                    Wall ->
+                        ( 3, 0 )
 
-                            Room { solved, sort } ->
-                                if world.player == ( x, y ) then
-                                    "blue"
+                    Room { solved, sort } ->
+                        ( if solved then
+                            0
 
-                                else if solved then
-                                    "green"
+                          else
+                            case sort of
+                                Trial _ ->
+                                    2
 
-                                else
-                                    case sort of
-                                        Trial _ ->
-                                            "yellow"
+                                _ ->
+                                    1
+                        , if world.player == ( x, y ) then
+                            1
 
-                                        _ ->
-                                            "red"
+                          else
+                            0
                         )
-                    ]
-                    Layout.none
+                  )
+                    |> image
+                        [ Html.Style.width (String.fromInt nodeSize ++ "px")
+                        , Html.Style.height (String.fromInt nodeSize ++ "px")
+                        , Html.Style.top (String.fromInt ((y - centerY) * nodeSize + offsetY) ++ "px")
+                        , Html.Style.left (String.fromInt ((x - centerX) * nodeSize + offsetX) ++ "px")
+                        , Html.Style.positionAbsolute
+                        ]
                 )
             )
         |> List.sortBy Tuple.first
