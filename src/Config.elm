@@ -12,3 +12,7 @@ cellSize =
 
 stageRepetition =
     2
+
+
+minWorldSize =
+    10

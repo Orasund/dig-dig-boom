@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Browser.Events
+import Config
 import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item)
@@ -9,6 +10,7 @@ import Game exposing (Game)
 import Game.Kill exposing (GameAndKill)
 import Game.Update
 import Html exposing (Html)
+import Html.Attributes
 import Html.Style
 import Input exposing (Input(..))
 import Json.Decode as Decode
@@ -17,6 +19,7 @@ import Process
 import Random exposing (Seed)
 import Task
 import Time
+import View.Controls
 import View.Screen as Screen
 import View.Stylesheet
 import View.World
@@ -221,6 +224,9 @@ update msg model =
                                             [] ->
                                                 ( model, Cmd.none )
 
+                                    InputOpenMap ->
+                                        ( { model | overlay = Just WorldMap }, Cmd.none )
+
                             Nothing ->
                                 case input of
                                     InputUndo ->
@@ -233,8 +239,11 @@ update msg model =
                                             [] ->
                                                 ( model, Cmd.none )
 
+                                    InputOpenMap ->
+                                        ( { model | overlay = Just WorldMap }, Cmd.none )
+
                                     _ ->
-                                        restartRoom model
+                                        ( model, Cmd.none )
 
         ApplyKills kills ->
             ( { model | game = Game.Kill.apply kills model.game }
@@ -308,6 +317,9 @@ toDirection string =
         "r" ->
             Input InputUndo
 
+        "Escape" ->
+            Input InputOpenMap
+
         " " ->
             Input InputActivate
 
@@ -332,43 +344,41 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     [ View.Stylesheet.toHtml
-    , [ Screen.world
-            { onInput = Input
-            , frame = model.frame
-            }
-            model.game
-      , case model.overlay of
+    , [ (case model.overlay of
             Nothing ->
-                Layout.none
+                Screen.world
+                    { frame = model.frame
+                    }
+                    model.game
 
-            {--if model.game.lifes > 0 then
-                    Layout.none
-
-                else
-                    Screen.death
-                        [ Html.Style.positionAbsolute
-                        , Html.Style.top "0"
-                        ]
-                        { onClick = Input InputActivate }--}
             Just WorldMap ->
-                View.World.toHtml
-                    [ Html.Style.positionAbsolute
-                    , Html.Style.top "0"
-                    ]
+                View.World.toHtml []
                     model.world
 
             Just Menu ->
-                Screen.menu
-                    [ Html.Style.positionAbsolute
-                    , Html.Style.top "0"
-                    ]
+                Screen.menu []
                     { frame = model.frame
                     , onClick = Input InputActivate
                     }
+        )
+            |> Layout.el
+                ([ Html.Attributes.style "width" "400px"
+                 , Html.Attributes.style "height" "400px"
+                 ]
+                    ++ Layout.centered
+                )
+      , View.Controls.toHtml
+            { onInput = Input
+            , item = model.game.item
+            }
       ]
-        |> Html.div
-            [ Html.Style.positionRelative
-            ]
+        |> Layout.column
+            ([ Html.Attributes.style "width" "400px"
+             , Html.Attributes.style "padding" (String.fromInt Config.cellSize ++ "px 0")
+             , Layout.gap 16
+             ]
+                ++ Layout.centered
+            )
     ]
         |> Html.div []
 

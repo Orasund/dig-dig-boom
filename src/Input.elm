@@ -7,3 +7,4 @@ type Input
     = InputDir Direction
     | InputActivate
     | InputUndo
+    | InputOpenMap

@@ -19,7 +19,10 @@ toHtml attrs world =
             5
 
         nodeSize =
-            16
+            32
+
+        ( offsetX, offsetY ) =
+            ( -nodeSize // 2, -nodeSize )
     in
     List.range (centerY - scale) (centerY + scale)
         |> List.concatMap
@@ -34,8 +37,8 @@ toHtml attrs world =
                 , Layout.el
                     [ Html.Style.width (String.fromInt nodeSize ++ "px")
                     , Html.Style.height (String.fromInt nodeSize ++ "px")
-                    , Html.Style.top (String.fromInt ((y - centerY) * nodeSize) ++ "px")
-                    , Html.Style.left (String.fromInt ((x - centerX) * nodeSize) ++ "px")
+                    , Html.Style.top (String.fromInt ((y - centerY) * nodeSize + offsetY) ++ "px")
+                    , Html.Style.left (String.fromInt ((x - centerX) * nodeSize + offsetX) ++ "px")
                     , Html.Style.positionAbsolute
                     , Html.Attributes.style "background-color"
                         (case node of
@@ -63,15 +66,7 @@ toHtml attrs world =
             )
         |> List.sortBy Tuple.first
         |> Html.Keyed.node "div"
-            [ Html.Style.positionRelative
-            , Html.Style.width (String.fromInt ((scale * 2 + 1) * nodeSize) ++ "px")
-            , Html.Style.height (String.fromInt ((scale * 2 + 1) * nodeSize) ++ "px")
-            ]
-        |> Layout.el
-            ([ Html.Attributes.class "dark-background"
-             , Html.Style.width "400px"
-             , Html.Style.height "700px"
+            ([ Html.Style.positionRelative
              ]
-                ++ Layout.centered
                 ++ attrs
             )

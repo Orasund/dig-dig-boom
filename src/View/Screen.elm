@@ -92,13 +92,12 @@ menu attrs args =
 
 
 world :
-    { onInput : Input -> msg
-    , frame : Int
+    { frame : Int
     }
     -> Game
     -> Html msg
 world args game =
-    [ (Position.asGrid
+    (Position.asGrid
         { rows = Config.mapSize
         , columns = Config.mapSize
         }
@@ -154,7 +153,7 @@ world args game =
                         ]
                 )
             )
-      )
+    )
         ++ (game.cells
                 |> Dict.toList
                 |> List.map
@@ -182,15 +181,3 @@ world args game =
             , Html.Attributes.style "height" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")
             , Html.Attributes.style "border" "4px solid white"
             ]
-    , View.Controls.toHtml
-        { onInput = args.onInput
-        , item = game.item
-        }
-    ]
-        |> Layout.column
-            ([ Html.Attributes.style "width" "400px"
-             , Html.Attributes.style "padding" (String.fromInt Config.cellSize ++ "px 0")
-             , Layout.gap 16
-             ]
-                ++ Layout.centered
-            )

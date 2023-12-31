@@ -1,5 +1,6 @@
 module World exposing (..)
 
+import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction)
 import Position
@@ -181,7 +182,11 @@ insertRandomNode ( x, y ) world =
 
     else
         Random.weighted
-            ( 1
+            ( if neighbors.rooms <= 1 && Dict.size world.nodes < Config.cellSize then
+                0
+
+              else
+                1
             , insertWall ( x, y ) world |> Random.constant
             )
             [ ( if neighbors.rooms <= 1 then

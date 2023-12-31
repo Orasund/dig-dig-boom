@@ -27,9 +27,14 @@ sprite attrs pos =
 toHtml : { onInput : Input -> msg, item : Maybe Item } -> Html msg
 toHtml args =
     [ [ Layout.el
-            [ Html.Style.width "72px"
-            , Html.Style.height "72px"
-            ]
+            (Layout.asButton
+                { onPress = args.onInput InputOpenMap |> Just
+                , label = "Open Map"
+                }
+                ++ [ Html.Style.width "72px"
+                   , Html.Style.height "72px"
+                   ]
+            )
             (Layout.text [ Html.Attributes.style "color" "white" ] "Return to Map")
       , sprite
             (Html.Attributes.style "transform" "rotate(90deg)"

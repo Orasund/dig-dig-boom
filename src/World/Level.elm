@@ -31,7 +31,7 @@ generate : Level -> Generator Game
 generate level =
     case level.dungeon of
         0 ->
-            tutorialDungeon level.stage
+            ratDungeon level.stage
 
         1 ->
             goblinDungeon level.stage
@@ -154,8 +154,8 @@ goblinDungeon stage =
             )
 
 
-tutorialDungeon : Int -> Generator Game
-tutorialDungeon stage =
+ratDungeon : Int -> Generator Game
+ratDungeon stage =
     Random.uniform
         [ "💣⬜⬜⬜💣"
         , "⬜⬜⬜⬜⬜"
@@ -187,7 +187,7 @@ tutorialDungeon stage =
                     )
                     [ [ List.repeat 3 (Enemy Rat |> EntityBlock)
                       , List.repeat 3 (ItemBlock Bomb)
-                      , List.repeat 4 (EntityBlock Crate)
+                      , List.repeat 3 (EntityBlock Crate)
                       ]
                         |> List.concat
                     , [ List.repeat 2 (Enemy Rat |> EntityBlock)
