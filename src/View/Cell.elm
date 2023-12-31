@@ -159,3 +159,12 @@ borders ( x, y ) game =
         Nothing
     ]
         |> List.filterMap identity
+
+
+item : List (Attribute msg) -> Item -> Html msg
+item attrs i =
+    (case i of
+        Bomb ->
+            ( 3, 2 )
+    )
+        |> sprite attrs

@@ -8,7 +8,7 @@ import Html.Style
 import Image
 import Input exposing (Input(..))
 import Layout
-import View.Item
+import View.Cell
 
 
 sprite : List (Attribute msg) -> ( Int, Int ) -> Html msg
@@ -66,10 +66,10 @@ toHtml args =
       , (case args.item of
             Just item ->
                 [ sprite [] ( 1, 0 )
-                , View.Item.toHtml
+                , View.Cell.item
                     [ Html.Attributes.style "position" "absolute"
-                    , Html.Attributes.style "top" "11px"
-                    , Html.Attributes.style "left" "11px"
+                    , Html.Attributes.style "top" "8px"
+                    , Html.Attributes.style "left" "8px"
                     ]
                     item
                 ]

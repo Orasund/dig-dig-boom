@@ -13,7 +13,6 @@ import Layout
 import Position
 import Set
 import View.Cell
-import View.Item
 
 
 logo : Int -> Html msg
@@ -118,7 +117,7 @@ world args game =
                         |> Dict.get ( x, y )
                         |> Maybe.map
                             (\item ->
-                                View.Item.toHtml
+                                View.Cell.item
                                     [ Html.Style.positionAbsolute
                                     , Html.Style.top "0"
                                     ]
