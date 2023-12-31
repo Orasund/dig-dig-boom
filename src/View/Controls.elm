@@ -24,22 +24,13 @@ sprite attrs pos =
         }
 
 
-toHtml : { onInput : Input -> msg, bombs : Int, lifes : Int } -> Html msg
+toHtml : { onInput : Input -> msg, item : Maybe Item } -> Html msg
 toHtml args =
-    [ [ (if args.lifes > 1 then
-            Image.image [ Image.pixelated ]
-                { url = "heart.png"
-                , width = 64
-                , height = 64
-                }
-
-         else
-            Layout.none
-        )
-            |> Layout.el
-                [ Html.Style.width "72px"
-                , Html.Style.height "72px"
-                ]
+    [ [ Layout.el
+            [ Html.Style.width "72px"
+            , Html.Style.height "72px"
+            ]
+            (Layout.text [ Html.Attributes.style "color" "white" ] "Return to Map")
       , sprite
             (Html.Attributes.style "transform" "rotate(90deg)"
                 :: Layout.asButton
@@ -49,10 +40,15 @@ toHtml args =
             )
             ( 0, 0 )
       , Layout.el
-            [ Html.Style.width "72px"
-            , Html.Style.height "72px"
-            ]
-            Layout.none
+            (Layout.asButton
+                { onPress = args.onInput InputUndo |> Just
+                , label = "Undo"
+                }
+                ++ [ Html.Style.width "72px"
+                   , Html.Style.height "72px"
+                   ]
+            )
+            (Layout.text [ Html.Attributes.style "color" "white" ] "Undo")
       ]
         |> Layout.row []
     , [ sprite
@@ -62,26 +58,19 @@ toHtml args =
                 }
             )
             ( 0, 0 )
-      , (if args.bombs > 0 then
-            [ sprite [] ( 1, 0 )
-            , View.Item.toHtml
-                [ Html.Attributes.style "position" "absolute"
-                , Html.Attributes.style "top" "11px"
-                , Html.Attributes.style "left" "11px"
-                ]
-                InactiveBomb
-            , String.fromInt args.bombs
-                |> Layout.text
+      , (case args.item of
+            Just item ->
+                [ sprite [] ( 1, 0 )
+                , View.Item.toHtml
                     [ Html.Attributes.style "position" "absolute"
-                    , Html.Attributes.style "right" "8px"
-                    , Html.Attributes.style "bottom" "4px"
-                    , Html.Attributes.style "color" "white"
-                    , Html.Attributes.style "font-size" "20px"
+                    , Html.Attributes.style "top" "11px"
+                    , Html.Attributes.style "left" "11px"
                     ]
-            ]
+                    item
+                ]
 
-         else
-            [ sprite [] ( 1, 0 ) ]
+            Nothing ->
+                [ sprite [] ( 1, 0 ) ]
         )
             |> Html.div
                 (Html.Attributes.style "position" "relative"

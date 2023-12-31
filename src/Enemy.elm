@@ -223,7 +223,7 @@ tryAttacking position game =
     [ Up, Down, Left, Right ]
         |> List.filterMap
             (\direction ->
-                Game.attackPlayer
+                Game.Kill.attackPlayer
                     (direction
                         |> Direction.toVector
                         |> Position.addToVector position

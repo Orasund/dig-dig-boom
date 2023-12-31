@@ -184,13 +184,13 @@ world args game =
             ]
     , View.Controls.toHtml
         { onInput = args.onInput
-        , bombs = game.bombs
-        , lifes = game.lifes
+        , item = game.item
         }
     ]
         |> Layout.column
             ([ Html.Attributes.style "width" "400px"
              , Html.Attributes.style "padding" (String.fromInt Config.cellSize ++ "px 0")
+             , Layout.gap 16
              ]
                 ++ Layout.centered
             )

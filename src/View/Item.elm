@@ -21,10 +21,7 @@ fromPos attrs pos =
 toHtml : List (Attribute msg) -> Item -> Html msg
 toHtml attrs item =
     (case item of
-        InactiveBomb ->
+        Bomb ->
             ( 1, 0 )
-
-        Heart ->
-            ( 0, 0 )
     )
         |> fromPos attrs

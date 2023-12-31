@@ -45,7 +45,7 @@ kill pos game =
             (\cell ->
                 case cell.entity of
                     Player ->
-                        Game.attackPlayer pos game
+                        attackPlayer pos game
                             |> Maybe.withDefault game
 
                     Crate ->
@@ -73,3 +73,36 @@ kill pos game =
                         game
             )
         |> Maybe.withDefault game
+
+
+attackPlayer : ( Int, Int ) -> Game -> Maybe Game
+attackPlayer position game =
+    game.cells
+        |> Dict.get position
+        |> Maybe.andThen
+            (\cell ->
+                case cell.entity of
+                    Player ->
+                        if game.item == Nothing then
+                            { game
+                                | cells =
+                                    game.cells
+                                        |> Dict.remove position
+                                , particles =
+                                    game.particles
+                                        |> Dict.insert position Bone
+                            }
+                                |> Just
+
+                        else
+                            { game
+                                | particles =
+                                    game.particles
+                                        |> Dict.insert position Bone
+                            }
+                                |> Game.removeItem
+                                |> Just
+
+                    _ ->
+                        Nothing
+            )

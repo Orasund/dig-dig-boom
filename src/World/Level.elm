@@ -78,9 +78,8 @@ golemDungeon stage =
             (\layout ->
                 Random.uniform
                     ([ List.repeat 3 (Enemy Golem |> EntityBlock)
-                     , List.repeat 3 (ItemBlock InactiveBomb)
+                     , List.repeat 4 (ItemBlock Bomb)
                      , List.repeat 3 (EntityBlock Crate)
-                     , List.repeat 1 (ItemBlock Heart)
                      , List.repeat 1 HoleBlock
                      ]
                         |> List.concat
@@ -88,17 +87,15 @@ golemDungeon stage =
                     [ [ List.repeat 1 (Enemy Golem |> EntityBlock)
                       , List.repeat 1 (Enemy (Goblin Down) |> EntityBlock)
                       , List.repeat 1 (Enemy (Goblin Left) |> EntityBlock)
-                      , List.repeat 3 (ItemBlock InactiveBomb)
+                      , List.repeat 4 (ItemBlock Bomb)
                       , List.repeat 3 (EntityBlock Crate)
-                      , List.repeat 1 (ItemBlock Heart)
                       , List.repeat 1 HoleBlock
                       ]
                         |> List.concat
                     , [ List.repeat 1 (Enemy Golem |> EntityBlock)
                       , List.repeat 2 (Enemy Rat |> EntityBlock)
-                      , List.repeat 3 (ItemBlock InactiveBomb)
+                      , List.repeat 4 (ItemBlock Bomb)
                       , List.repeat 3 (EntityBlock Crate)
-                      , List.repeat 1 (ItemBlock Heart)
                       , List.repeat 1 HoleBlock
                       ]
                         |> List.concat
@@ -135,24 +132,21 @@ goblinDungeon stage =
                     ([ List.repeat 1 (EntityBlock (Enemy (Goblin Right)))
                      , List.repeat 1 (EntityBlock (Enemy (Goblin Left)))
                      , List.repeat 1 (EntityBlock (Enemy (Goblin Down)))
-                     , List.repeat 2 (ItemBlock InactiveBomb)
+                     , List.repeat 3 (ItemBlock Bomb)
                      , List.repeat 2 (EntityBlock Crate)
-                     , List.repeat 1 (ItemBlock Heart)
                      ]
                         |> List.concat
                     )
                     [ [ List.repeat 1 (EntityBlock (Enemy (Goblin Right)))
                       , List.repeat 1 (EntityBlock (Enemy (Goblin Left)))
-                      , List.repeat 2 (ItemBlock InactiveBomb)
+                      , List.repeat 3 (ItemBlock Bomb)
                       , List.repeat 3 (EntityBlock Crate)
-                      , List.repeat 1 (ItemBlock Heart)
                       ]
                         |> List.concat
                     , [ List.repeat 1 (EntityBlock (Enemy (Goblin Down)))
                       , List.repeat 1 (EntityBlock (Enemy Rat))
-                      , List.repeat 2 (ItemBlock InactiveBomb)
+                      , List.repeat 3 (ItemBlock Bomb)
                       , List.repeat 3 (EntityBlock Crate)
-                      , List.repeat 1 (ItemBlock Heart)
                       ]
                         |> List.concat
                     ]
@@ -186,23 +180,20 @@ tutorialDungeon stage =
             (\layout ->
                 Random.uniform
                     ([ List.repeat 3 (Enemy Rat |> EntityBlock)
-                     , List.repeat 4 (ItemBlock InactiveBomb)
+                     , List.repeat 5 (ItemBlock Bomb)
                      , List.repeat 2 (EntityBlock Crate)
-                     , List.repeat 1 (ItemBlock Heart)
                      ]
                         |> List.concat
                     )
                     [ [ List.repeat 3 (Enemy Rat |> EntityBlock)
-                      , List.repeat 2 (ItemBlock InactiveBomb)
+                      , List.repeat 3 (ItemBlock Bomb)
                       , List.repeat 4 (EntityBlock Crate)
-                      , List.repeat 1 (ItemBlock Heart)
                       ]
                         |> List.concat
                     , [ List.repeat 2 (Enemy Rat |> EntityBlock)
                       , List.repeat 1 (Enemy (Goblin Down) |> EntityBlock)
-                      , List.repeat 3 (ItemBlock InactiveBomb)
+                      , List.repeat 4 (ItemBlock Bomb)
                       , List.repeat 3 (EntityBlock Crate)
-                      , List.repeat 1 (ItemBlock Heart)
                       ]
                         |> List.concat
                     ]
@@ -268,9 +259,8 @@ ratLevel : List BuildingBlock
 ratLevel =
     [ List.repeat 4 (EntityBlock (Enemy Rat))
     , List.repeat 3 (EntityBlock Crate)
-    , List.repeat 4 (ItemBlock InactiveBomb)
-    , [ ItemBlock Heart
-      , HoleBlock
+    , List.repeat 5 (ItemBlock Bomb)
+    , [ HoleBlock
       ]
     ]
         |> List.concat
@@ -283,10 +273,9 @@ goblinLevel =
       , Enemy (Goblin Right) |> EntityBlock
       , Enemy (Goblin Down) |> EntityBlock
       , Enemy (Goblin Up) |> EntityBlock
-      , ItemBlock Heart
       , HoleBlock
       ]
-    , List.repeat 4 (ItemBlock InactiveBomb)
+    , List.repeat 5 (ItemBlock Bomb)
     ]
         |> List.concat
 
@@ -294,10 +283,9 @@ goblinLevel =
 golemLevel : List BuildingBlock
 golemLevel =
     [ List.repeat 3 (EntityBlock (Enemy Golem))
-    , List.repeat 3 (ItemBlock InactiveBomb)
+    , List.repeat 4 (ItemBlock Bomb)
     , List.repeat 3 (EntityBlock Crate)
-    , [ ItemBlock Heart
-      , HoleBlock
+    , [ HoleBlock
       ]
     ]
         |> List.concat
@@ -305,10 +293,9 @@ golemLevel =
 
 finalLevel : List BuildingBlock
 finalLevel =
-    [ List.repeat 3 (ItemBlock InactiveBomb)
+    [ List.repeat 4 (ItemBlock Bomb)
     , List.repeat 3 (EntityBlock Crate)
-    , [ ItemBlock Heart
-      , EntityBlock (Enemy Rat)
+    , [ EntityBlock (Enemy Rat)
       , Enemy (Goblin Left) |> EntityBlock
       , EntityBlock (Enemy Golem)
       , HoleBlock

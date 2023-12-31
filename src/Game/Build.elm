@@ -76,11 +76,8 @@ parseEmoji string =
         '📦' ->
             EntityBlock Crate |> Just
 
-        '💚' ->
-            ItemBlock Heart |> Just
-
         '💣' ->
-            ItemBlock InactiveBomb |> Just
+            ItemBlock Bomb |> Just
 
         '❌' ->
             HoleBlock |> Just

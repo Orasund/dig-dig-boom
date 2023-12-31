@@ -1,4 +1,4 @@
-module Game exposing (Cell, Game, addBomb, addFloor, addLife, attackPlayer, clearParticles, empty, face, findFirstEmptyCellInDirection, findFirstInDirection, fromCells, get, getPlayerPosition, insert, isLost, isWon, move, placeItem, remove, removeBomb, removeFloor, removeLife, update)
+module Game exposing (Cell, Game, addBomb, addFloor, clearParticles, empty, face, findFirstEmptyCellInDirection, findFirstInDirection, fromCells, get, getPlayerPosition, insert, isLost, isWon, move, placeItem, remove, removeFloor, removeItem, update)
 
 import Config
 import Dict exposing (Dict)
@@ -27,8 +27,7 @@ type alias Game =
     , particles : Dict ( Int, Int ) ParticleSort
     , floor : Set ( Int, Int )
     , nextId : Int
-    , bombs : Int
-    , lifes : Int
+    , item : Maybe Item
     , playerDirection : Direction
     , won : Bool
     }
@@ -70,8 +69,7 @@ empty =
             , rows = Config.mapSize
             }
             |> Set.fromList
-    , bombs = 0
-    , lifes = 1
+    , item = Nothing
     , nextId = 0
     , playerDirection = Down
     , won = False
@@ -85,7 +83,7 @@ isWon game =
 
 isLost : Game -> Bool
 isLost game =
-    game.lifes > 0
+    getPlayerPosition game == Nothing
 
 
 get : ( Int, Int ) -> Game -> Maybe Entity
@@ -214,37 +212,6 @@ findFirstEmptyCellInDirection pos direction game =
         pos
 
 
-attackPlayer : ( Int, Int ) -> Game -> Maybe Game
-attackPlayer position game =
-    let
-        newGame =
-            game |> removeLife
-    in
-    game.cells
-        |> Dict.get position
-        |> Maybe.andThen
-            (\cell ->
-                case cell.entity of
-                    Player ->
-                        if newGame.lifes > 0 then
-                            newGame |> Just
-
-                        else
-                            { newGame
-                                | cells =
-                                    newGame.cells
-                                        |> Dict.remove position
-                                , particles =
-                                    newGame.particles
-                                        |> Dict.insert position Bone
-                            }
-                                |> Just
-
-                    _ ->
-                        Nothing
-            )
-
-
 face :
     Direction
     -> Game
@@ -253,33 +220,15 @@ face direction game =
     { game | playerDirection = direction }
 
 
-removeLife : Game -> Game
-removeLife game =
-    { game | lifes = game.lifes - 1 |> max 0 }
-
-
-addLife : Game -> Maybe Game
-addLife game =
-    if game.lifes < Config.maxLifes then
-        { game | lifes = game.lifes + 1 } |> Just
-
-    else
-        Nothing
-
-
-removeBomb : Game -> Maybe Game
-removeBomb playerData =
-    if playerData.bombs > 0 then
-        Just { playerData | bombs = playerData.bombs - 1 }
-
-    else
-        Nothing
+removeItem : Game -> Game
+removeItem game =
+    { game | item = Nothing }
 
 
 addBomb : Game -> Maybe Game
 addBomb game =
-    if game.bombs < Config.maxBombs then
-        { game | bombs = game.bombs + 1 } |> Just
+    if game.item == Nothing then
+        { game | item = Just Bomb } |> Just
 
     else
         Nothing

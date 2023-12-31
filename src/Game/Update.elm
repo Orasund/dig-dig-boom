@@ -164,11 +164,8 @@ takeItem pos game =
 addItem : Item -> Game -> Maybe Game
 addItem item =
     case item of
-        InactiveBomb ->
+        Bomb ->
             Game.addBomb
-
-        Heart ->
-            Game.addLife
 
 
 applyBomb : ( Int, Int ) -> Game -> Maybe Game
@@ -202,9 +199,14 @@ applyBomb position game =
 
 placeBombeAndUpdateGame : ( Int, Int ) -> Game -> Maybe Game
 placeBombeAndUpdateGame playerCell game =
-    Game.removeBomb game
-        |> Maybe.andThen (applyBomb playerCell)
-        |> Maybe.map updateGame
+    case game.item of
+        Just Bomb ->
+            Game.removeItem game
+                |> applyBomb playerCell
+                |> Maybe.map updateGame
+
+        _ ->
+            Nothing
 
 
 pushCrate : ( Int, Int ) -> Direction -> Game -> Maybe Game

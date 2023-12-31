@@ -4,7 +4,7 @@ import Browser
 import Browser.Events
 import Dict
 import Direction exposing (Direction(..))
-import Entity exposing (Enemy(..), Entity(..))
+import Entity exposing (Enemy(..), Entity(..), Item)
 import Game exposing (Game)
 import Game.Update
 import Html exposing (Html)
@@ -42,6 +42,7 @@ type alias Model =
     , history : List Game
     , room : RoomSort
     , world : World
+    , initialItem : Maybe Item
     }
 
 
@@ -73,6 +74,7 @@ init _ =
     ( { levelSeed = seed
       , seed = seed
       , game = game
+      , initialItem = Nothing
       , overlay = Just Menu
       , frame = 0
       , history = []
@@ -106,26 +108,38 @@ generateLevel seed sort model =
     in
     { model
         | levelSeed = seed
-        , game = { game | bombs = model.game.bombs, lifes = model.game.lifes }
+        , game = { game | item = model.game.item }
         , room = sort
         , overlay = Nothing
     }
 
 
-gameWon : Model -> ( Model, Cmd Msg )
-gameWon model =
+solvedRoom : Model -> ( Model, Cmd Msg )
+solvedRoom model =
     Random.step (World.solveRoom model.world) model.seed
         |> (\( world, seed ) ->
-                ( { model | world = world, seed = seed, overlay = Just WorldMap, history = [] }
+                ( { model
+                    | world = world
+                    , seed = seed
+                    , overlay = Just WorldMap
+                    , history = []
+                    , initialItem = model.game.item
+                  }
                 , Cmd.none
                 )
            )
 
 
-gameLost : Model -> ( Model, Cmd Msg )
-gameLost model =
+restartRoom : Model -> ( Model, Cmd Msg )
+restartRoom model =
     ( { model
-        | game = model.game |> (\game -> { game | lifes = 1, bombs = 0 })
+        | game =
+            model.game
+                |> (\game ->
+                        { game
+                            | item = model.initialItem
+                        }
+                   )
         , history = []
       }
         |> generateLevel model.levelSeed model.room
@@ -166,7 +180,7 @@ update msg model =
 
                 Nothing ->
                     if Game.isWon model.game then
-                        gameWon model
+                        solvedRoom model
 
                     else
                         case Game.getPlayerPosition model.game of
@@ -217,7 +231,7 @@ update msg model =
                                                 ( model, Cmd.none )
 
                                     _ ->
-                                        gameLost model
+                                        restartRoom model
 
         NextFrameRequested ->
             ( nextFrameRequested model

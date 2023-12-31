@@ -21,8 +21,7 @@ type ParticleSort
 
 
 type Item
-    = Heart
-    | InactiveBomb
+    = Bomb
 
 
 type Entity
