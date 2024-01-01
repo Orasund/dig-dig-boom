@@ -1,8 +1,8 @@
 module Config exposing (..)
 
 
-mapSize : Int
-mapSize =
+roomSize : Int
+roomSize =
     5
 
 

@@ -134,16 +134,9 @@ takeItem : ( Int, Int ) -> Game -> Game
 takeItem pos game =
     game.items
         |> Dict.get pos
-        |> Maybe.andThen (\item -> addItem item game)
+        |> Maybe.andThen (\item -> Game.addItem item game)
         |> Maybe.map (\g -> { g | items = g.items |> Dict.remove pos })
         |> Maybe.withDefault game
-
-
-addItem : Item -> Game -> Maybe Game
-addItem item =
-    case item of
-        Bomb ->
-            Game.addBomb
 
 
 applyBomb : ( Int, Int ) -> Game -> Maybe Game
@@ -153,26 +146,27 @@ applyBomb position game =
             game.playerDirection
                 |> Direction.toVector
                 |> Position.addToVector position
-
-        cell =
-            Stunned PlacedBomb
     in
-    if Math.posIsValid newPosition then
-        case game.cells |> Dict.get newPosition |> Maybe.map .entity of
-            Nothing ->
-                if Set.member newPosition game.floor then
-                    game
-                        |> Game.insert newPosition cell
-                        |> Just
+    game.item
+        |> Maybe.andThen
+            (\item ->
+                if Math.posIsValid newPosition then
+                    case game.cells |> Dict.get newPosition |> Maybe.map .entity of
+                        Nothing ->
+                            if Set.member newPosition game.floor then
+                                game
+                                    |> Game.insert newPosition (Stunned (PlacedBomb item))
+                                    |> Just
+
+                            else
+                                Nothing
+
+                        _ ->
+                            Nothing
 
                 else
                     Nothing
-
-            _ ->
-                Nothing
-
-    else
-        Nothing
+            )
 
 
 placeBombeAndUpdateGame : ( Int, Int ) -> Game -> Maybe GameAndKill

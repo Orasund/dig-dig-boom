@@ -1,4 +1,4 @@
-module Game exposing (Cell, Game, addBomb, addFloor, clearParticles, empty, face, findFirstEmptyCellInDirection, findFirstInDirection, fromCells, get, getPlayerPosition, insert, isLost, isWon, move, placeItem, remove, removeFloor, removeItem, update)
+module Game exposing (Cell, Game, addFloor, addItem, clearParticles, empty, face, findFirstEmptyCellInDirection, findFirstInDirection, fromCells, get, getPlayerPosition, insert, isLost, isWon, move, placeItem, remove, removeFloor, removeItem, update)
 
 import Config
 import Dict exposing (Dict)
@@ -65,8 +65,8 @@ empty =
     , particles = Dict.empty
     , floor =
         Position.asGrid
-            { columns = Config.mapSize
-            , rows = Config.mapSize
+            { columns = Config.roomSize
+            , rows = Config.roomSize
             }
             |> Set.fromList
     , item = Nothing
@@ -225,10 +225,10 @@ removeItem game =
     { game | item = Nothing }
 
 
-addBomb : Game -> Maybe Game
-addBomb game =
+addItem : Item -> Game -> Maybe Game
+addItem item game =
     if game.item == Nothing then
-        { game | item = Just Bomb } |> Just
+        { game | item = Just item } |> Just
 
     else
         Nothing

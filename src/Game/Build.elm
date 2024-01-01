@@ -23,8 +23,8 @@ generator emojis blocks =
 
         rec () =
             Position.asGrid
-                { columns = Config.mapSize
-                , rows = Config.mapSize
+                { columns = Config.roomSize
+                , rows = Config.roomSize
                 }
                 |> List.filter
                     (\pos ->

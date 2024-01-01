@@ -96,8 +96,8 @@ world :
     -> Html msg
 world args game =
     (Position.asGrid
-        { rows = Config.mapSize
-        , columns = Config.mapSize
+        { rows = Config.roomSize
+        , columns = Config.roomSize
         }
         |> List.map
             (\( x, y ) ->
@@ -175,7 +175,7 @@ world args game =
         |> List.sortBy Tuple.first
         |> Html.Keyed.node "div"
             [ Html.Attributes.style "position" "relative"
-            , Html.Attributes.style "width" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")
-            , Html.Attributes.style "height" (String.fromFloat (Config.cellSize * toFloat Config.mapSize) ++ "px")
+            , Html.Attributes.style "width" (String.fromFloat (Config.cellSize * toFloat Config.roomSize) ++ "px")
+            , Html.Attributes.style "height" (String.fromFloat (Config.cellSize * toFloat Config.roomSize) ++ "px")
             , Html.Attributes.style "border" "4px solid white"
             ]

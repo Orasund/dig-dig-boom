@@ -3,11 +3,9 @@ module View.World exposing (..)
 import Config
 import Dict
 import Html exposing (Attribute, Html)
-import Html.Attributes
 import Html.Keyed
 import Html.Style
 import Image
-import Layout
 import World exposing (Node(..), RoomSort(..), World)
 
 
@@ -83,7 +81,4 @@ toHtml attrs world =
             )
         |> List.sortBy Tuple.first
         |> Html.Keyed.node "div"
-            ([ Html.Style.positionRelative
-             ]
-                ++ attrs
-            )
+            (Html.Style.positionRelative :: attrs)

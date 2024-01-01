@@ -9,7 +9,7 @@ import Direction exposing (Direction)
 
 
 type Enemy
-    = PlacedBomb
+    = PlacedBomb Item
     | Goblin Direction
     | Rat
     | Golem
@@ -22,6 +22,7 @@ type ParticleSort
 
 type Item
     = Bomb
+    | CrossBomb
 
 
 type Entity

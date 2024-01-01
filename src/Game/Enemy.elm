@@ -1,7 +1,8 @@
 module Game.Enemy exposing (..)
 
+import Config
 import Direction exposing (Direction(..))
-import Entity exposing (Enemy(..), Entity(..), ParticleSort(..))
+import Entity exposing (Enemy(..), Entity(..), Item(..), ParticleSort(..))
 import Game exposing (Game)
 import Game.Kill exposing (GameAndKill)
 import Math
@@ -31,8 +32,13 @@ update args game =
                     )
     in
     (case args.enemy of
-        PlacedBomb ->
-            updatePlacedBombe args.pos game
+        PlacedBomb item ->
+            case item of
+                Bomb ->
+                    updateDynamite args.pos game
+
+                CrossBomb ->
+                    updateCrossBomb args.pos game
 
         Rat ->
             updateRat args.pos game |> Game.Kill.none
@@ -159,7 +165,7 @@ tryMovingRat position direction game =
                             |> Position.addToVector position
                     }
 
-        Just (Enemy PlacedBomb) ->
+        Just (Enemy (PlacedBomb _)) ->
             game
                 |> tryMoving
                     { from = position
@@ -174,8 +180,8 @@ tryMovingRat position direction game =
             Nothing
 
 
-updatePlacedBombe : ( Int, Int ) -> Game -> GameAndKill
-updatePlacedBombe location game =
+updateDynamite : ( Int, Int ) -> Game -> GameAndKill
+updateDynamite location game =
     [ Up, Down, Left, Right ]
         |> List.foldl
             (\direction output ->
@@ -197,6 +203,38 @@ updatePlacedBombe location game =
                     output
             )
             { game = game, kill = [ location ] }
+
+
+updateCrossBomb : ( Int, Int ) -> Game -> GameAndKill
+updateCrossBomb pos game =
+    [ Up, Down, Left, Right ]
+        |> List.concatMap
+            (\direction ->
+                List.range 1 (Config.roomSize - 1)
+                    |> List.map
+                        (\n ->
+                            direction
+                                |> Direction.toVector
+                                |> (\v -> { x = v.x * n, y = v.y * n })
+                                |> Position.addToVector pos
+                        )
+            )
+        |> List.foldl
+            (\newPos output ->
+                if Math.posIsValid newPos then
+                    case Game.get newPos output.game of
+                        Just Player ->
+                            output
+
+                        _ ->
+                            { output | kill = newPos :: output.kill }
+
+                else
+                    output
+            )
+            { game = game |> Game.removeFloor pos
+            , kill = [ pos ]
+            }
 
 
 stun : Direction -> Enemy -> Enemy

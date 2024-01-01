@@ -109,7 +109,7 @@ directional ( x, y ) args =
 fromEnemy : { frame : Int, playerDirection : Direction } -> Enemy -> ( Int, Int )
 fromEnemy args enemy =
     case enemy of
-        PlacedBomb ->
+        PlacedBomb _ ->
             ( 2 + args.frame, 1 )
 
         Goblin dir ->
@@ -165,6 +165,9 @@ item : List (Attribute msg) -> Item -> Html msg
 item attrs i =
     (case i of
         Bomb ->
-            ( 3, 2 )
+            ( 0, 6 )
+
+        CrossBomb ->
+            ( 3, 6 )
     )
         |> sprite attrs
