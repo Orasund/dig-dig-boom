@@ -12,10 +12,10 @@ generate : Int -> Generator Game
 generate difficulty =
     case difficulty of
         0 ->
-            crateDungeon 0
+            crateDungeonNoPushingIntoLava
 
         1 ->
-            crateDungeon 1
+            crateDungeonNoPushingIntoLava
 
         2 ->
             crateDungeon 2
@@ -49,6 +49,61 @@ generate difficulty =
 
         _ ->
             golemDungeon 3
+
+
+crateDungeonNoPushingIntoLava : Generator Game
+crateDungeonNoPushingIntoLava =
+    Random.uniform
+        [ "❌⬜⬜⬜❌"
+        , "❌⬜⬜⬜❌"
+        , "❌⬜⬜⬜❌"
+        , "❌⬜⬜⬜❌"
+        , "❌⬜😊⬜❌"
+        ]
+        [ [ "⬜⬜⬜⬜⬜"
+          , "⬜📦⬜⬜⬜"
+          , "⬜❌❌❌⬜"
+          , "📦⬜⬜⬜⬜"
+          , "⬜⬜😊⬜⬜"
+          ]
+        , [ "⬜⬜⬜⬜⬜"
+          , "⬜⬜⬜📦⬜"
+          , "⬜❌❌❌⬜"
+          , "⬜⬜⬜⬜📦"
+          , "⬜⬜😊⬜⬜"
+          ]
+        , [ "⬜⬜⬜📦⬜"
+          , "⬜📦❌⬜⬜"
+          , "⬜⬜❌⬜⬜"
+          , "⬜⬜❌⬜⬜"
+          , "⬜⬜😊⬜⬜"
+          ]
+        , [ "⬜📦⬜⬜⬜"
+          , "⬜⬜❌📦⬜"
+          , "⬜⬜❌⬜⬜"
+          , "⬜⬜❌⬜⬜"
+          , "⬜⬜😊⬜⬜"
+          ]
+        , [ "⬜⬜⬜⬜⬜"
+          , "⬜❌❌⬜⬜"
+          , "⬜⬜⬜⬜⬜"
+          , "⬜⬜❌❌⬜"
+          , "⬜⬜😊⬜⬜"
+          ]
+        ]
+        |> Random.andThen
+            (\layout ->
+                Random.uniform
+                    ([ List.repeat 5 (EntityBlock Crate)
+                     ]
+                        |> List.concat
+                    )
+                    [ [ List.repeat 4 (EntityBlock Crate)
+                      ]
+                        |> List.concat
+                    ]
+                    |> Random.andThen (Game.Build.generator layout)
+            )
 
 
 crateDungeon : Int -> Generator Game
