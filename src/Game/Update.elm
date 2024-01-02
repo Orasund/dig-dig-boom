@@ -5,7 +5,7 @@ import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item(..), ParticleSort(..))
 import Game exposing (Cell, Game)
 import Game.Enemy
-import Game.Kill exposing (GameAndKill)
+import Game.Event exposing (GameAndKill)
 import Math
 import Position
 import Set
@@ -16,8 +16,8 @@ updateGame game =
     game.cells
         |> Dict.toList
         |> List.foldl
-            (\tuple -> Game.Kill.andThen (updateCell tuple))
-            (game |> Game.clearParticles |> Game.Kill.none)
+            (\tuple -> Game.Event.andThen (updateCell tuple))
+            (game |> Game.clearParticles |> Game.Event.none)
 
 
 updateCell : ( ( Int, Int ), Cell ) -> Game -> GameAndKill
@@ -33,10 +33,10 @@ updateCell ( position, cell ) game =
         Stunned enemy ->
             game
                 |> Game.update position (\_ -> Enemy enemy)
-                |> Game.Kill.none
+                |> Game.Event.none
 
         _ ->
-            game |> Game.Kill.none
+            game |> Game.Event.none
 
 
 movePlayerInDirectionAndUpdateGame : Direction -> ( Int, Int ) -> Game -> GameAndKill
@@ -44,7 +44,7 @@ movePlayerInDirectionAndUpdateGame dir location game =
     game
         |> Game.face dir
         |> movePlayer location
-        |> Game.Kill.andThen updateGame
+        |> Game.Event.andThen updateGame
 
 
 movePlayer : ( Int, Int ) -> Game -> GameAndKill

@@ -1,5 +1,6 @@
-module World.Level exposing (Level, empty, generate)
+module World.Level exposing (empty, generate)
 
+import Dict exposing (diff)
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item(..))
 import Game exposing (Game)
@@ -7,35 +8,100 @@ import Game.Build exposing (BuildingBlock(..))
 import Random exposing (Generator)
 
 
-type alias Level =
-    { dungeon : Int
-    , difficulty : Int
-    }
-
-
-generate : Level -> Generator Game
-generate level =
-    case level.dungeon of
+generate : Int -> Generator Game
+generate difficulty =
+    case difficulty of
         0 ->
-            ratDungeon level.difficulty
+            crateDungeon 0
 
         1 ->
-            goblinDungeon level.difficulty
+            crateDungeon 1
 
         2 ->
-            golemDungeon level.difficulty
+            crateDungeon 2
+
+        3 ->
+            ratDungeon 0
+
+        4 ->
+            ratDungeon 1
+
+        5 ->
+            ratDungeon 2
+
+        6 ->
+            goblinDungeon 0
+
+        7 ->
+            goblinDungeon 1
+
+        8 ->
+            goblinDungeon 2
+
+        9 ->
+            golemDungeon 0
+
+        10 ->
+            golemDungeon 1
+
+        11 ->
+            golemDungeon 2
 
         _ ->
-            Random.map2 Game.Build.generator
-                randomLayout
-                (Random.uniform
-                    golemLevel
-                    [ ratLevel
-                    , goblinLevel
-                    , finalLevel
+            golemDungeon 3
+
+
+crateDungeon : Int -> Generator Game
+crateDungeon difficulty =
+    let
+        maxCrate =
+            difficulty + 1 |> min 4
+    in
+    Random.uniform
+        [ "❌❌📦❌❌"
+        , "❌⬜⬜⬜❌"
+        , "❌⬜⬜⬜❌"
+        , "❌⬜⬜⬜❌"
+        , "❌⬜😊⬜❌"
+        ]
+        [ [ "📦⬜⬜⬜⬜"
+          , "⬜⬜⬜⬜⬜"
+          , "❌❌❌❌❌"
+          , "⬜⬜📦⬜⬜"
+          , "⬜⬜😊⬜⬜"
+          ]
+        , [ "📦⬜⬜⬜⬜"
+          , "⬜⬜❌⬜⬜"
+          , "❌❌❌❌❌"
+          , "⬜⬜📦⬜⬜"
+          , "⬜⬜😊⬜⬜"
+          ]
+        , [ "❌⬜⬜⬜❌"
+          , "📦⬜⬜⬜📦"
+          , "⬜⬜❌⬜⬜"
+          , "⬜⬜📦⬜⬜"
+          , "❌⬜😊⬜❌"
+          ]
+        ]
+        |> Random.andThen
+            (\layout ->
+                Random.uniform
+                    ([ List.repeat maxCrate (EntityBlock Crate)
+                     , List.repeat 1 HoleBlock
+                     ]
+                        |> List.concat
+                    )
+                    [ [ List.repeat 1 (ItemBlock Bomb)
+                      , List.repeat (maxCrate + 1) (EntityBlock Crate)
+                      ]
+                        |> List.concat
+                    , [ List.repeat 1 HoleBlock
+                      , List.repeat maxCrate (EntityBlock Crate)
+                      ]
+                        |> List.concat
                     ]
-                )
-                |> Random.andThen identity
+                    |> Random.andThen (Game.Build.generator layout)
+            )
 
 
 golemDungeon : Int -> Generator Game
@@ -147,7 +213,7 @@ ratDungeon difficulty =
             difficulty |> modBy 4
 
         maxEnemies =
-            difficulty * 2 |> min 3 |> max 1
+            difficulty // 2 |> min 3 |> max 1
 
         maxBombs =
             maxEnemies - 1 |> max 1

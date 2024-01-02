@@ -7,7 +7,7 @@ import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item)
 import Game exposing (Game)
-import Game.Kill exposing (GameAndKill)
+import Game.Event exposing (GameAndKill)
 import Game.Update
 import Html exposing (Html)
 import Html.Attributes
@@ -103,7 +103,7 @@ generateLevel seed sort model =
         ( game, _ ) =
             case sort of
                 Stage level ->
-                    Random.step (World.Level.generate level) seed
+                    Random.step (World.Level.generate level.difficulty) seed
 
                 Trial i ->
                     Random.step
@@ -223,6 +223,10 @@ update msg model =
                                             [] ->
                                                 ( model, Cmd.none )
 
+                                    InputReset ->
+                                        model
+                                            |> restartRoom
+
                                     InputOpenMap ->
                                         ( { model | overlay = Just WorldMap }, Cmd.none )
 
@@ -245,7 +249,7 @@ update msg model =
                                         ( model, Cmd.none )
 
         ApplyKills kills ->
-            ( { model | game = Game.Kill.apply kills model.game }
+            ( { model | game = Game.Event.apply kills model.game }
             , Cmd.none
             )
 
@@ -315,6 +319,9 @@ toDirection string =
 
         "r" ->
             Input InputUndo
+
+        "c" ->
+            Input InputReset
 
         "Escape" ->
             Input InputOpenMap

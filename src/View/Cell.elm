@@ -70,6 +70,9 @@ toHtml attrs args cell =
                 , frame = args.frame
                 }
 
+        Sign _ ->
+            ( 3, 2 )
+
         Crate ->
             ( 1, 3 )
 

@@ -1,4 +1,4 @@
-module Game.Kill exposing (GameAndKill, andThen, apply, map, none)
+module Game.Event exposing (GameAndKill, andThen, apply, map, none)
 
 import Dict
 import Entity exposing (Enemy(..), Entity(..), ParticleSort(..))

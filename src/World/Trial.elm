@@ -36,15 +36,6 @@ crateTails =
     , [ List.repeat 2 (ItemBlock Bomb) ]
         |> List.concat
         |> Game.Build.generator
-            [ "⬜📦⬜📦⬜"
-            , "📦⬜📦⬜📦"
-            , "⬜📦⬜📦⬜"
-            , "📦⬜📦⬜📦"
-            , "⬜⬜😊⬜⬜"
-            ]
-    , [ List.repeat 2 (ItemBlock Bomb) ]
-        |> List.concat
-        |> Game.Build.generator
             [ "❌❌📦❌❌"
             , "⬜⬜⬜⬜⬜"
             , "⬜⬜⬜⬜⬜"

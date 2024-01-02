@@ -4,7 +4,7 @@ import Config
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item(..), ParticleSort(..))
 import Game exposing (Game)
-import Game.Kill exposing (GameAndKill)
+import Game.Event exposing (GameAndKill)
 import Math
 import Position
 import Set
@@ -41,13 +41,13 @@ update args game =
                     updateCrossBomb args.pos game
 
         Rat ->
-            updateRat args.pos game |> Game.Kill.none
+            updateRat args.pos game |> Game.Event.none
 
         Goblin dir ->
-            updateGoblin args.pos dir game |> Game.Kill.none
+            updateGoblin args.pos dir game |> Game.Event.none
 
         Golem ->
-            updateGolem args.pos game |> Game.Kill.none
+            updateGolem args.pos game |> Game.Event.none
     )
         |> (\out -> { out | kill = neighboringPlayer ++ out.kill })
 

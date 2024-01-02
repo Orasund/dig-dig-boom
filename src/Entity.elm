@@ -29,5 +29,6 @@ type Entity
     = Door
     | Player
     | Crate
+    | Sign String
     | Enemy Enemy
     | Stunned Enemy
