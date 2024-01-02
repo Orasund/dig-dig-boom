@@ -1,43 +1,29 @@
 module World.Level exposing (Level, empty, generate)
 
-import Config
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item(..))
 import Game exposing (Game)
 import Game.Build exposing (BuildingBlock(..))
 import Random exposing (Generator)
-import World.Trial
 
 
 type alias Level =
     { dungeon : Int
-    , stage : Int
+    , difficulty : Int
     }
-
-
-first : Level
-first =
-    { dungeon = 0
-    , stage = 0
-    }
-
-
-next : Level -> Level
-next level =
-    { level | stage = level.stage + 1 }
 
 
 generate : Level -> Generator Game
 generate level =
     case level.dungeon of
         0 ->
-            ratDungeon level.stage
+            ratDungeon level.difficulty
 
         1 ->
-            goblinDungeon level.stage
+            goblinDungeon level.difficulty
 
         2 ->
-            golemDungeon level.stage
+            golemDungeon level.difficulty
 
         _ ->
             Random.map2 Game.Build.generator
@@ -155,7 +141,17 @@ goblinDungeon stage =
 
 
 ratDungeon : Int -> Generator Game
-ratDungeon stage =
+ratDungeon difficulty =
+    let
+        maxCrates =
+            difficulty |> modBy 4
+
+        maxEnemies =
+            difficulty * 2 |> min 3 |> max 1
+
+        maxBombs =
+            maxEnemies - 1 |> max 1
+    in
     Random.uniform
         [ "💣⬜⬜⬜💣"
         , "⬜⬜⬜⬜⬜"
@@ -179,21 +175,21 @@ ratDungeon stage =
         |> Random.andThen
             (\layout ->
                 Random.uniform
-                    ([ List.repeat 3 (Enemy Rat |> EntityBlock)
-                     , List.repeat 5 (ItemBlock Bomb)
-                     , List.repeat 2 (EntityBlock Crate)
+                    ([ List.repeat maxEnemies (Enemy Rat |> EntityBlock)
+                     , List.repeat (maxBombs + 1) (ItemBlock Bomb)
+                     , List.repeat (maxCrates - 1) (EntityBlock Crate)
                      ]
                         |> List.concat
                     )
-                    [ [ List.repeat 3 (Enemy Rat |> EntityBlock)
-                      , List.repeat 3 (ItemBlock Bomb)
-                      , List.repeat 3 (EntityBlock Crate)
+                    [ [ List.repeat maxEnemies (Enemy Rat |> EntityBlock)
+                      , List.repeat maxBombs (ItemBlock Bomb)
+                      , List.repeat maxCrates (EntityBlock Crate)
                       ]
                         |> List.concat
-                    , [ List.repeat 2 (Enemy Rat |> EntityBlock)
+                    , [ List.repeat (maxEnemies - 1) (Enemy Rat |> EntityBlock)
                       , List.repeat 1 (Enemy (Goblin Down) |> EntityBlock)
-                      , List.repeat 4 (ItemBlock Bomb)
-                      , List.repeat 3 (EntityBlock Crate)
+                      , List.repeat maxBombs (ItemBlock Bomb)
+                      , List.repeat maxCrates (EntityBlock Crate)
                       ]
                         |> List.concat
                     ]

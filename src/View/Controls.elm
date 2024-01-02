@@ -68,8 +68,8 @@ toHtml args =
                 [ sprite [] ( 1, 0 )
                 , View.Cell.item
                     [ Html.Attributes.style "position" "absolute"
-                    , Html.Attributes.style "top" "8px"
-                    , Html.Attributes.style "left" "8px"
+                    , Html.Attributes.style "top" "4px"
+                    , Html.Attributes.style "left" "4px"
                     ]
                     item
                 ]

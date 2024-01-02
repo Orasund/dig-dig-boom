@@ -171,14 +171,9 @@ applyBomb position game =
 
 placeBombeAndUpdateGame : ( Int, Int ) -> Game -> Maybe GameAndKill
 placeBombeAndUpdateGame playerCell game =
-    case game.item of
-        Just Bomb ->
-            Game.removeItem game
-                |> applyBomb playerCell
-                |> Maybe.map updateGame
-
-        _ ->
-            Nothing
+    applyBomb playerCell game
+        |> Maybe.map Game.removeItem
+        |> Maybe.map updateGame
 
 
 pushCrate : ( Int, Int ) -> Direction -> Game -> Maybe Game

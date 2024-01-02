@@ -35,7 +35,7 @@ new seed =
     { nodes =
         Dict.singleton ( 0, 0 )
             ({ seed = seed
-             , sort = Stage { dungeon = 0, stage = 0 }
+             , sort = Stage { dungeon = 0, difficulty = 0 }
              , solved = False
              }
                 |> Room
@@ -107,27 +107,26 @@ insertStage ( x, y ) world =
         dungeon =
             abs y // 2
 
-        stage =
-            { dungeon = dungeon
-            , stage = (Dict.get dungeon world.stages |> Maybe.withDefault 0) + 1
-            }
+        currentDifficulity =
+            Dict.get dungeon world.stages |> Maybe.withDefault 0
     in
-    Random.independentSeed
-        |> Random.map
-            (\seed ->
-                { world
-                    | nodes =
-                        world.nodes
-                            |> Dict.insert ( x, y )
-                                ({ seed = seed
-                                 , sort = Stage stage
-                                 , solved = False
-                                 }
-                                    |> Room
-                                )
-                    , stages = world.stages |> Dict.insert stage.dungeon stage.stage
-                }
-            )
+    Random.map2
+        (\seed difficulty ->
+            { world
+                | nodes =
+                    world.nodes
+                        |> Dict.insert ( x, y )
+                            ({ seed = seed
+                             , sort = Stage { dungeon = dungeon, difficulty = difficulty }
+                             , solved = False
+                             }
+                                |> Room
+                            )
+                , stages = world.stages |> Dict.insert dungeon difficulty
+            }
+        )
+        Random.independentSeed
+        (Random.int (max 0 (currentDifficulity - 1)) currentDifficulity)
 
 
 insertTrail : ( Int, Int ) -> World -> Generator World
@@ -177,28 +176,23 @@ insertRandomNode ( x, y ) world =
                     , trails = 0
                     }
     in
-    if y >= 0 || neighbors.trails > 0 then
+    if y >= 0 || (neighbors.rooms + neighbors.trails > 1 && Dict.size world.nodes < Config.cellSize) then
         insertWall ( x, y ) world |> Random.constant
 
     else
         Random.weighted
-            ( if neighbors.rooms <= 1 && Dict.size world.nodes < Config.cellSize then
-                0
-
-              else
-                1
+            ( toFloat (abs x // 4) + 1
             , insertWall ( x, y ) world |> Random.constant
             )
-            [ ( if neighbors.rooms <= 1 then
-                    3
+            [ ( 3
+              , insertStage ( x, y ) world
+              )
+            , ( if neighbors.trails == 0 then
+                    1
 
                 else
                     0
-              , if neighbors.wall > 1 || abs x > 5 then
-                    insertTrail ( x, y ) world
-
-                else
-                    insertStage ( x, y ) world
+              , insertTrail ( x, y ) world
               )
             ]
             |> Random.andThen identity

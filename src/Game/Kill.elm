@@ -84,26 +84,25 @@ attackPlayer position game =
             (\cell ->
                 case cell.entity of
                     Player ->
-                        if game.item == Nothing then
-                            { game
-                                | cells =
-                                    game.cells
-                                        |> Dict.remove position
-                                , particles =
-                                    game.particles
-                                        |> Dict.insert position Bone
-                            }
-                                |> Just
+                        --if game.item == Nothing then
+                        { game
+                            | cells =
+                                game.cells
+                                    |> Dict.remove position
+                            , particles =
+                                game.particles
+                                    |> Dict.insert position Bone
+                        }
+                            |> Just
 
-                        else
+                    {--else
                             { game
                                 | particles =
                                     game.particles
                                         |> Dict.insert position Bone
                             }
                                 |> Game.removeItem
-                                |> Just
-
+                                |> Just--}
                     _ ->
                         Nothing
             )

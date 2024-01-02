@@ -15,23 +15,89 @@ fromInt i =
 
 asArray : Array (Generator Game)
 asArray =
-    ratTrails
+    crateTails
+        ++ ratTrails
         ++ goblinTrails
+        ++ golemTrail
         |> Array.fromList
+
+
+crateTails : List (Generator Game)
+crateTails =
+    [ [ List.repeat 1 (ItemBlock Bomb) ]
+        |> List.concat
+        |> Game.Build.generator
+            [ "⬜📦⬜📦⬜"
+            , "⬜⬜📦⬜⬜"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜😊⬜⬜"
+            ]
+    , [ List.repeat 2 (ItemBlock Bomb) ]
+        |> List.concat
+        |> Game.Build.generator
+            [ "⬜📦⬜📦⬜"
+            , "📦⬜📦⬜📦"
+            , "⬜📦⬜📦⬜"
+            , "📦⬜📦⬜📦"
+            , "⬜⬜😊⬜⬜"
+            ]
+    , [ List.repeat 2 (ItemBlock Bomb) ]
+        |> List.concat
+        |> Game.Build.generator
+            [ "❌❌📦❌❌"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜😊⬜⬜"
+            ]
+    , [ List.repeat 1 (ItemBlock Bomb) ]
+        |> List.concat
+        |> Game.Build.generator
+            [ "⬜⬜❌⬜⬜"
+            , "⬜⬜📦⬜⬜"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜😊⬜⬜"
+            ]
+    , [ List.repeat 2 (ItemBlock Bomb) ]
+        |> List.concat
+        |> Game.Build.generator
+            [ "❌❌📦⬜❌"
+            , "❌❌❌⬜❌"
+            , "❌📦⬜📦❌"
+            , "❌⬜❌❌❌"
+            , "❌📦😊⬜⬜"
+            ]
+    ]
 
 
 ratTrails : List (Generator Game)
 ratTrails =
     [ [ List.repeat 1 (EntityBlock (Enemy Rat))
-      , List.repeat 3 (ItemBlock Bomb)
+      , List.repeat 1 (ItemBlock Bomb)
+      , List.repeat 1 (ItemBlock CrossBomb)
       ]
         |> List.concat
         |> Game.Build.generator
-            [ "💣⬜⬜⬜💣"
+            [ "⬜⬜⬜⬜⬜"
             , "⬜⬜⬜⬜⬜"
             , "⬜⬜⬜⬜⬜"
             , "⬜⬜⬜⬜⬜"
-            , "💣⬜😊⬜💣"
+            , "⬜⬜😊⬜⬜"
+            ]
+    , [ List.repeat 2 (EntityBlock (Enemy Rat))
+      , List.repeat 1 (ItemBlock Bomb)
+      , List.repeat 1 (ItemBlock CrossBomb)
+      , List.repeat 1 (EntityBlock Crate)
+      ]
+        |> List.concat
+        |> Game.Build.generator
+            [ "⬜⬜⬜⬜⬜"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜😊⬜⬜"
             ]
     , [ List.repeat 2 (EntityBlock (Enemy Rat))
       , List.repeat 5 (ItemBlock Bomb)
