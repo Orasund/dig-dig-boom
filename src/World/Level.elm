@@ -1,6 +1,6 @@
 module World.Level exposing (empty, generate)
 
-import Dict exposing (diff)
+import Array
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item(..))
 import Game exposing (Game)
@@ -10,45 +10,18 @@ import Random exposing (Generator)
 
 generate : Int -> Generator Game
 generate difficulty =
-    case difficulty of
-        0 ->
-            crateDungeonNoPushingIntoLava
+    Array.get difficulty dungeons
+        |> Maybe.withDefault golemDungeon
 
-        1 ->
-            crateDungeonNoPushingIntoLava
 
-        2 ->
-            crateDungeon 2
-
-        3 ->
-            ratDungeon 0
-
-        4 ->
-            ratDungeon 1
-
-        5 ->
-            ratDungeon 2
-
-        6 ->
-            goblinDungeon 0
-
-        7 ->
-            goblinDungeon 1
-
-        8 ->
-            goblinDungeon 2
-
-        9 ->
-            golemDungeon 0
-
-        10 ->
-            golemDungeon 1
-
-        11 ->
-            golemDungeon 2
-
-        _ ->
-            golemDungeon 3
+dungeons : Array.Array (Generator Game)
+dungeons =
+    [ crateDungeonNoPushingIntoLava
+    , crateDungeon 2
+    , ratDungeon 1
+    , goblinDungeon
+    ]
+        |> Array.fromList
 
 
 crateDungeonNoPushingIntoLava : Generator Game
@@ -74,13 +47,13 @@ crateDungeonNoPushingIntoLava =
           ]
         , [ "⬜⬜⬜📦⬜"
           , "⬜📦❌⬜⬜"
-          , "⬜⬜❌⬜⬜"
+          , "⬜⬜⬜⬜📦"
           , "⬜⬜❌⬜⬜"
           , "⬜⬜😊⬜⬜"
           ]
         , [ "⬜📦⬜⬜⬜"
           , "⬜⬜❌📦⬜"
-          , "⬜⬜❌⬜⬜"
+          , "📦⬜⬜⬜⬜"
           , "⬜⬜❌⬜⬜"
           , "⬜⬜😊⬜⬜"
           ]
@@ -94,11 +67,11 @@ crateDungeonNoPushingIntoLava =
         |> Random.andThen
             (\layout ->
                 Random.uniform
-                    ([ List.repeat 5 (EntityBlock Crate)
+                    ([ List.repeat 4 (EntityBlock Crate)
                      ]
                         |> List.concat
                     )
-                    [ [ List.repeat 4 (EntityBlock Crate)
+                    [ [ List.repeat 3 (EntityBlock Crate)
                       ]
                         |> List.concat
                     ]
@@ -159,8 +132,8 @@ crateDungeon difficulty =
             )
 
 
-golemDungeon : Int -> Generator Game
-golemDungeon stage =
+golemDungeon : Generator Game
+golemDungeon =
     Random.uniform
         [ "❌⬜⬜⬜❌"
         , "⬜⬜⬜⬜⬜"
@@ -211,8 +184,8 @@ golemDungeon stage =
             )
 
 
-goblinDungeon : Int -> Generator Game
-goblinDungeon stage =
+goblinDungeon : Generator Game
+goblinDungeon =
     Random.uniform
         [ "❌⬜⬜⬜❌"
         , "❌⬜⬜⬜❌"
@@ -265,10 +238,10 @@ ratDungeon : Int -> Generator Game
 ratDungeon difficulty =
     let
         maxCrates =
-            difficulty |> modBy 4
+            difficulty + 1
 
         maxEnemies =
-            difficulty // 2 |> min 3 |> max 1
+            difficulty |> min 3 |> max 1
 
         maxBombs =
             maxEnemies - 1 |> max 1
@@ -370,52 +343,3 @@ empty =
         , "⬜⬜😊⬜⬜"
         ]
         []
-
-
-ratLevel : List BuildingBlock
-ratLevel =
-    [ List.repeat 4 (EntityBlock (Enemy Rat))
-    , List.repeat 3 (EntityBlock Crate)
-    , List.repeat 5 (ItemBlock Bomb)
-    , [ HoleBlock
-      ]
-    ]
-        |> List.concat
-
-
-goblinLevel : List BuildingBlock
-goblinLevel =
-    [ List.repeat 3 (EntityBlock Crate)
-    , [ Enemy (Goblin Left) |> EntityBlock
-      , Enemy (Goblin Right) |> EntityBlock
-      , Enemy (Goblin Down) |> EntityBlock
-      , Enemy (Goblin Up) |> EntityBlock
-      , HoleBlock
-      ]
-    , List.repeat 5 (ItemBlock Bomb)
-    ]
-        |> List.concat
-
-
-golemLevel : List BuildingBlock
-golemLevel =
-    [ List.repeat 3 (EntityBlock (Enemy Golem))
-    , List.repeat 4 (ItemBlock Bomb)
-    , List.repeat 3 (EntityBlock Crate)
-    , [ HoleBlock
-      ]
-    ]
-        |> List.concat
-
-
-finalLevel : List BuildingBlock
-finalLevel =
-    [ List.repeat 4 (ItemBlock Bomb)
-    , List.repeat 3 (EntityBlock Crate)
-    , [ EntityBlock (Enemy Rat)
-      , Enemy (Goblin Left) |> EntityBlock
-      , EntityBlock (Enemy Golem)
-      , HoleBlock
-      ]
-    ]
-        |> List.concat

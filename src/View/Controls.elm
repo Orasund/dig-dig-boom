@@ -36,9 +36,21 @@ label attrs title =
         title
 
 
-toHtml : { onInput : Input -> msg, item : Maybe Item } -> Html msg
+toHtml : { onInput : Input -> msg, item : Maybe Item, isLevelSelect : Bool } -> Html msg
 toHtml args =
-    [ [ [ Layout.text [ Html.Attributes.style "color" "white" ] "Return to Map"
+    [ [ [ (if args.isLevelSelect then
+            ""
+
+           else
+            "Exit"
+          )
+            |> Layout.text [ Html.Attributes.style "color" "white" ]
+            |> Layout.el
+                ([ Html.Style.width "72px"
+                 , Html.Style.height "72px"
+                 ]
+                    ++ Layout.centered
+                )
         , label
             [ Html.Style.positionAbsolute
             , Html.Style.bottom "4px"
@@ -51,9 +63,7 @@ toHtml args =
                     { onPress = args.onInput InputOpenMap |> Just
                     , label = "Open Map"
                     }
-                    ++ [ Html.Style.width "72px"
-                       , Html.Style.height "72px"
-                       , Html.Style.positionRelative
+                    ++ [ Html.Style.positionRelative
                        ]
                 )
       , [ sprite
@@ -73,11 +83,19 @@ toHtml args =
                         , label = "Move Up"
                         }
                 )
-      , [ Layout.el
-            [ Html.Style.width "72px"
-            , Html.Style.height "72px"
-            ]
-            (Layout.text [ Html.Attributes.style "color" "white" ] "Undo")
+      , [ (if args.isLevelSelect then
+            ""
+
+           else
+            "Undo"
+          )
+            |> Layout.text [ Html.Attributes.style "color" "white" ]
+            |> Layout.el
+                ([ Html.Style.width "72px"
+                 , Html.Style.height "72px"
+                 ]
+                    ++ Layout.centered
+                )
         , label
             [ Html.Style.positionAbsolute
             , Html.Style.bottom "4px"
@@ -112,17 +130,30 @@ toHtml args =
                         }
                 )
       , [ sprite [] ( 1, 0 )
-        , case args.item of
-            Just item ->
-                View.Cell.item
-                    [ Html.Attributes.style "position" "absolute"
-                    , Html.Attributes.style "top" "4px"
-                    , Html.Attributes.style "left" "4px"
-                    ]
-                    item
+        , if args.isLevelSelect then
+            "Play"
+                |> Layout.text [ Html.Attributes.style "color" "white" ]
+                |> Layout.el
+                    ([ Html.Style.width "72px"
+                     , Html.Style.height "72px"
+                     , Html.Style.positionAbsolute
+                     , Html.Style.top "0"
+                     ]
+                        ++ Layout.centered
+                    )
 
-            Nothing ->
-                Layout.none
+          else
+            case args.item of
+                Just item ->
+                    View.Cell.item
+                        [ Html.Attributes.style "position" "absolute"
+                        , Html.Attributes.style "top" "4px"
+                        , Html.Attributes.style "left" "4px"
+                        ]
+                        item
+
+                Nothing ->
+                    Layout.none
         , label
             [ Html.Style.positionAbsolute
             , Html.Style.bottom "0px"
@@ -131,8 +162,11 @@ toHtml args =
             "SPACE"
         ]
             |> Html.div
-                (Html.Attributes.style "position" "relative"
-                    :: Layout.asButton
+                ([ Html.Attributes.style "position" "relative"
+                 , Html.Style.width "72px"
+                 , Html.Style.height "72px"
+                 ]
+                    ++ Layout.asButton
                         { onPress = args.onInput InputActivate |> Just
                         , label = "Place Bombe"
                         }
@@ -179,12 +213,20 @@ toHtml args =
                         , label = "Move Down"
                         }
                 )
-      , [ Layout.text [] "Retry"
+      , [ (if args.isLevelSelect then
+            ""
+
+           else
+            "Retry"
+          )
+            |> Layout.text []
             |> Layout.el
-                [ Html.Style.width "72px"
-                , Html.Style.height "72px"
-                , Html.Attributes.style "color" "white"
-                ]
+                ([ Html.Style.width "72px"
+                 , Html.Style.height "72px"
+                 , Html.Attributes.style "color" "white"
+                 ]
+                    ++ Layout.centered
+                )
         , label
             [ Html.Style.positionAbsolute
             , Html.Style.bottom "4px"

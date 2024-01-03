@@ -8,7 +8,6 @@ import Game.Enemy
 import Game.Event exposing (GameAndKill)
 import Math
 import Position
-import Set
 
 
 updateGame : Game -> GameAndKill
@@ -76,7 +75,7 @@ movePlayer position game =
                                 |> Maybe.withDefault g
                        )
             , kill =
-                if game.floor |> Set.member newPos then
+                if game.floor |> Dict.member newPos then
                     []
 
                 else
@@ -113,7 +112,7 @@ movePlayer position game =
 
         Nothing ->
             { game =
-                if Math.posIsValid newLocation && Set.member newLocation game.floor then
+                if Math.posIsValid newLocation && Dict.member newLocation game.floor then
                     game
                         |> Game.move { from = position, to = newLocation }
                         |> Maybe.map (takeItem newLocation)
@@ -153,7 +152,7 @@ applyBomb position game =
                 if Math.posIsValid newPosition then
                     case game.cells |> Dict.get newPosition |> Maybe.map .entity of
                         Nothing ->
-                            if Set.member newPosition game.floor then
+                            if Dict.member newPosition game.floor then
                                 game
                                     |> Game.insert newPosition (Stunned (PlacedBomb item))
                                     |> Just
@@ -190,7 +189,7 @@ pushCrate pos dir game =
             == Nothing
             && Math.posIsValid newPos
     then
-        if Set.member newPos game.floor then
+        if Dict.member newPos game.floor then
             game
                 |> Game.move { from = pos, to = newPos }
 

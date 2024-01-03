@@ -376,6 +376,7 @@ view model =
       , View.Controls.toHtml
             { onInput = Input
             , item = model.game.item
+            , isLevelSelect = model.overlay /= Nothing
             }
       ]
         |> Layout.column

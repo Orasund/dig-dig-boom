@@ -11,7 +11,6 @@ import Html.Style
 import Image
 import Layout
 import Position
-import Set
 import View.Cell
 
 
@@ -102,8 +101,14 @@ world args game =
         |> List.map
             (\( x, y ) ->
                 ( "0_" ++ String.fromInt x ++ "_" ++ String.fromInt y
-                , [ if game.floor |> Set.member ( x, y ) then
+                , [ if game.floor |> Dict.member ( x, y ) then
                         View.Cell.floor
+                            [ Html.Style.positionAbsolute
+                            , Html.Style.top "0"
+                            ]
+
+                    else if game.floor |> Dict.member ( x, y - 1 ) then
+                        View.Cell.holeTop
                             [ Html.Style.positionAbsolute
                             , Html.Style.top "0"
                             ]
@@ -136,7 +141,7 @@ world args game =
                             )
                         |> Maybe.withDefault Layout.none
                   ]
-                    ++ (if game.floor |> Set.member ( x, y ) |> not then
+                    ++ (if game.floor |> Dict.member ( x, y ) |> not then
                             View.Cell.borders ( x, y ) game
 
                         else

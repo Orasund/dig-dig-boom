@@ -7,12 +7,12 @@ import Entity
     exposing
         ( Enemy(..)
         , Entity(..)
+        , Floor(..)
         , Item(..)
         , ParticleSort(..)
         )
 import Math
 import Position
-import Set exposing (Set)
 
 
 type alias Cell =
@@ -25,7 +25,7 @@ type alias Game =
     { cells : Dict ( Int, Int ) Cell
     , items : Dict ( Int, Int ) Item
     , particles : Dict ( Int, Int ) ParticleSort
-    , floor : Set ( Int, Int )
+    , floor : Dict ( Int, Int ) Floor
     , nextId : Int
     , item : Maybe Item
     , playerDirection : Direction
@@ -68,7 +68,8 @@ empty =
             { columns = Config.roomSize
             , rows = Config.roomSize
             }
-            |> Set.fromList
+            |> List.map (\pos -> Tuple.pair pos Ground)
+            |> Dict.fromList
     , item = Nothing
     , nextId = 0
     , playerDirection = Down
@@ -116,12 +117,12 @@ placeItem pos item game =
 
 addFloor : ( Int, Int ) -> Game -> Game
 addFloor pos game =
-    { game | floor = game.floor |> Set.insert pos }
+    { game | floor = game.floor |> Dict.insert pos Ground }
 
 
 removeFloor : ( Int, Int ) -> Game -> Game
 removeFloor pos game =
-    { game | floor = game.floor |> Set.remove pos }
+    { game | floor = game.floor |> Dict.remove pos }
 
 
 update : ( Int, Int ) -> (Entity -> Entity) -> Game -> Game

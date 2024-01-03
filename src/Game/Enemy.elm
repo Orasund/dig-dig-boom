@@ -1,13 +1,13 @@
 module Game.Enemy exposing (..)
 
 import Config
+import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item(..), ParticleSort(..))
 import Game exposing (Game)
 import Game.Event exposing (GameAndKill)
 import Math
 import Position
-import Set
 
 
 update :
@@ -146,7 +146,7 @@ updateRat pos game =
 
 tryMoving : { from : ( Int, Int ), to : ( Int, Int ) } -> Game -> Maybe Game
 tryMoving args game =
-    if Set.member args.to game.floor then
+    if Dict.member args.to game.floor then
         Game.move args game
 
     else

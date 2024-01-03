@@ -5,7 +5,6 @@ import Dict exposing (Dict)
 import Direction exposing (Direction)
 import Position
 import Random exposing (Generator, Seed)
-import World.Level
 
 
 type RoomSort
@@ -82,13 +81,6 @@ solveRoom world =
                     (\w ->
                         { w
                             | nodes = w.nodes |> Dict.insert ( x, y ) (Room { room | solved = True })
-                            , difficulty =
-                                case room.sort of
-                                    Trial _ ->
-                                        w.difficulty + 1
-
-                                    _ ->
-                                        w.difficulty
                         }
                     )
 
@@ -105,30 +97,21 @@ insertWall ( x, y ) world =
 
 insertStage : ( Int, Int ) -> World -> Generator World
 insertStage ( x, y ) world =
-    let
-        dungeon =
-            abs y // 2
-
-        currentDifficulity =
-            Dict.get dungeon world.stages |> Maybe.withDefault 0
-    in
-    Random.map2
-        (\seed difficulty ->
+    Random.map
+        (\seed ->
             { world
                 | nodes =
                     world.nodes
                         |> Dict.insert ( x, y )
                             ({ seed = seed
-                             , sort = Stage { difficulty = world.difficulty }
+                             , sort = Stage { difficulty = world.difficulty |> min ((abs x + abs y) // 2) }
                              , solved = False
                              }
                                 |> Room
                             )
-                , stages = world.stages |> Dict.insert dungeon difficulty
             }
         )
         Random.independentSeed
-        (Random.int (max 0 (currentDifficulity - 1)) (currentDifficulity + 2))
 
 
 insertTrail : ( Int, Int ) -> World -> Generator World
@@ -147,6 +130,7 @@ insertTrail pos world =
                                     |> Room
                                 )
                     , trials = world.trials + 1
+                    , difficulty = world.difficulty + 1
                 }
             )
 

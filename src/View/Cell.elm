@@ -1,13 +1,13 @@
 module View.Cell exposing (..)
 
 import Config
+import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item(..), ParticleSort(..))
 import Game exposing (Game)
 import Html exposing (Attribute, Html)
 import Html.Style
 import Image
-import Set
 
 
 sprite : List (Attribute msg) -> ( Int, Int ) -> Html msg
@@ -44,6 +44,11 @@ floor attrs =
 hole : List (Attribute msg) -> Html msg
 hole attrs =
     sprite attrs ( 1, 2 )
+
+
+holeTop : List (Attribute msg) -> Html msg
+holeTop attrs =
+    sprite attrs ( 0, 2 )
 
 
 particle : List (Attribute msg) -> ParticleSort -> Html msg
@@ -139,24 +144,24 @@ borders ( x, y ) game =
             , Html.Style.top "0"
             ]
     in
-    [ if Set.member ( x, y - 1 ) game.floor then
+    [ if Dict.member ( x - 1, y ) game.floor then
+        border attrs ( 0, 1 ) |> Just
+
+      else
+        Nothing
+    , if Dict.member ( x + 1, y ) game.floor then
+        border attrs ( 1, 0 ) |> Just
+
+      else
+        Nothing
+    , if Dict.member ( x, y - 1 ) game.floor then
         border attrs ( 0, 0 )
             |> Just
 
       else
         Nothing
-    , if Set.member ( x - 1, y ) game.floor then
-        border attrs ( 0, 1 ) |> Just
-
-      else
-        Nothing
-    , if Set.member ( x, y + 1 ) game.floor then
+    , if Dict.member ( x, y + 1 ) game.floor then
         border attrs ( 1, 1 ) |> Just
-
-      else
-        Nothing
-    , if Set.member ( x + 1, y ) game.floor then
-        border attrs ( 1, 0 ) |> Just
 
       else
         Nothing
