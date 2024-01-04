@@ -162,7 +162,15 @@ insertRandomNode ( x, y ) world =
                     , trails = 0
                     }
     in
-    if
+    if x == 0 && y < 0 then
+        insertTrail ( x, y ) world
+
+    else
+        insertWall ( x, y ) world |> Random.constant
+
+
+
+{--if
         y >= 0 || (neighbors.rooms + neighbors.trails > 1)
         --|| (neighbors.rooms + neighbors.trails > 1 && Dict.size world.nodes > Config.minWorldSize)
     then
@@ -192,3 +200,4 @@ insertRandomNode ( x, y ) world =
               )
             ]
             |> Random.andThen identity
+            --}

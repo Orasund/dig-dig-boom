@@ -212,13 +212,13 @@ update msg model =
                             InputDir dir ->
                                 model.game
                                     |> Game.getPlayerPosition
-                                    |> Maybe.map
+                                    |> Maybe.andThen
                                         (\playerPosition ->
                                             model.game
                                                 |> Game.Update.movePlayerInDirectionAndUpdateGame
                                                     dir
                                                     playerPosition
-                                                |> applyGameAndKill model
+                                                |> Maybe.map (applyGameAndKill model)
                                         )
                                     |> Maybe.withDefault ( model, Cmd.none )
 

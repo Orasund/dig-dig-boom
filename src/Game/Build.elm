@@ -2,7 +2,7 @@ module Game.Build exposing (BuildingBlock(..), generator)
 
 import Config
 import Dict exposing (Dict)
-import Entity exposing (Entity(..), Item(..))
+import Entity exposing (Enemy(..), Entity(..), Item(..))
 import Game exposing (Cell, Game)
 import Math
 import Position
@@ -81,6 +81,9 @@ parseEmoji string =
 
         '❌' ->
             HoleBlock |> Just
+
+        '🐀' ->
+            EntityBlock (Enemy Goblin) |> Just
 
         '⬜' ->
             Nothing
@@ -171,11 +174,10 @@ validator =
                                             )
                                    )
 
-                        Crate ->
+                        {--Crate ->
                             count ((==) (Just Crate))
                                 (neighbors4 pos dict)
-                                < 1
-
+                                < 1--}
                         _ ->
                             True
                 )

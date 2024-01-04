@@ -38,15 +38,15 @@ updateCell ( position, cell ) game =
             game |> Game.Event.none
 
 
-movePlayerInDirectionAndUpdateGame : Direction -> ( Int, Int ) -> Game -> GameAndKill
+movePlayerInDirectionAndUpdateGame : Direction -> ( Int, Int ) -> Game -> Maybe GameAndKill
 movePlayerInDirectionAndUpdateGame dir location game =
     game
         |> Game.face dir
         |> movePlayer location
-        |> Game.Event.andThen updateGame
+        |> Maybe.map (Game.Event.andThen updateGame)
 
 
-movePlayer : ( Int, Int ) -> Game -> GameAndKill
+movePlayer : ( Int, Int ) -> Game -> Maybe GameAndKill
 movePlayer position game =
     let
         newLocation : ( Int, Int )
@@ -56,7 +56,7 @@ movePlayer position game =
                 |> Position.addToVector position
     in
     case game.cells |> Dict.get newLocation |> Maybe.map .entity of
-        Just (Enemy enemy) ->
+        {--Just (Enemy enemy) ->
             let
                 newPos =
                     game |> Game.findFirstEmptyCellInDirection newLocation game.playerDirection
@@ -80,8 +80,7 @@ movePlayer position game =
 
                 else
                     [ newPos ]
-            }
-
+            }--}
         Just Crate ->
             { game =
                 game
@@ -91,6 +90,7 @@ movePlayer position game =
                     |> Maybe.withDefault game
             , kill = []
             }
+                |> Just
 
         Just Door ->
             { game =
@@ -109,24 +109,25 @@ movePlayer position game =
                 }
             , kill = []
             }
+                |> Just
 
         Nothing ->
-            { game =
-                if Math.posIsValid newLocation && Dict.member newLocation game.floor then
-                    game
-                        |> Game.move { from = position, to = newLocation }
-                        |> Maybe.map (takeItem newLocation)
-                        |> Maybe.withDefault game
+            if Math.posIsValid newLocation && Dict.member newLocation game.floor then
+                game
+                    |> Game.move { from = position, to = newLocation }
+                    |> Maybe.map (takeItem newLocation)
+                    |> Maybe.withDefault game
+                    |> Game.Event.none
+                    |> Just
 
-                else
-                    game
-            , kill = []
-            }
+            else
+                Nothing
 
         _ ->
-            { game = game |> Game.face game.playerDirection
+            {--{ game = game |> Game.face game.playerDirection
             , kill = []
-            }
+            }--}
+            Nothing
 
 
 takeItem : ( Int, Int ) -> Game -> Game

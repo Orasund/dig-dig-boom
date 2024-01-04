@@ -11,125 +11,131 @@ import Random exposing (Generator)
 generate : Int -> Generator Game
 generate difficulty =
     Array.get difficulty dungeons
-        |> Maybe.withDefault orcDungeon
+        |> Maybe.withDefault goblinDungeon
 
 
 dungeons : Array.Array (Generator Game)
 dungeons =
-    [ crateDungeonNoPushingIntoLava
-    , crateDungeon 2
+    [ crateDungeonNoLavaNoBombs
+    , crateDungeonNoBombs
+    , crateDungeonNoLava
     , ratDungeon 1
-    , goblinDungeon
     ]
         |> Array.fromList
 
 
-crateDungeonNoPushingIntoLava : Generator Game
-crateDungeonNoPushingIntoLava =
+crateDungeonNoLavaNoBombs : Generator Game
+crateDungeonNoLavaNoBombs =
     Random.uniform
-        [ "❌⬜⬜⬜❌"
-        , "❌⬜⬜⬜❌"
-        , "❌⬜⬜⬜❌"
-        , "❌⬜⬜⬜❌"
-        , "❌⬜😊⬜❌"
+        (Game.Build.generator
+            [ "⬜⬜⬜⬜⬜"
+            , "⬜📦⬜📦⬜"
+            , "📦📦📦📦📦"
+            , "📦⬜⬜📦⬜"
+            , "⬜⬜😊⬜⬜"
+            ]
+            []
+        )
+        [ Game.Build.generator
+            [ "⬜⬜⬜⬜⬜"
+            , "📦⬜⬜📦⬜"
+            , "📦📦📦📦📦"
+            , "📦⬜⬜⬜📦"
+            , "⬜⬜😊⬜⬜"
+            ]
+            []
+        , Game.Build.generator
+            [ "⬜⬜⬜⬜⬜"
+            , "⬜📦📦📦📦"
+            , "📦⬜⬜📦⬜"
+            , "⬜📦📦⬜⬜"
+            , "⬜⬜😊⬜⬜"
+            ]
+            []
+        , Game.Build.generator
+            [ "⬜📦⬜📦⬜"
+            , "⬜⬜📦⬜⬜"
+            , "📦📦📦📦📦"
+            , "⬜⬜⬜⬜⬜"
+            , "⬜⬜😊⬜⬜"
+            ]
+            []
         ]
-        [ [ "⬜⬜⬜⬜⬜"
-          , "⬜📦⬜⬜⬜"
-          , "⬜❌❌❌⬜"
-          , "📦⬜⬜⬜⬜"
-          , "⬜⬜😊⬜⬜"
-          ]
-        , [ "⬜⬜⬜⬜⬜"
-          , "⬜⬜⬜📦⬜"
-          , "⬜❌❌❌⬜"
-          , "⬜⬜⬜⬜📦"
-          , "⬜⬜😊⬜⬜"
-          ]
-        , [ "⬜⬜⬜📦⬜"
-          , "⬜📦❌⬜⬜"
-          , "⬜⬜⬜⬜📦"
-          , "⬜⬜❌⬜⬜"
-          , "⬜⬜😊⬜⬜"
-          ]
-        , [ "⬜📦⬜⬜⬜"
-          , "⬜⬜❌📦⬜"
-          , "📦⬜⬜⬜⬜"
-          , "⬜⬜❌⬜⬜"
-          , "⬜⬜😊⬜⬜"
-          ]
-        , [ "⬜⬜⬜⬜⬜"
-          , "⬜❌❌⬜⬜"
-          , "⬜⬜⬜⬜⬜"
-          , "⬜⬜❌❌⬜"
-          , "⬜⬜😊⬜⬜"
-          ]
-        ]
-        |> Random.andThen
-            (\layout ->
-                Random.uniform
-                    ([ List.repeat 4 (EntityBlock Crate)
-                     ]
-                        |> List.concat
-                    )
-                    [ [ List.repeat 3 (EntityBlock Crate)
-                      ]
-                        |> List.concat
-                    ]
-                    |> Random.andThen (Game.Build.generator layout)
-            )
+        |> Random.andThen identity
 
 
-crateDungeon : Int -> Generator Game
-crateDungeon difficulty =
-    let
-        maxCrate =
-            difficulty + 1 |> min 4
-    in
+crateDungeonNoBombs : Generator Game
+crateDungeonNoBombs =
     Random.uniform
         [ "❌❌📦❌❌"
-        , "❌⬜⬜⬜❌"
-        , "❌⬜⬜⬜❌"
-        , "❌⬜⬜⬜❌"
+        , "❌⬜⬜📦❌"
+        , "❌⬜📦⬜❌"
+        , "❌📦⬜⬜❌"
         , "❌⬜😊⬜❌"
         ]
-        [ [ "📦⬜⬜⬜⬜"
-          , "⬜⬜⬜⬜⬜"
+        [ [ "📦⬜📦⬜⬜"
+          , "⬜📦⬜📦⬜"
           , "❌❌❌❌❌"
           , "⬜⬜📦⬜⬜"
           , "⬜⬜😊⬜⬜"
           ]
-        , [ "📦⬜⬜⬜⬜"
-          , "⬜⬜❌⬜⬜"
+        , [ "📦⬜⬜📦⬜"
+          , "⬜📦❌⬜📦"
           , "❌❌❌❌❌"
-          , "⬜⬜📦⬜⬜"
+          , "⬜⬜📦⬜📦"
           , "⬜⬜😊⬜⬜"
           ]
-        , [ "❌⬜⬜⬜❌"
+        , [ "❌📦⬜⬜❌"
           , "📦⬜⬜⬜📦"
-          , "⬜⬜❌⬜⬜"
-          , "⬜⬜📦⬜⬜"
+          , "⬜⬜❌📦⬜"
+          , "📦⬜📦⬜📦"
           , "❌⬜😊⬜❌"
           ]
         ]
         |> Random.andThen
             (\layout ->
-                Random.uniform
-                    ([ List.repeat maxCrate (EntityBlock Crate)
-                     , List.repeat 1 HoleBlock
-                     ]
-                        |> List.concat
-                    )
-                    [ [ List.repeat 1 (ItemBlock Bomb)
-                      , List.repeat (maxCrate + 1) (EntityBlock Crate)
-                      ]
-                        |> List.concat
-                    , [ List.repeat 1 HoleBlock
-                      , List.repeat maxCrate (EntityBlock Crate)
-                      ]
-                        |> List.concat
-                    ]
-                    |> Random.andThen (Game.Build.generator layout)
+                Game.Build.generator layout []
             )
+
+
+crateDungeonNoLava : Generator Game
+crateDungeonNoLava =
+    Random.uniform
+        (Game.Build.generator
+            [ "⬜⬜📦⬜⬜"
+            , "⬜📦⬜📦⬜"
+            , "📦📦📦📦📦"
+            , "📦⬜💣📦⬜"
+            , "⬜⬜😊⬜⬜"
+            ]
+            []
+        )
+        [ Game.Build.generator
+            [ "⬜⬜📦⬜⬜"
+            , "📦⬜⬜📦⬜"
+            , "📦📦📦📦📦"
+            , "📦⬜💣⬜📦"
+            , "⬜⬜😊⬜⬜"
+            ]
+            []
+        , Game.Build.generator
+            [ "⬜⬜📦⬜⬜"
+            , "⬜📦📦📦📦"
+            , "📦⬜💣📦⬜"
+            , "⬜📦📦⬜⬜"
+            , "⬜⬜😊⬜⬜"
+            ]
+            []
+        , Game.Build.generator
+            [ "⬜📦📦📦⬜"
+            , "⬜⬜📦⬜⬜"
+            , "📦📦📦📦📦"
+            , "⬜⬜💣⬜⬜"
+            , "⬜⬜😊⬜⬜"
+            ]
+            []
+        ]
+        |> Random.andThen identity
 
 
 doppelgangerDungeon : Generator Game
