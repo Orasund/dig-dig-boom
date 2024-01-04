@@ -8,7 +8,6 @@ import Html.Style
 import Image
 import Input exposing (Input(..))
 import Layout
-import View.Cell
 
 
 sprite : List (Attribute msg) -> ( Int, Int ) -> Html msg
@@ -76,20 +75,28 @@ toHtml args =
            else
             "Retry"
           )
-            |> Layout.text []
-            |> Layout.el
-                ([ Html.Style.width "72px"
-                 , Html.Style.height "72px"
+            |> Layout.text
+                ([ Html.Style.positionAbsolute
                  , Html.Attributes.style "color" "white"
+                 , Html.Style.bottom "0px"
+                 , Html.Style.width "72px"
                  ]
                     ++ Layout.centered
                 )
-        , label
-            [ Html.Style.positionAbsolute
-            , Html.Style.bottom "4px"
-            , Html.Style.right "4px"
-            ]
-            "C"
+        , "C"
+            |> Layout.text
+                ([ Html.Style.positionAbsolute
+                 , Html.Style.top "16px"
+                 , Html.Style.left "20px"
+                 , Html.Style.width "32px"
+                 , Html.Style.height "32px"
+                 , Html.Attributes.style "border" "4px solid white"
+                 , Html.Attributes.style "font-size" "20px"
+                 , Html.Attributes.style "color" "white"
+                 , Html.Style.boxSizingBorderBox
+                 ]
+                    ++ Layout.centered
+                )
         ]
             |> Html.div
                 (Layout.asButton
@@ -97,18 +104,20 @@ toHtml args =
                     , label = "Retry"
                     }
                     ++ [ Html.Style.positionRelative
+                       , Html.Style.width "72px"
+                       , Html.Style.height "72px"
                        ]
                 )
       , [ sprite
             [ Html.Attributes.style "transform" "rotate(90deg)" ]
             ( 0, 0 )
-        , label []
-            "W"
-            |> Layout.el
+        , "W"
+            |> Layout.text
                 ([ Html.Style.positionAbsolute
-                 , Html.Style.top "0"
+                 , Html.Style.bottom "16px"
                  , Html.Style.width "72px"
-                 , Html.Style.height "72px"
+                 , Html.Attributes.style "font-size" "20px"
+                 , Html.Attributes.style "color" "white"
                  ]
                     ++ Layout.centered
                 )
@@ -126,23 +135,35 @@ toHtml args =
            else
             "Undo"
           )
-            |> Layout.text [ Html.Attributes.style "color" "white" ]
-            |> Layout.el
-                ([ Html.Style.width "72px"
-                 , Html.Style.height "72px"
+            |> Layout.text
+                ([ Html.Style.positionAbsolute
+                 , Html.Attributes.style "color" "white"
+                 , Html.Style.bottom "0px"
+                 , Html.Style.width "72px"
                  ]
                     ++ Layout.centered
                 )
-        , label
-            [ Html.Style.positionAbsolute
-            , Html.Style.bottom "4px"
-            , Html.Style.right "0px"
-            ]
-            "R"
+        , "R"
+            |> Layout.text
+                ([ Html.Style.positionAbsolute
+                 , Html.Style.top "16px"
+                 , Html.Style.left "20px"
+                 , Html.Style.width "32px"
+                 , Html.Style.height "32px"
+                 , Html.Attributes.style "border" "4px solid white"
+                 , Html.Attributes.style "font-size" "20px"
+                 , Html.Attributes.style "color" "white"
+                 , Html.Style.boxSizingBorderBox
+                 ]
+                    ++ Layout.centered
+                )
         ]
             |> Html.div
-                (Html.Style.positionRelative
-                    :: Layout.asButton
+                ([ Html.Style.positionRelative
+                 , Html.Style.width "72px"
+                 , Html.Style.height "72px"
+                 ]
+                    ++ Layout.asButton
                         { onPress = args.onInput InputUndo |> Just
                         , label = "Undo"
                         }
@@ -152,14 +173,14 @@ toHtml args =
     , [ [ sprite
             []
             ( 0, 0 )
-        , label
-            []
-            "A"
-            |> Layout.el
+        , "A"
+            |> Layout.text
                 ([ Html.Style.positionAbsolute
                  , Html.Style.top "0"
-                 , Html.Style.width "72px"
+                 , Html.Style.right "20px"
                  , Html.Style.height "72px"
+                 , Html.Attributes.style "font-size" "20px"
+                 , Html.Attributes.style "color" "white"
                  ]
                     ++ Layout.centered
                 )
@@ -223,14 +244,14 @@ toHtml args =
             [ Html.Attributes.style "transform" "rotate(180deg)"
             ]
             ( 0, 0 )
-        , label
-            []
-            "D"
-            |> Layout.el
+        , "D"
+            |> Layout.text
                 ([ Html.Style.positionAbsolute
                  , Html.Style.top "0"
-                 , Html.Style.width "72px"
+                 , Html.Style.left "20px"
                  , Html.Style.height "72px"
+                 , Html.Attributes.style "font-size" "20px"
+                 , Html.Attributes.style "color" "white"
                  ]
                     ++ Layout.centered
                 )
@@ -247,14 +268,13 @@ toHtml args =
     , [ [ sprite
             [ Html.Attributes.style "transform" "rotate(-90deg)" ]
             ( 0, 0 )
-        , label
-            []
-            "S"
-            |> Layout.el
+        , "S"
+            |> Layout.text
                 ([ Html.Style.positionAbsolute
-                 , Html.Style.top "0"
+                 , Html.Style.top "16px"
                  , Html.Style.width "72px"
-                 , Html.Style.height "72px"
+                 , Html.Attributes.style "font-size" "20px"
+                 , Html.Attributes.style "color" "white"
                  ]
                     ++ Layout.centered
                 )
