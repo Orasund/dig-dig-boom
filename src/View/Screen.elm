@@ -1,4 +1,4 @@
-module View.Screen exposing (death, menu, world)
+module View.Screen exposing (death, gameWon, menu, world)
 
 import Config
 import Dict
@@ -62,14 +62,40 @@ death attrs args =
             )
 
 
+gameWon : Html msg
+gameWon =
+    [ "Thanks for playing"
+        |> Layout.text
+            [ Html.Attributes.style "font-size" "46px"
+            , Layout.contentCentered
+            ]
+    ]
+        |> Layout.column
+            ([ Html.Attributes.class "dark-background"
+             , Html.Style.width "400px"
+             , Html.Style.height "400px"
+             , Html.Attributes.style "color" "white"
+             ]
+                ++ Layout.centered
+            )
+
+
 menu : List (Attribute msg) -> { frame : Int, onClick : msg } -> Html msg
 menu attrs args =
-    [ [ "Dungeon" |> Layout.text [ Layout.contentCentered ]
-      , "Demolition" |> Layout.text [ Layout.contentCentered ]
+    [ [ Config.title
+            |> Layout.text
+                [ Html.Attributes.style "font-size" "46px"
+                , Layout.contentCentered
+                ]
+      , "Press any button to start"
+            |> Layout.text
+                [ Html.Attributes.style "font-size" "16px"
+                , Layout.contentCentered
+                ]
       ]
         |> Layout.column
-            [ Html.Attributes.style "font-size" "46px"
-            , Html.Attributes.style "color" "white"
+            [ Html.Attributes.style "color" "white"
+            , Layout.gap 32
             ]
 
     --, logo args.frame

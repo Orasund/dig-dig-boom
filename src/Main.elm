@@ -36,6 +36,7 @@ import World.Trial
 type Overlay
     = Menu
     | WorldMap
+    | GameWon
 
 
 type alias Model =
@@ -45,7 +46,7 @@ type alias Model =
     , overlay : Maybe Overlay
     , frame : Int
     , history : List Game
-    , room : RoomSort
+    , room : Int
     , world : World
     , initialItem : Maybe Item
     }
@@ -57,6 +58,7 @@ type Msg
     | GotSeed Seed
     | NextFrameRequested
     | NoOps
+    | NextLevelRequested
 
 
 
@@ -69,7 +71,7 @@ init : flag -> ( Model, Cmd Msg )
 init _ =
     let
         room =
-            Trial 0
+            0
 
         level =
             World.Trial.fromInt 0 |> Maybe.withDefault World.Level.empty
@@ -97,27 +99,29 @@ init _ =
 -------------------------------
 
 
-generateLevel : Seed -> RoomSort -> Model -> Model
-generateLevel seed sort model =
+generateLevel : Seed -> Int -> Model -> Model
+generateLevel seed trial model =
     let
-        ( game, _ ) =
-            case sort of
+        maybeGenerator =
+            case Trial trial of
                 Stage level ->
-                    Random.step (World.Level.generate level.difficulty) seed
+                    World.Level.generate level.difficulty |> Just
 
                 Trial i ->
-                    Random.step
-                        (World.Trial.fromInt i
-                            |> Maybe.withDefault World.Level.empty
-                        )
-                        seed
+                    World.Trial.fromInt i
     in
-    { model
-        | levelSeed = seed
-        , game = { game | item = model.game.item }
-        , room = sort
-        , overlay = Nothing
-    }
+    maybeGenerator
+        |> Maybe.map (\generator -> Random.step generator seed)
+        |> Maybe.map
+            (\( game, _ ) ->
+                { model
+                    | levelSeed = seed
+                    , game = { game | item = model.game.item }
+                    , room = trial
+                    , overlay = Nothing
+                }
+            )
+        |> Maybe.withDefault { model | overlay = Just GameWon }
 
 
 solvedRoom : Model -> ( Model, Cmd Msg )
@@ -153,6 +157,18 @@ restartRoom model =
     )
 
 
+nextRoom : Model -> ( Model, Cmd Msg )
+nextRoom model =
+    ( generateLevel model.seed
+        (model.room + 1)
+        { model
+            | room = model.room + 1
+            , history = []
+        }
+    , Cmd.none
+    )
+
+
 setGame : Model -> Game -> Model
 setGame model game =
     { model
@@ -184,6 +200,9 @@ update msg model =
     case msg of
         Input input ->
             case model.overlay of
+                Just GameWon ->
+                    ( model, Cmd.none )
+
                 Just WorldMap ->
                     updateWorldMap input model
 
@@ -194,7 +213,8 @@ update msg model =
 
                 Nothing ->
                     if Game.isWon model.game then
-                        solvedRoom model
+                        --solvedRoom model
+                        ( model, Cmd.none )
 
                     else
                         case input of
@@ -240,8 +260,16 @@ update msg model =
                                 ( { model | overlay = Just WorldMap }, Cmd.none )
 
         ApplyKills kills ->
-            ( { model | game = Game.Event.apply kills model.game }
-            , Cmd.none
+            let
+                game =
+                    Game.Event.apply kills model.game
+            in
+            ( { model | game = game }
+            , if Game.isWon game then
+                Process.sleep 200 |> Task.perform (\() -> NextLevelRequested)
+
+              else
+                Cmd.none
             )
 
         NextFrameRequested ->
@@ -255,6 +283,9 @@ update msg model =
         NoOps ->
             ( model, Cmd.none )
 
+        NextLevelRequested ->
+            nextRoom model
+
 
 updateWorldMap : Input -> Model -> ( Model, Cmd Msg )
 updateWorldMap input model =
@@ -266,7 +297,7 @@ updateWorldMap input model =
                         |> Random.step (World.solveRoom model.world)
                         |> (\( w, s ) -> ( { model | world = w, seed = s }, Cmd.none ))
                     --}
-                    ( generateLevel seed sort model, Cmd.none )
+                    ( generateLevel seed model.room model, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -314,12 +345,10 @@ toDirection string =
         "c" ->
             Input InputReset
 
-        "Escape" ->
-            Input InputOpenMap
-
-        " " ->
-            Input InputActivate
-
+        -- "Escape" ->
+        --    Input InputOpenMap
+        --" " ->
+        --    Input InputActivate
         _ ->
             NoOps
 
@@ -357,6 +386,9 @@ view model =
                     { frame = model.frame
                     , onClick = Input InputActivate
                     }
+
+            Just GameWon ->
+                Screen.gameWon
         )
             |> Layout.el
                 ([ Html.Attributes.style "width" "400px"

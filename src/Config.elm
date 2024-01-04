@@ -16,3 +16,7 @@ stageRepetition =
 
 minWorldSize =
     10
+
+
+title =
+    "Sokobomb"

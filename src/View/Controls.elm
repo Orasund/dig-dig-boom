@@ -26,19 +26,23 @@ sprite attrs pos =
 
 label : List (Attribute msg) -> String -> Html msg
 label attrs title =
-    Layout.text
-        ([ Html.Attributes.style "padding" "4px"
-         , Html.Attributes.style "background-color" "white"
-         , Html.Attributes.style "font-size" "10px"
-         ]
-            ++ attrs
-        )
-        title
+    title
+        |> Layout.text []
+        |> Layout.el
+            ([ Html.Attributes.style "background-color" "white"
+             , Html.Attributes.style "font-size" "12px"
+             , Html.Attributes.style "width" "16px"
+             , Html.Attributes.style "height" "16px"
+             , Html.Style.boxSizingBorderBox
+             ]
+                ++ Layout.centered
+                ++ attrs
+            )
 
 
 toHtml : { onInput : Input -> msg, item : Maybe Item, isLevelSelect : Bool } -> Html msg
 toHtml args =
-    [ [ [ (if args.isLevelSelect then
+    [ [ {--[ (if args.isLevelSelect then
             ""
 
            else
@@ -65,16 +69,49 @@ toHtml args =
                     }
                     ++ [ Html.Style.positionRelative
                        ]
+                )--}
+        [ (if args.isLevelSelect then
+            ""
+
+           else
+            "Retry"
+          )
+            |> Layout.text []
+            |> Layout.el
+                ([ Html.Style.width "72px"
+                 , Html.Style.height "72px"
+                 , Html.Attributes.style "color" "white"
+                 ]
+                    ++ Layout.centered
+                )
+        , label
+            [ Html.Style.positionAbsolute
+            , Html.Style.bottom "4px"
+            , Html.Style.right "4px"
+            ]
+            "C"
+        ]
+            |> Html.div
+                (Layout.asButton
+                    { onPress = args.onInput InputReset |> Just
+                    , label = "Retry"
+                    }
+                    ++ [ Html.Style.positionRelative
+                       ]
                 )
       , [ sprite
             [ Html.Attributes.style "transform" "rotate(90deg)" ]
             ( 0, 0 )
-        , label
-            [ Html.Style.positionAbsolute
-            , Html.Style.bottom "4px"
-            , Html.Style.right "0px"
-            ]
+        , label []
             "W"
+            |> Layout.el
+                ([ Html.Style.positionAbsolute
+                 , Html.Style.top "0"
+                 , Html.Style.width "72px"
+                 , Html.Style.height "72px"
+                 ]
+                    ++ Layout.centered
+                )
         ]
             |> Html.div
                 (Html.Style.positionRelative
@@ -116,11 +153,16 @@ toHtml args =
             []
             ( 0, 0 )
         , label
-            [ Html.Style.positionAbsolute
-            , Html.Style.bottom "0px"
-            , Html.Style.right "4px"
-            ]
+            []
             "A"
+            |> Layout.el
+                ([ Html.Style.positionAbsolute
+                 , Html.Style.top "0"
+                 , Html.Style.width "72px"
+                 , Html.Style.height "72px"
+                 ]
+                    ++ Layout.centered
+                )
         ]
             |> Html.div
                 (Html.Style.positionRelative
@@ -129,7 +171,13 @@ toHtml args =
                         , label = "Move Left"
                         }
                 )
-      , [ sprite [] ( 1, 0 )
+      , Layout.el
+            [ Html.Style.width "72px"
+            , Html.Style.height "72px"
+            ]
+            Layout.none
+
+      {--[ sprite [] ( 1, 0 )
         , if args.isLevelSelect then
             "Play"
                 |> Layout.text [ Html.Attributes.style "color" "white" ]
@@ -170,17 +218,22 @@ toHtml args =
                         { onPress = args.onInput InputActivate |> Just
                         , label = "Place Bombe"
                         }
-                )
+                )--}
       , [ sprite
             [ Html.Attributes.style "transform" "rotate(180deg)"
             ]
             ( 0, 0 )
         , label
-            [ Html.Style.positionAbsolute
-            , Html.Style.bottom "0px"
-            , Html.Style.left "4px"
-            ]
+            []
             "D"
+            |> Layout.el
+                ([ Html.Style.positionAbsolute
+                 , Html.Style.top "0"
+                 , Html.Style.width "72px"
+                 , Html.Style.height "72px"
+                 ]
+                    ++ Layout.centered
+                )
         ]
             |> Html.div
                 (Html.Style.positionRelative
@@ -191,20 +244,20 @@ toHtml args =
                 )
       ]
         |> Layout.row []
-    , [ Layout.el
-            [ Html.Style.width "72px"
-            , Html.Style.height "72px"
-            ]
-            Layout.none
-      , [ sprite
+    , [ [ sprite
             [ Html.Attributes.style "transform" "rotate(-90deg)" ]
             ( 0, 0 )
         , label
-            [ Html.Style.positionAbsolute
-            , Html.Style.top "4px"
-            , Html.Style.right "0px"
-            ]
+            []
             "S"
+            |> Layout.el
+                ([ Html.Style.positionAbsolute
+                 , Html.Style.top "0"
+                 , Html.Style.width "72px"
+                 , Html.Style.height "72px"
+                 ]
+                    ++ Layout.centered
+                )
         ]
             |> Html.div
                 (Html.Style.positionRelative
@@ -212,35 +265,6 @@ toHtml args =
                         { onPress = args.onInput (InputDir Down) |> Just
                         , label = "Move Down"
                         }
-                )
-      , [ (if args.isLevelSelect then
-            ""
-
-           else
-            "Retry"
-          )
-            |> Layout.text []
-            |> Layout.el
-                ([ Html.Style.width "72px"
-                 , Html.Style.height "72px"
-                 , Html.Attributes.style "color" "white"
-                 ]
-                    ++ Layout.centered
-                )
-        , label
-            [ Html.Style.positionAbsolute
-            , Html.Style.bottom "4px"
-            , Html.Style.right "4px"
-            ]
-            "C"
-        ]
-            |> Html.div
-                (Layout.asButton
-                    { onPress = args.onInput InputReset |> Just
-                    , label = "Retry"
-                    }
-                    ++ [ Html.Style.positionRelative
-                       ]
                 )
       ]
         |> Layout.row []
