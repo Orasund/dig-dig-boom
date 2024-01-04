@@ -120,20 +120,26 @@ fromEnemy args enemy =
         PlacedBomb _ ->
             ( 2 + args.frame, 1 )
 
-        Goblin dir ->
-            directional ( 4, 0 )
+        Orc dir ->
+            directional ( 4, 2 )
                 { direction = dir
+                , frame = args.frame
+                }
+
+        Goblin ->
+            directional ( 4, 0 )
+                { direction = Down
+                , frame = args.frame
+                }
+
+        Doppelganger ->
+            directional ( 4, 2 )
+                { direction = Direction.mirror args.playerDirection
                 , frame = args.frame
                 }
 
         Rat ->
             ( 0 + args.frame, 1 )
-
-        Golem ->
-            directional ( 4, 2 )
-                { direction = Direction.mirror args.playerDirection
-                , frame = args.frame
-                }
 
 
 borders : ( Int, Int ) -> Game -> List (Html msg)
@@ -173,7 +179,7 @@ item : List (Attribute msg) -> Item -> Html msg
 item attrs i =
     (case i of
         Bomb ->
-            ( 0, 6 )
+            ( 1, 6 )
 
         CrossBomb ->
             ( 3, 6 )

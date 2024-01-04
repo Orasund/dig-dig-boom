@@ -197,56 +197,47 @@ update msg model =
                         solvedRoom model
 
                     else
-                        case Game.getPlayerPosition model.game of
-                            Just playerPosition ->
-                                case input of
-                                    InputActivate ->
-                                        model.game
-                                            |> Game.Update.placeBombeAndUpdateGame playerPosition
-                                            |> Maybe.map (applyGameAndKill model)
-                                            |> Maybe.withDefault ( model, Cmd.none )
+                        case input of
+                            InputActivate ->
+                                model.game
+                                    |> Game.getPlayerPosition
+                                    |> Maybe.andThen
+                                        (\playerPosition ->
+                                            model.game
+                                                |> Game.Update.placeBombeAndUpdateGame playerPosition
+                                                |> Maybe.map (applyGameAndKill model)
+                                        )
+                                    |> Maybe.withDefault ( model, Cmd.none )
 
-                                    InputDir dir ->
-                                        model.game
-                                            |> Game.Update.movePlayerInDirectionAndUpdateGame
-                                                dir
-                                                playerPosition
-                                            |> applyGameAndKill model
+                            InputDir dir ->
+                                model.game
+                                    |> Game.getPlayerPosition
+                                    |> Maybe.map
+                                        (\playerPosition ->
+                                            model.game
+                                                |> Game.Update.movePlayerInDirectionAndUpdateGame
+                                                    dir
+                                                    playerPosition
+                                                |> applyGameAndKill model
+                                        )
+                                    |> Maybe.withDefault ( model, Cmd.none )
 
-                                    InputUndo ->
-                                        case model.history of
-                                            head :: tail ->
-                                                ( { model | game = head, history = tail }
-                                                , Cmd.none
-                                                )
+                            InputUndo ->
+                                case model.history of
+                                    head :: tail ->
+                                        ( { model | game = head, history = tail }
+                                        , Cmd.none
+                                        )
 
-                                            [] ->
-                                                ( model, Cmd.none )
-
-                                    InputReset ->
-                                        model
-                                            |> restartRoom
-
-                                    InputOpenMap ->
-                                        ( { model | overlay = Just WorldMap }, Cmd.none )
-
-                            Nothing ->
-                                case input of
-                                    InputUndo ->
-                                        case model.history of
-                                            head :: tail ->
-                                                ( { model | game = head, history = tail }
-                                                , Cmd.none
-                                                )
-
-                                            [] ->
-                                                ( model, Cmd.none )
-
-                                    InputOpenMap ->
-                                        ( { model | overlay = Just WorldMap }, Cmd.none )
-
-                                    _ ->
+                                    [] ->
                                         ( model, Cmd.none )
+
+                            InputReset ->
+                                model
+                                    |> restartRoom
+
+                            InputOpenMap ->
+                                ( { model | overlay = Just WorldMap }, Cmd.none )
 
         ApplyKills kills ->
             ( { model | game = Game.Event.apply kills model.game }

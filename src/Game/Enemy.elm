@@ -40,20 +40,23 @@ update args game =
                 CrossBomb ->
                     updateCrossBomb args.pos game
 
+        Goblin ->
+            updateGoblin args.pos game |> Game.Event.none
+
+        Orc dir ->
+            updateOrc args.pos dir game |> Game.Event.none
+
+        Doppelganger ->
+            updateDoppelganger args.pos game |> Game.Event.none
+
         Rat ->
             updateRat args.pos game |> Game.Event.none
-
-        Goblin dir ->
-            updateGoblin args.pos dir game |> Game.Event.none
-
-        Golem ->
-            updateGolem args.pos game |> Game.Event.none
     )
         |> (\out -> { out | kill = neighboringPlayer ++ out.kill })
 
 
-updateGolem : ( Int, Int ) -> Game -> Game
-updateGolem pos game =
+updateDoppelganger : ( Int, Int ) -> Game -> Game
+updateDoppelganger pos game =
     let
         newPos =
             game.playerDirection
@@ -77,8 +80,8 @@ updateGolem pos game =
             game
 
 
-updateGoblin : ( Int, Int ) -> Direction -> Game -> Game
-updateGoblin pos direction game =
+updateOrc : ( Int, Int ) -> Direction -> Game -> Game
+updateOrc pos direction game =
     let
         newPos =
             direction
@@ -119,7 +122,7 @@ updateGoblin pos direction game =
                 )
                 (Game.update pos
                     (\_ ->
-                        Enemy (Goblin (Direction.mirror direction))
+                        Enemy (Orc (Direction.mirror direction))
                     )
                     game
                 )
@@ -127,15 +130,61 @@ updateGoblin pos direction game =
         game
 
 
-updateRat : ( Int, Int ) -> Game -> Game
-updateRat pos game =
+updateGoblin : ( Int, Int ) -> Game -> Game
+updateGoblin position game =
     [ Up, Down, Left, Right ]
         |> List.foldl
-            (\dir out ->
+            (\direction out ->
                 if out == Nothing then
-                    tryMovingRat pos
-                        dir
-                        game
+                    case Game.findFirstInDirection position direction game of
+                        Just Player ->
+                            game
+                                |> tryMoving
+                                    { from = position
+                                    , to =
+                                        Direction.toVector direction
+                                            |> Position.addToVector position
+                                    }
+
+                        Just (Enemy (PlacedBomb _)) ->
+                            game
+                                |> tryMoving
+                                    { from = position
+                                    , to =
+                                        direction
+                                            |> Direction.mirror
+                                            |> Direction.toVector
+                                            |> Position.addToVector position
+                                    }
+
+                        _ ->
+                            Nothing
+
+                else
+                    out
+            )
+            Nothing
+        |> Maybe.withDefault game
+
+
+updateRat : ( Int, Int ) -> Game -> Game
+updateRat position game =
+    [ Up, Down, Left, Right ]
+        |> List.foldl
+            (\direction out ->
+                if out == Nothing then
+                    case Game.findFirstInDirection position direction game of
+                        Just Player ->
+                            game
+                                |> tryMoving
+                                    { from = position
+                                    , to =
+                                        Direction.toVector direction
+                                            |> Position.addToVector position
+                                    }
+
+                        _ ->
+                            Nothing
 
                 else
                     out
@@ -151,33 +200,6 @@ tryMoving args game =
 
     else
         Nothing
-
-
-tryMovingRat : ( Int, Int ) -> Direction -> Game -> Maybe Game
-tryMovingRat position direction game =
-    case Game.findFirstInDirection position direction game of
-        Just Player ->
-            game
-                |> tryMoving
-                    { from = position
-                    , to =
-                        Direction.toVector direction
-                            |> Position.addToVector position
-                    }
-
-        Just (Enemy (PlacedBomb _)) ->
-            game
-                |> tryMoving
-                    { from = position
-                    , to =
-                        direction
-                            |> Direction.mirror
-                            |> Direction.toVector
-                            |> Position.addToVector position
-                    }
-
-        _ ->
-            Nothing
 
 
 updateDynamite : ( Int, Int ) -> Game -> GameAndKill
@@ -240,8 +262,8 @@ updateCrossBomb pos game =
 stun : Direction -> Enemy -> Enemy
 stun direction enemy =
     case enemy of
-        Goblin _ ->
-            Goblin (Direction.mirror direction)
+        Orc _ ->
+            Orc (Direction.mirror direction)
 
         _ ->
             enemy

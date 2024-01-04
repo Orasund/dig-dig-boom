@@ -16,9 +16,10 @@ type Floor
 
 type Enemy
     = PlacedBomb Item
-    | Goblin Direction
+    | Orc Direction
+    | Goblin
+    | Doppelganger
     | Rat
-    | Golem
 
 
 type ParticleSort

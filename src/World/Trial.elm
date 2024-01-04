@@ -58,7 +58,6 @@ ratTrails : List (Generator Game)
 ratTrails =
     [ [ List.repeat 1 (EntityBlock (Enemy Rat))
       , List.repeat 1 (ItemBlock Bomb)
-      , List.repeat 1 (ItemBlock CrossBomb)
       ]
         |> List.concat
         |> Game.Build.generator
@@ -73,7 +72,7 @@ ratTrails =
 
 goblinTrails : List (Generator Game)
 goblinTrails =
-    [ [ List.repeat 1 (EntityBlock (Enemy (Goblin Down)))
+    [ [ List.repeat 1 (EntityBlock (Enemy (Orc Down)))
       ]
         |> List.concat
         |> Game.Build.generator
@@ -83,8 +82,8 @@ goblinTrails =
             , "❌❌💣❌❌"
             , "❌❌😊❌❌"
             ]
-    , [ List.repeat 1 (EntityBlock (Enemy (Goblin Left)))
-      , List.repeat 1 (EntityBlock (Enemy (Goblin Down)))
+    , [ List.repeat 1 (EntityBlock (Enemy (Orc Left)))
+      , List.repeat 1 (EntityBlock (Enemy (Orc Down)))
       , List.repeat 1 (EntityBlock Crate)
       , List.repeat 2 (ItemBlock Bomb)
       ]
@@ -101,7 +100,7 @@ goblinTrails =
 
 golemTrail : List (Generator Game)
 golemTrail =
-    [ [ List.repeat 1 (EntityBlock (Enemy Golem))
+    [ [ List.repeat 1 (EntityBlock (Enemy Doppelganger))
       , List.repeat 1 (EntityBlock Crate)
       , List.repeat 1 (ItemBlock Bomb)
       , List.repeat 1 HoleBlock
@@ -114,7 +113,7 @@ golemTrail =
             , "⬜⬜⬜⬜⬜"
             , "❌⬜😊⬜❌"
             ]
-    , [ List.repeat 2 (EntityBlock (Enemy Golem))
+    , [ List.repeat 2 (EntityBlock (Enemy Doppelganger))
       , List.repeat 1 (EntityBlock Crate)
       , List.repeat 1 (ItemBlock Bomb)
       ]
@@ -126,7 +125,7 @@ golemTrail =
             , "⬜⬜❌⬜⬜"
             , "⬜⬜😊⬜⬜"
             ]
-    , [ List.repeat 3 (EntityBlock (Enemy Golem))
+    , [ List.repeat 3 (EntityBlock (Enemy Doppelganger))
       , List.repeat 2 (EntityBlock Crate)
       , List.repeat 2 (ItemBlock Bomb)
       ]
@@ -138,7 +137,7 @@ golemTrail =
             , "⬜⬜⬜⬜⬜"
             , "📦⬜😊⬜📦"
             ]
-    , [ List.repeat 1 (EntityBlock (Enemy Golem))
+    , [ List.repeat 1 (EntityBlock (Enemy Doppelganger))
       , List.repeat 1 (ItemBlock Bomb)
       ]
         |> List.concat

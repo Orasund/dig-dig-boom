@@ -11,7 +11,7 @@ import Random exposing (Generator)
 generate : Int -> Generator Game
 generate difficulty =
     Array.get difficulty dungeons
-        |> Maybe.withDefault golemDungeon
+        |> Maybe.withDefault orcDungeon
 
 
 dungeons : Array.Array (Generator Game)
@@ -132,8 +132,8 @@ crateDungeon difficulty =
             )
 
 
-golemDungeon : Generator Game
-golemDungeon =
+doppelgangerDungeon : Generator Game
+doppelgangerDungeon =
     Random.uniform
         [ "❌⬜⬜⬜❌"
         , "⬜⬜⬜⬜⬜"
@@ -157,26 +157,76 @@ golemDungeon =
         |> Random.andThen
             (\layout ->
                 Random.uniform
-                    ([ List.repeat 3 (Enemy Golem |> EntityBlock)
+                    ([ List.repeat 3 (Enemy Doppelganger |> EntityBlock)
                      , List.repeat 4 (ItemBlock Bomb)
                      , List.repeat 3 (EntityBlock Crate)
                      , List.repeat 1 HoleBlock
                      ]
                         |> List.concat
                     )
-                    [ [ List.repeat 1 (Enemy Golem |> EntityBlock)
-                      , List.repeat 1 (Enemy (Goblin Down) |> EntityBlock)
-                      , List.repeat 1 (Enemy (Goblin Left) |> EntityBlock)
+                    [ [ List.repeat 1 (Enemy Doppelganger |> EntityBlock)
+                      , List.repeat 1 (Enemy (Orc Down) |> EntityBlock)
+                      , List.repeat 1 (Enemy (Orc Left) |> EntityBlock)
                       , List.repeat 4 (ItemBlock Bomb)
                       , List.repeat 3 (EntityBlock Crate)
                       , List.repeat 1 HoleBlock
                       ]
                         |> List.concat
-                    , [ List.repeat 1 (Enemy Golem |> EntityBlock)
-                      , List.repeat 2 (Enemy Rat |> EntityBlock)
+                    , [ List.repeat 1 (Enemy Doppelganger |> EntityBlock)
+                      , List.repeat 2 (Enemy Goblin |> EntityBlock)
                       , List.repeat 4 (ItemBlock Bomb)
                       , List.repeat 3 (EntityBlock Crate)
                       , List.repeat 1 HoleBlock
+                      ]
+                        |> List.concat
+                    ]
+                    |> Random.andThen (Game.Build.generator layout)
+            )
+
+
+orcDungeon : Generator Game
+orcDungeon =
+    Random.uniform
+        [ "❌⬜⬜⬜❌"
+        , "❌⬜⬜⬜❌"
+        , "❌⬜⬜⬜❌"
+        , "❌⬜⬜⬜❌"
+        , "❌⬜😊⬜❌"
+        ]
+        [ [ "⬜⬜⬜⬜⬜"
+          , "⬜⬜⬜⬜⬜"
+          , "❌❌❌❌❌"
+          , "⬜⬜📦⬜⬜"
+          , "⬜⬜😊⬜⬜"
+          ]
+        , [ "❌⬜⬜⬜❌"
+          , "⬜⬜⬜⬜⬜"
+          , "⬜⬜⬜⬜⬜"
+          , "⬜⬜⬜⬜⬜"
+          , "❌⬜😊⬜❌"
+          ]
+        ]
+        |> Random.andThen
+            (\layout ->
+                Random.uniform
+                    ([ List.repeat 1 (EntityBlock (Enemy (Orc Right)))
+                     , List.repeat 1 (EntityBlock (Enemy (Orc Left)))
+                     , List.repeat 1 (EntityBlock (Enemy (Orc Down)))
+                     , List.repeat 3 (ItemBlock Bomb)
+                     , List.repeat 2 (EntityBlock Crate)
+                     ]
+                        |> List.concat
+                    )
+                    [ [ List.repeat 1 (EntityBlock (Enemy (Orc Right)))
+                      , List.repeat 1 (EntityBlock (Enemy (Orc Left)))
+                      , List.repeat 3 (ItemBlock Bomb)
+                      , List.repeat 3 (EntityBlock Crate)
+                      ]
+                        |> List.concat
+                    , [ List.repeat 1 (EntityBlock (Enemy (Orc Down)))
+                      , List.repeat 1 (EntityBlock (Enemy Goblin))
+                      , List.repeat 3 (ItemBlock Bomb)
+                      , List.repeat 3 (EntityBlock Crate)
                       ]
                         |> List.concat
                     ]
@@ -209,21 +259,21 @@ goblinDungeon =
         |> Random.andThen
             (\layout ->
                 Random.uniform
-                    ([ List.repeat 1 (EntityBlock (Enemy (Goblin Right)))
-                     , List.repeat 1 (EntityBlock (Enemy (Goblin Left)))
-                     , List.repeat 1 (EntityBlock (Enemy (Goblin Down)))
+                    ([ List.repeat 1 (EntityBlock (Enemy Goblin))
+                     , List.repeat 1 (EntityBlock (Enemy Goblin))
+                     , List.repeat 1 (EntityBlock (Enemy Goblin))
                      , List.repeat 3 (ItemBlock Bomb)
                      , List.repeat 2 (EntityBlock Crate)
                      ]
                         |> List.concat
                     )
-                    [ [ List.repeat 1 (EntityBlock (Enemy (Goblin Right)))
-                      , List.repeat 1 (EntityBlock (Enemy (Goblin Left)))
+                    [ [ List.repeat 1 (EntityBlock (Enemy Goblin))
+                      , List.repeat 1 (EntityBlock (Enemy Goblin))
                       , List.repeat 3 (ItemBlock Bomb)
                       , List.repeat 3 (EntityBlock Crate)
                       ]
                         |> List.concat
-                    , [ List.repeat 1 (EntityBlock (Enemy (Goblin Down)))
+                    , [ List.repeat 1 (EntityBlock (Enemy Goblin))
                       , List.repeat 1 (EntityBlock (Enemy Rat))
                       , List.repeat 3 (ItemBlock Bomb)
                       , List.repeat 3 (EntityBlock Crate)
@@ -281,7 +331,7 @@ ratDungeon difficulty =
                       ]
                         |> List.concat
                     , [ List.repeat (maxEnemies - 1) (Enemy Rat |> EntityBlock)
-                      , List.repeat 1 (Enemy (Goblin Down) |> EntityBlock)
+                      , List.repeat 1 (Enemy (Orc Down) |> EntityBlock)
                       , List.repeat maxBombs (ItemBlock Bomb)
                       , List.repeat maxCrates (EntityBlock Crate)
                       ]
