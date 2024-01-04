@@ -15,7 +15,7 @@ type Floor
 
 
 type Enemy
-    = PlacedBomb Item
+    = ActivatedBomb Item
     | Orc Direction
     | Goblin
     | Doppelganger
@@ -36,6 +36,7 @@ type Entity
     = Door
     | Player
     | Crate
+    | InactiveBomb Item
     | Sign String
     | Enemy Enemy
     | Stunned Enemy

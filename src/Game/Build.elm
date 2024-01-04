@@ -1,4 +1,4 @@
-module Game.Build exposing (BuildingBlock(..), generator)
+module Game.Build exposing (BuildingBlock(..), fromEmojis, generator)
 
 import Config
 import Dict exposing (Dict)
@@ -77,7 +77,7 @@ parseEmoji string =
             EntityBlock Crate |> Just
 
         '💣' ->
-            ItemBlock Bomb |> Just
+            EntityBlock (InactiveBomb Bomb) |> Just
 
         '❌' ->
             HoleBlock |> Just
@@ -139,7 +139,11 @@ diagNeighbors ( x, y ) dict =
 
 
 validator =
-    \dict ->
+    \_ -> True
+
+
+
+{--\dict ->
         dict
             |> Dict.toList
             |> List.all
@@ -180,7 +184,7 @@ validator =
                                 < 1--}
                         _ ->
                             True
-                )
+                )--}
 
 
 count : (a -> Bool) -> List a -> Int

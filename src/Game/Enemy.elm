@@ -32,7 +32,7 @@ update args game =
                     )
     in
     (case args.enemy of
-        PlacedBomb item ->
+        ActivatedBomb item ->
             case item of
                 Bomb ->
                     updateDynamite args.pos game
@@ -146,7 +146,7 @@ updateGoblin position game =
                                             |> Position.addToVector position
                                     }
 
-                        Just (Enemy (PlacedBomb _)) ->
+                        Just (Enemy (ActivatedBomb _)) ->
                             game
                                 |> tryMoving
                                     { from = position

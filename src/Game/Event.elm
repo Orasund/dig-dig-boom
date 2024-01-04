@@ -18,7 +18,10 @@ apply : List ( Int, Int ) -> Game -> Game
 apply kills game =
     kills
         |> List.foldl kill game
-        |> checkIfWon
+
+
+
+-- |> checkIfWon
 
 
 map : (Game -> Game) -> GameAndKill -> GameAndKill
@@ -52,7 +55,7 @@ kill pos game =
             }
                 |> Game.remove pos
 
-        Just (Enemy (PlacedBomb _)) ->
+        Just (Enemy (ActivatedBomb _)) ->
             { game
                 | particles =
                     game.particles |> Dict.insert pos Smoke
@@ -71,6 +74,9 @@ kill pos game =
                 | particles =
                     game.particles |> Dict.insert pos Smoke
             }
+
+        Just (InactiveBomb item) ->
+            game |> Game.update pos (\_ -> Enemy (ActivatedBomb item))
 
         _ ->
             game
@@ -108,7 +114,8 @@ attackPlayer position game =
             )
 
 
-checkIfWon : Game -> Game
+
+{--checkIfWon : Game -> Game
 checkIfWon game =
     if
         (Game.get ( 2, -1 ) game == Nothing)
@@ -128,4 +135,4 @@ checkIfWon game =
         game |> Game.insert ( 2, -1 ) Door
 
     else
-        game
+        game--}

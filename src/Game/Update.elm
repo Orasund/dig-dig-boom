@@ -84,11 +84,38 @@ movePlayer position game =
         Just Crate ->
             { game =
                 game
-                    |> pushCrate newLocation game.playerDirection
+                    |> push newLocation game.playerDirection
                     |> Maybe.andThen (Game.move { from = position, to = newLocation })
                     |> Maybe.map (takeItem newLocation)
                     |> Maybe.withDefault game
             , kill = []
+            }
+                |> Just
+
+        Just (InactiveBomb item) ->
+            let
+                newPos =
+                    game |> Game.findFirstEmptyCellInDirection newLocation game.playerDirection
+            in
+            { game =
+                game
+                    |> Game.update newLocation
+                        (\_ ->
+                            ActivatedBomb item
+                                |> Game.Enemy.stun game.playerDirection
+                                |> Stunned
+                        )
+                    |> (\g ->
+                            g
+                                |> Game.move { from = newLocation, to = newPos }
+                                |> Maybe.withDefault g
+                       )
+            , kill =
+                if game.floor |> Dict.member newPos then
+                    []
+
+                else
+                    [ newPos ]
             }
                 |> Just
 
@@ -155,7 +182,7 @@ applyBomb position game =
                         Nothing ->
                             if Dict.member newPosition game.floor then
                                 game
-                                    |> Game.insert newPosition (Stunned (PlacedBomb item))
+                                    |> Game.insert newPosition (Stunned (ActivatedBomb item))
                                     |> Just
 
                             else
@@ -176,8 +203,8 @@ placeBombeAndUpdateGame playerCell game =
         |> Maybe.map updateGame
 
 
-pushCrate : ( Int, Int ) -> Direction -> Game -> Maybe Game
-pushCrate pos dir game =
+push : ( Int, Int ) -> Direction -> Game -> Maybe Game
+push pos dir game =
     let
         newPos =
             dir

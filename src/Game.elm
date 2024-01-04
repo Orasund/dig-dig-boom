@@ -75,6 +75,7 @@ empty =
     , playerDirection = Down
     , won = False
     }
+        |> insert ( 2, -1 ) Door
 
 
 isWon : Game -> Bool

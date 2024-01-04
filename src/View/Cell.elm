@@ -81,6 +81,9 @@ toHtml attrs args cell =
         Crate ->
             ( 1, 3 )
 
+        InactiveBomb _ ->
+            ( 1, 6 )
+
         Enemy enemy ->
             fromEnemy
                 { frame = args.frame
@@ -117,7 +120,7 @@ directional ( x, y ) args =
 fromEnemy : { frame : Int, playerDirection : Direction } -> Enemy -> ( Int, Int )
 fromEnemy args enemy =
     case enemy of
-        PlacedBomb _ ->
+        ActivatedBomb _ ->
             ( 2 + args.frame, 1 )
 
         Orc dir ->
