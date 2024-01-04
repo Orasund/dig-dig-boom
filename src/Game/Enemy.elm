@@ -5,7 +5,8 @@ import Dict
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item(..), ParticleSort(..))
 import Game exposing (Game)
-import Game.Event exposing (GameAndKill)
+import Game.Event exposing (Event(..), GameAndEvents)
+import Gen.Sound exposing (Sound(..))
 import Math
 import Position
 
@@ -15,7 +16,7 @@ update :
     , enemy : Enemy
     }
     -> Game
-    -> GameAndKill
+    -> GameAndEvents
 update args game =
     let
         neighboringPlayer =
@@ -52,7 +53,7 @@ update args game =
         Rat ->
             updateRat args.pos game |> Game.Event.none
     )
-        |> (\out -> { out | kill = neighboringPlayer ++ out.kill })
+        |> (\out -> { out | kill = List.map Kill neighboringPlayer ++ out.kill })
 
 
 updateDoppelganger : ( Int, Int ) -> Game -> Game
@@ -202,7 +203,7 @@ tryMoving args game =
         Nothing
 
 
-updateDynamite : ( Int, Int ) -> Game -> GameAndKill
+updateDynamite : ( Int, Int ) -> Game -> GameAndEvents
 updateDynamite location game =
     [ Up, Down, Left, Right ]
         |> List.foldl
@@ -219,15 +220,20 @@ updateDynamite location game =
                             output
 
                         _ ->
-                            { output | kill = newLocation :: output.kill }
+                            { output | kill = Kill newLocation :: output.kill }
 
                 else
                     output
             )
-            { game = game, kill = [ location ] }
+            { game = game
+            , kill =
+                [ Kill location
+                , Fx Explosion
+                ]
+            }
 
 
-updateCrossBomb : ( Int, Int ) -> Game -> GameAndKill
+updateCrossBomb : ( Int, Int ) -> Game -> GameAndEvents
 updateCrossBomb pos game =
     [ Up, Down, Left, Right ]
         |> List.concatMap
@@ -249,13 +255,13 @@ updateCrossBomb pos game =
                             output
 
                         _ ->
-                            { output | kill = newPos :: output.kill }
+                            { output | kill = Kill newPos :: output.kill }
 
                 else
                     output
             )
             { game = game |> Game.removeFloor pos
-            , kill = [ pos ]
+            , kill = [ Kill pos ]
             }
 
 

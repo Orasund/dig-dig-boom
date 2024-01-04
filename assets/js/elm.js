@@ -4372,6 +4372,43 @@ function _Browser_load(url)
 }
 
 
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
+
+
 // CREATE
 
 var _Regex_never = /.^/;
@@ -4474,40 +4511,49 @@ var _Regex_infinity = Infinity;
 
 
 
-var _Bitwise_and = F2(function(a, b)
+function _Time_now(millisToPosix)
 {
-	return a & b;
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(millisToPosix(Date.now())));
+	});
+}
+
+var _Time_setInterval = F2(function(interval, task)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var id = setInterval(function() { _Scheduler_rawSpawn(task); }, interval);
+		return function() { clearInterval(id); };
+	});
 });
 
-var _Bitwise_or = F2(function(a, b)
+function _Time_here()
 {
-	return a | b;
-});
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(
+			A2($elm$time$Time$customZone, -(new Date().getTimezoneOffset()), _List_Nil)
+		));
+	});
+}
 
-var _Bitwise_xor = F2(function(a, b)
-{
-	return a ^ b;
-});
 
-function _Bitwise_complement(a)
+function _Time_getZoneName()
 {
-	return ~a;
-};
-
-var _Bitwise_shiftLeftBy = F2(function(offset, a)
-{
-	return a << offset;
-});
-
-var _Bitwise_shiftRightBy = F2(function(offset, a)
-{
-	return a >> offset;
-});
-
-var _Bitwise_shiftRightZfBy = F2(function(offset, a)
-{
-	return a >>> offset;
-});
+	return _Scheduler_binding(function(callback)
+	{
+		try
+		{
+			var name = $elm$time$Time$Name(Intl.DateTimeFormat().resolvedOptions().timeZone);
+		}
+		catch (e)
+		{
+			var name = $elm$time$Time$Offset(new Date().getTimezoneOffset());
+		}
+		callback(_Scheduler_succeed(name));
+	});
+}
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5296,65 +5342,78 @@ var $elm$core$Task$perform = F2(
 			$elm$core$Task$Perform(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
-var $elm$browser$Browser$document = _Browser_document;
-var $author$project$Overlay$GameMenu = {$: 'GameMenu'};
-var $author$project$InteropDefinitions$RegisterSounds = function (a) {
+var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$GotSeed = function (a) {
+	return {$: 'GotSeed', a: a};
+};
+var $author$project$Main$Menu = {$: 'Menu'};
+var $author$project$PortDefinition$RegisterSounds = function (a) {
 	return {$: 'RegisterSounds', a: a};
 };
-var $author$project$Gen$Sound$ClickButton = {$: 'ClickButton'};
+var $author$project$Gen$Sound$Explosion = {$: 'Explosion'};
+var $author$project$Gen$Sound$Move = {$: 'Move'};
+var $author$project$Gen$Sound$Push = {$: 'Push'};
+var $author$project$Gen$Sound$Retry = {$: 'Retry'};
+var $author$project$Gen$Sound$Undo = {$: 'Undo'};
+var $author$project$Gen$Sound$Win = {$: 'Win'};
 var $author$project$Gen$Sound$asList = _List_fromArray(
-	[$author$project$Gen$Sound$ClickButton]);
-var $dillonkearns$elm_ts_json$TsJson$Encode$encoder = F2(
-	function (_v0, input) {
-		var encodeFn = _v0.a;
-		return encodeFn(input);
+	[$author$project$Gen$Sound$Explosion, $author$project$Gen$Sound$Move, $author$project$Gen$Sound$Push, $author$project$Gen$Sound$Retry, $author$project$Gen$Sound$Undo, $author$project$Gen$Sound$Win]);
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var $elm$random$Random$andThen = F2(
+	function (callback, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed) {
+				var _v1 = genA(seed);
+				var result = _v1.a;
+				var newSeed = _v1.b;
+				var _v2 = callback(result);
+				var genB = _v2.a;
+				return genB(newSeed);
+			});
 	});
-var $dillonkearns$elm_ts_json$TsJson$Internal$Decode$Decoder = F2(
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm$core$Tuple$pair = F2(
 	function (a, b) {
-		return {$: 'Decoder', a: a, b: b};
+		return _Utils_Tuple2(a, b);
 	});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Literal = function (a) {
-	return {$: 'Literal', a: a};
+var $author$project$Position$asGrid = function (_v0) {
+	var rows = _v0.rows;
+	var columns = _v0.columns;
+	return A2(
+		$elm$core$List$concatMap,
+		function (x) {
+			return A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$pair(x),
+				A2($elm$core$List$range, 0, columns - 1));
+		},
+		A2($elm$core$List$range, 0, rows - 1));
 };
-var $elm$json$Json$Decode$andThen = _Json_andThen;
-var $elm$json$Json$Decode$fail = _Json_fail;
-var $elm$json$Json$Decode$value = _Json_decodeValue;
-var $dillonkearns$elm_ts_json$TsJson$Decode$literal = F2(
-	function (value_, literalValue) {
-		return A2(
-			$dillonkearns$elm_ts_json$TsJson$Internal$Decode$Decoder,
-			A2(
-				$elm$json$Json$Decode$andThen,
-				function (decodeValue) {
-					return _Utils_eq(literalValue, decodeValue) ? $elm$json$Json$Decode$succeed(value_) : $elm$json$Json$Decode$fail(
-						'Expected the following literal value: ' + A2($elm$json$Json$Encode$encode, 0, literalValue));
-				},
-				$elm$json$Json$Decode$value),
-			$dillonkearns$elm_ts_json$Internal$TsJsonType$Literal(literalValue));
-	});
-var $elm$json$Json$Encode$null = _Json_encodeNull;
-var $dillonkearns$elm_ts_json$TsJson$Decode$null = function (value_) {
-	return A2($dillonkearns$elm_ts_json$TsJson$Decode$literal, value_, $elm$json$Json$Encode$null);
+var $elm$random$Random$constant = function (value) {
+	return $elm$random$Random$Generator(
+		function (seed) {
+			return _Utils_Tuple2(value, seed);
+		});
 };
-var $author$project$InteropDefinitions$flags = $dillonkearns$elm_ts_json$TsJson$Decode$null(
-	{});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Boolean = {$: 'Boolean'};
-var $dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder = F2(
-	function (a, b) {
-		return {$: 'Encoder', a: a, b: b};
-	});
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $dillonkearns$elm_ts_json$TsJson$Encode$bool = A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder, $elm$json$Json$Encode$bool, $dillonkearns$elm_ts_json$Internal$TsJsonType$Boolean);
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$TsNever = {$: 'TsNever'};
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Union = function (a) {
-	return {$: 'Union', a: a};
-};
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Unknown = {$: 'Unknown'};
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -5366,280 +5425,9 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $dillonkearns$elm_ts_json$Internal$TypeReducer$union = function (tsTypes) {
-	var withoutNevers = A2(
-		$elm$core$List$filter,
-		$elm$core$Basics$neq($dillonkearns$elm_ts_json$Internal$TsJsonType$TsNever),
-		tsTypes);
-	var hadNevers = !_Utils_eq(
-		$elm$core$List$length(tsTypes),
-		$elm$core$List$length(withoutNevers));
-	if (!withoutNevers.b) {
-		return hadNevers ? $dillonkearns$elm_ts_json$Internal$TsJsonType$TsNever : $dillonkearns$elm_ts_json$Internal$TsJsonType$Unknown;
-	} else {
-		if (!withoutNevers.b.b) {
-			var singleType = withoutNevers.a;
-			return singleType;
-		} else {
-			var first = withoutNevers.a;
-			var rest = withoutNevers.b;
-			return $dillonkearns$elm_ts_json$Internal$TsJsonType$Union(
-				_Utils_Tuple2(first, rest));
-		}
-	}
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$unwrapUnion = function (_v0) {
-	var rawValue = _v0.a;
-	return rawValue;
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$buildUnion = function (_v0) {
-	var toValue = _v0.a;
-	var tsTypes_ = _v0.b;
-	return A2(
-		$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
-		A2($elm$core$Basics$composeR, toValue, $dillonkearns$elm_ts_json$TsJson$Encode$unwrapUnion),
-		$dillonkearns$elm_ts_json$Internal$TypeReducer$union(tsTypes_));
-};
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$List = function (a) {
-	return {$: 'List', a: a};
-};
-var $elm$json$Json$Encode$list = F2(
-	function (func, entries) {
-		return _Json_wrap(
-			A3(
-				$elm$core$List$foldl,
-				_Json_addEntry(func),
-				_Json_emptyArray(_Utils_Tuple0),
-				entries));
-	});
-var $dillonkearns$elm_ts_json$TsJson$Encode$list = function (_v0) {
-	var encodeFn = _v0.a;
-	var tsType_ = _v0.b;
-	return A2(
-		$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
-		function (input) {
-			return A2($elm$json$Json$Encode$list, encodeFn, input);
-		},
-		$dillonkearns$elm_ts_json$Internal$TsJsonType$List(tsType_));
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$map = F2(
-	function (mapFunction, _v0) {
-		var encodeFn = _v0.a;
-		var tsType_ = _v0.b;
-		return A2(
-			$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
-			function (input) {
-				return encodeFn(
-					mapFunction(input));
-			},
-			tsType_);
-	});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$TypeObject = function (a) {
-	return {$: 'TypeObject', a: a};
-};
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $elm$json$Json$Encode$object = function (pairs) {
-	return _Json_wrap(
-		A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v0, obj) {
-					var k = _v0.a;
-					var v = _v0.b;
-					return A3(_Json_addField, k, v, obj);
-				}),
-			_Json_emptyObject(_Utils_Tuple0),
-			pairs));
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$object = function (propertyEncoders) {
-	var propertyTypes = $dillonkearns$elm_ts_json$Internal$TsJsonType$TypeObject(
-		A2(
-			$elm$core$List$map,
-			function (_v1) {
-				var optionality = _v1.a;
-				var propertyName = _v1.b;
-				var tsType_ = _v1.d;
-				return _Utils_Tuple3(optionality, propertyName, tsType_);
-			},
-			propertyEncoders));
-	var encodeObject = function (input) {
-		return $elm$json$Json$Encode$object(
-			A2(
-				$elm$core$List$filterMap,
-				function (_v0) {
-					var propertyName = _v0.b;
-					var encodeFn = _v0.c;
-					return A2(
-						$elm$core$Maybe$map,
-						function (encoded) {
-							return _Utils_Tuple2(propertyName, encoded);
-						},
-						encodeFn(input));
-				},
-				propertyEncoders));
-	};
-	return A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder, encodeObject, propertyTypes);
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$Property = F4(
-	function (a, b, c, d) {
-		return {$: 'Property', a: a, b: b, c: c, d: d};
-	});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Required = {$: 'Required'};
-var $dillonkearns$elm_ts_json$TsJson$Encode$required = F3(
-	function (name, getter, _v0) {
-		var encodeFn = _v0.a;
-		var tsType_ = _v0.b;
-		return A4(
-			$dillonkearns$elm_ts_json$TsJson$Encode$Property,
-			$dillonkearns$elm_ts_json$Internal$TsJsonType$Required,
-			name,
-			function (input) {
-				return $elm$core$Maybe$Just(
-					encodeFn(
-						getter(input)));
-			},
-			tsType_);
-	});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$String = {$: 'String'};
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $dillonkearns$elm_ts_json$TsJson$Encode$string = A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder, $elm$json$Json$Encode$string, $dillonkearns$elm_ts_json$Internal$TsJsonType$String);
-var $author$project$Gen$Sound$toString = function (sound) {
-	return 'ClickButton.mp3';
-};
-var $dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionBuilder = F2(
-	function (a, b) {
-		return {$: 'UnionBuilder', a: a, b: b};
-	});
-var $dillonkearns$elm_ts_json$TsJson$Encode$union = function (constructor) {
-	return A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionBuilder, constructor, _List_Nil);
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$literal = function (literalValue) {
-	return A2(
-		$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
-		function (_v0) {
-			return literalValue;
-		},
-		$dillonkearns$elm_ts_json$Internal$TsJsonType$Literal(literalValue));
-};
-var $dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionEncodeValue = function (a) {
-	return {$: 'UnionEncodeValue', a: a};
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$variant = F2(
-	function (_v0, _v1) {
-		var encoder_ = _v0.a;
-		var tsType_ = _v0.b;
-		var builder = _v1.a;
-		var tsTypes_ = _v1.b;
-		return A2(
-			$dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionBuilder,
-			builder(
-				A2($elm$core$Basics$composeR, encoder_, $dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionEncodeValue)),
-			A2($elm$core$List$cons, tsType_, tsTypes_));
-	});
-var $dillonkearns$elm_ts_json$TsJson$Encode$variantObject = F3(
-	function (variantName, objectFields, unionBuilder) {
-		return A2(
-			$dillonkearns$elm_ts_json$TsJson$Encode$variant,
-			$dillonkearns$elm_ts_json$TsJson$Encode$object(
-				A2(
-					$elm$core$List$cons,
-					A3(
-						$dillonkearns$elm_ts_json$TsJson$Encode$required,
-						'tag',
-						$elm$core$Basics$identity,
-						$dillonkearns$elm_ts_json$TsJson$Encode$literal(
-							$elm$json$Json$Encode$string(variantName))),
-					objectFields)),
-			unionBuilder);
-	});
-var $dillonkearns$elm_ts_json$TsJson$Encode$variantTagged = F3(
-	function (tagName, dataEncoder, builder) {
-		return A3(
-			$dillonkearns$elm_ts_json$TsJson$Encode$variantObject,
-			tagName,
-			_List_fromArray(
-				[
-					A3($dillonkearns$elm_ts_json$TsJson$Encode$required, 'data', $elm$core$Basics$identity, dataEncoder)
-				]),
-			builder);
-	});
-var $author$project$InteropDefinitions$fromElm = $dillonkearns$elm_ts_json$TsJson$Encode$buildUnion(
-	A3(
-		$dillonkearns$elm_ts_json$TsJson$Encode$variantTagged,
-		'registerSounds',
-		$dillonkearns$elm_ts_json$TsJson$Encode$list(
-			A2($dillonkearns$elm_ts_json$TsJson$Encode$map, $author$project$Gen$Sound$toString, $dillonkearns$elm_ts_json$TsJson$Encode$string)),
-		A3(
-			$dillonkearns$elm_ts_json$TsJson$Encode$variantTagged,
-			'playSound',
-			$dillonkearns$elm_ts_json$TsJson$Encode$object(
-				_List_fromArray(
-					[
-						A3(
-						$dillonkearns$elm_ts_json$TsJson$Encode$required,
-						'sound',
-						function (obj) {
-							return $author$project$Gen$Sound$toString(obj.sound);
-						},
-						$dillonkearns$elm_ts_json$TsJson$Encode$string),
-						A3(
-						$dillonkearns$elm_ts_json$TsJson$Encode$required,
-						'looping',
-						function ($) {
-							return $.looping;
-						},
-						$dillonkearns$elm_ts_json$TsJson$Encode$bool)
-					])),
-			$dillonkearns$elm_ts_json$TsJson$Encode$union(
-				F3(
-					function (playSound, registerSounds, value) {
-						if (value.$ === 'RegisterSounds') {
-							var list = value.a;
-							return registerSounds(list);
-						} else {
-							var args = value.a;
-							return playSound(args);
-						}
-					})))));
-var $author$project$InteropDefinitions$SoundEnded = function (a) {
-	return {$: 'SoundEnded', a: a};
-};
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$ArrayIndex = F2(
-	function (a, b) {
-		return {$: 'ArrayIndex', a: a, b: b};
-	});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Intersection = function (a) {
-	return {$: 'Intersection', a: a};
-};
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Optional = {$: 'Optional'};
+var $author$project$Entity$Door = {$: 'Door'};
+var $author$project$Direction$Down = {$: 'Down'};
+var $author$project$Entity$Ground = {$: 'Ground'};
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $elm$core$Dict$Black = {$: 'Black'};
@@ -5751,62 +5539,63 @@ var $elm$core$Dict$insert = F3(
 			return x;
 		}
 	});
-var $elm$core$Dict$values = function (dict) {
+var $elm$core$Dict$fromList = function (assocs) {
 	return A3(
-		$elm$core$Dict$foldr,
-		F3(
-			function (key, value, valueList) {
-				return A2($elm$core$List$cons, value, valueList);
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
 			}),
-		_List_Nil,
-		dict);
+		$elm$core$Dict$empty,
+		assocs);
 };
-var $dillonkearns$elm_ts_json$Internal$TypeReducer$deduplicateBy = F2(
-	function (toComparable, list) {
-		return $elm$core$Dict$values(
-			A3(
-				$elm$core$List$foldl,
-				F2(
-					function (value, accum) {
-						return A3(
-							$elm$core$Dict$insert,
-							toComparable(value),
-							value,
-							accum);
-					}),
-				$elm$core$Dict$empty,
-				list));
+var $author$project$Game$insert = F3(
+	function (pos, entity, game) {
+		return _Utils_update(
+			game,
+			{
+				cells: A3(
+					$elm$core$Dict$insert,
+					pos,
+					{entity: entity, id: game.nextId},
+					game.cells),
+				nextId: game.nextId + 1
+			});
 	});
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1.$) {
-					case 'LT':
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 'EQ':
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Config$roomSize = 5;
+var $author$project$Game$empty = A3(
+	$author$project$Game$insert,
+	_Utils_Tuple2(2, -1),
+	$author$project$Entity$Door,
+	{
+		cells: $elm$core$Dict$empty,
+		floor: $elm$core$Dict$fromList(
+			A2(
+				$elm$core$List$map,
+				function (pos) {
+					return A2($elm$core$Tuple$pair, pos, $author$project$Entity$Ground);
+				},
+				$author$project$Position$asGrid(
+					{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize}))),
+		item: $elm$core$Maybe$Nothing,
+		items: $elm$core$Dict$empty,
+		nextId: 0,
+		particles: $elm$core$Dict$empty,
+		playerDirection: $author$project$Direction$Down,
+		won: false
+	});
+var $author$project$Game$placeItem = F3(
+	function (pos, item, game) {
+		return _Utils_update(
+			game,
+			{
+				items: A3($elm$core$Dict$insert, pos, item, game.items)
+			});
 	});
 var $elm$core$Dict$getMin = function (dict) {
 	getMin:
@@ -6170,6 +5959,666 @@ var $elm$core$Dict$remove = F2(
 			return x;
 		}
 	});
+var $author$project$Game$removeFloor = F2(
+	function (pos, game) {
+		return _Utils_update(
+			game,
+			{
+				floor: A2($elm$core$Dict$remove, pos, game.floor)
+			});
+	});
+var $author$project$Game$Build$fromBlocks = function (blocks) {
+	return A3(
+		$elm$core$List$foldl,
+		function (_v0) {
+			var pos = _v0.a;
+			var block = _v0.b;
+			switch (block.$) {
+				case 'EntityBlock':
+					var entity = block.a;
+					return A2($author$project$Game$insert, pos, entity);
+				case 'ItemBlock':
+					var item = block.a;
+					return A2($author$project$Game$placeItem, pos, item);
+				default:
+					return $author$project$Game$removeFloor(pos);
+			}
+		},
+		$author$project$Game$empty,
+		blocks);
+};
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Entity$Bomb = {$: 'Bomb'};
+var $author$project$Entity$Crate = {$: 'Crate'};
+var $author$project$Entity$Enemy = function (a) {
+	return {$: 'Enemy', a: a};
+};
+var $author$project$Game$Build$EntityBlock = function (a) {
+	return {$: 'EntityBlock', a: a};
+};
+var $author$project$Entity$Goblin = {$: 'Goblin'};
+var $author$project$Game$Build$HoleBlock = {$: 'HoleBlock'};
+var $author$project$Entity$InactiveBomb = function (a) {
+	return {$: 'InactiveBomb', a: a};
+};
+var $author$project$Entity$Player = {$: 'Player'};
+var $author$project$Game$Build$parseEmoji = function (string) {
+	switch (string.valueOf()) {
+		case '😊':
+			return $elm$core$Maybe$Just(
+				$author$project$Game$Build$EntityBlock($author$project$Entity$Player));
+		case '📦':
+			return $elm$core$Maybe$Just(
+				$author$project$Game$Build$EntityBlock($author$project$Entity$Crate));
+		case '💣':
+			return $elm$core$Maybe$Just(
+				$author$project$Game$Build$EntityBlock(
+					$author$project$Entity$InactiveBomb($author$project$Entity$Bomb)));
+		case '❌':
+			return $elm$core$Maybe$Just($author$project$Game$Build$HoleBlock);
+		case '🐀':
+			return $elm$core$Maybe$Just(
+				$author$project$Game$Build$EntityBlock(
+					$author$project$Entity$Enemy($author$project$Entity$Goblin)));
+		case '⬜':
+			return $elm$core$Maybe$Nothing;
+		default:
+			return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Game$Build$fromEmojis = function (rows) {
+	return $elm$core$Dict$fromList(
+		$elm$core$List$concat(
+			A2(
+				$elm$core$List$indexedMap,
+				F2(
+					function (y, strings) {
+						return A2(
+							$elm$core$List$filterMap,
+							$elm$core$Basics$identity,
+							A2(
+								$elm$core$List$indexedMap,
+								F2(
+									function (x, string) {
+										return A2(
+											$elm$core$Maybe$map,
+											function (block) {
+												return _Utils_Tuple2(
+													_Utils_Tuple2(x, y),
+													block);
+											},
+											$author$project$Game$Build$parseEmoji(string));
+									}),
+								$elm$core$String$toList(strings)));
+					}),
+				rows)));
+};
+var $elm$random$Random$lazy = function (callback) {
+	return $elm$random$Random$Generator(
+		function (seed) {
+			var _v0 = callback(_Utils_Tuple0);
+			var gen = _v0.a;
+			return gen(seed);
+		});
+};
+var $elm$random$Random$map = F2(
+	function (func, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v1 = genA(seed0);
+				var a = _v1.a;
+				var seed1 = _v1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
+	});
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (_v0.$ === 'Just') {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$Basics$abs = function (n) {
+	return (n < 0) ? (-n) : n;
+};
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$random$Random$Seed = F2(
+	function (a, b) {
+		return {$: 'Seed', a: a, b: b};
+	});
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$random$Random$next = function (_v0) {
+	var state0 = _v0.a;
+	var incr = _v0.b;
+	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
+};
+var $elm$core$Bitwise$xor = _Bitwise_xor;
+var $elm$random$Random$peel = function (_v0) {
+	var state = _v0.a;
+	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
+	return ((word >>> 22) ^ word) >>> 0;
+};
+var $elm$random$Random$float = F2(
+	function (a, b) {
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var seed1 = $elm$random$Random$next(seed0);
+				var range = $elm$core$Basics$abs(b - a);
+				var n1 = $elm$random$Random$peel(seed1);
+				var n0 = $elm$random$Random$peel(seed0);
+				var lo = (134217727 & n1) * 1.0;
+				var hi = (67108863 & n0) * 1.0;
+				var val = ((hi * 134217728.0) + lo) / 9007199254740992.0;
+				var scaled = (val * range) + a;
+				return _Utils_Tuple2(
+					scaled,
+					$elm$random$Random$next(seed1));
+			});
+	});
+var $elm$random$Random$listHelp = F4(
+	function (revList, n, gen, seed) {
+		listHelp:
+		while (true) {
+			if (n < 1) {
+				return _Utils_Tuple2(revList, seed);
+			} else {
+				var _v0 = gen(seed);
+				var value = _v0.a;
+				var newSeed = _v0.b;
+				var $temp$revList = A2($elm$core$List$cons, value, revList),
+					$temp$n = n - 1,
+					$temp$gen = gen,
+					$temp$seed = newSeed;
+				revList = $temp$revList;
+				n = $temp$n;
+				gen = $temp$gen;
+				seed = $temp$seed;
+				continue listHelp;
+			}
+		}
+	});
+var $elm$random$Random$list = F2(
+	function (n, _v0) {
+		var gen = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed) {
+				return A4($elm$random$Random$listHelp, _List_Nil, n, gen, seed);
+			});
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$core$List$sortBy = _List_sortBy;
+var $author$project$Game$Build$shuffle = function (list) {
+	return A2(
+		$elm$random$Random$map,
+		function (rand) {
+			return A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$second,
+				A2(
+					$elm$core$List$sortBy,
+					$elm$core$Tuple$first,
+					A3($elm$core$List$map2, $elm$core$Tuple$pair, rand, list)));
+		},
+		A2(
+			$elm$random$Random$list,
+			$elm$core$List$length(list),
+			A2($elm$random$Random$float, 0, 1)));
+};
+var $author$project$Game$Build$validator = function (_v0) {
+	return true;
+};
+var $author$project$Game$Build$generator = F2(
+	function (emojis, blocks) {
+		var dict = $author$project$Game$Build$fromEmojis(emojis);
+		var rec = function (_v0) {
+			return A2(
+				$elm$random$Random$andThen,
+				function (game) {
+					return $author$project$Game$Build$validator(game.cells) ? $elm$random$Random$constant(game) : $elm$random$Random$lazy(rec);
+				},
+				A2(
+					$elm$random$Random$map,
+					$author$project$Game$Build$fromBlocks,
+					A2(
+						$elm$random$Random$map,
+						function (list) {
+							return _Utils_ap(
+								A3($elm$core$List$map2, $elm$core$Tuple$pair, list, blocks),
+								$elm$core$Dict$toList(dict));
+						},
+						$author$project$Game$Build$shuffle(
+							A2(
+								$elm$core$List$filter,
+								function (pos) {
+									return !A2($elm$core$Dict$member, pos, dict);
+								},
+								$author$project$Position$asGrid(
+									{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize}))))));
+		};
+		return rec(_Utils_Tuple0);
+	});
+var $author$project$World$Level$empty = A2(
+	$author$project$Game$Build$generator,
+	_List_fromArray(
+		['⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜😊⬜⬜']),
+	_List_Nil);
+var $dillonkearns$elm_ts_json$TsJson$Encode$encoder = F2(
+	function (_v0, input) {
+		var encodeFn = _v0.a;
+		return encodeFn(input);
+	});
+var $dillonkearns$elm_ts_json$TsJson$Internal$Decode$Decoder = F2(
+	function (a, b) {
+		return {$: 'Decoder', a: a, b: b};
+	});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Literal = function (a) {
+	return {$: 'Literal', a: a};
+};
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$fail = _Json_fail;
+var $elm$json$Json$Decode$value = _Json_decodeValue;
+var $dillonkearns$elm_ts_json$TsJson$Decode$literal = F2(
+	function (value_, literalValue) {
+		return A2(
+			$dillonkearns$elm_ts_json$TsJson$Internal$Decode$Decoder,
+			A2(
+				$elm$json$Json$Decode$andThen,
+				function (decodeValue) {
+					return _Utils_eq(literalValue, decodeValue) ? $elm$json$Json$Decode$succeed(value_) : $elm$json$Json$Decode$fail(
+						'Expected the following literal value: ' + A2($elm$json$Json$Encode$encode, 0, literalValue));
+				},
+				$elm$json$Json$Decode$value),
+			$dillonkearns$elm_ts_json$Internal$TsJsonType$Literal(literalValue));
+	});
+var $elm$json$Json$Encode$null = _Json_encodeNull;
+var $dillonkearns$elm_ts_json$TsJson$Decode$null = function (value_) {
+	return A2($dillonkearns$elm_ts_json$TsJson$Decode$literal, value_, $elm$json$Json$Encode$null);
+};
+var $author$project$PortDefinition$flags = $dillonkearns$elm_ts_json$TsJson$Decode$null(
+	{});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Boolean = {$: 'Boolean'};
+var $dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder = F2(
+	function (a, b) {
+		return {$: 'Encoder', a: a, b: b};
+	});
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $dillonkearns$elm_ts_json$TsJson$Encode$bool = A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder, $elm$json$Json$Encode$bool, $dillonkearns$elm_ts_json$Internal$TsJsonType$Boolean);
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$TsNever = {$: 'TsNever'};
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Union = function (a) {
+	return {$: 'Union', a: a};
+};
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Unknown = {$: 'Unknown'};
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $dillonkearns$elm_ts_json$Internal$TypeReducer$union = function (tsTypes) {
+	var withoutNevers = A2(
+		$elm$core$List$filter,
+		$elm$core$Basics$neq($dillonkearns$elm_ts_json$Internal$TsJsonType$TsNever),
+		tsTypes);
+	var hadNevers = !_Utils_eq(
+		$elm$core$List$length(tsTypes),
+		$elm$core$List$length(withoutNevers));
+	if (!withoutNevers.b) {
+		return hadNevers ? $dillonkearns$elm_ts_json$Internal$TsJsonType$TsNever : $dillonkearns$elm_ts_json$Internal$TsJsonType$Unknown;
+	} else {
+		if (!withoutNevers.b.b) {
+			var singleType = withoutNevers.a;
+			return singleType;
+		} else {
+			var first = withoutNevers.a;
+			var rest = withoutNevers.b;
+			return $dillonkearns$elm_ts_json$Internal$TsJsonType$Union(
+				_Utils_Tuple2(first, rest));
+		}
+	}
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$unwrapUnion = function (_v0) {
+	var rawValue = _v0.a;
+	return rawValue;
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$buildUnion = function (_v0) {
+	var toValue = _v0.a;
+	var tsTypes_ = _v0.b;
+	return A2(
+		$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
+		A2($elm$core$Basics$composeR, toValue, $dillonkearns$elm_ts_json$TsJson$Encode$unwrapUnion),
+		$dillonkearns$elm_ts_json$Internal$TypeReducer$union(tsTypes_));
+};
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$List = function (a) {
+	return {$: 'List', a: a};
+};
+var $elm$json$Json$Encode$list = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$List$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(_Utils_Tuple0),
+				entries));
+	});
+var $dillonkearns$elm_ts_json$TsJson$Encode$list = function (_v0) {
+	var encodeFn = _v0.a;
+	var tsType_ = _v0.b;
+	return A2(
+		$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
+		function (input) {
+			return A2($elm$json$Json$Encode$list, encodeFn, input);
+		},
+		$dillonkearns$elm_ts_json$Internal$TsJsonType$List(tsType_));
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$map = F2(
+	function (mapFunction, _v0) {
+		var encodeFn = _v0.a;
+		var tsType_ = _v0.b;
+		return A2(
+			$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
+			function (input) {
+				return encodeFn(
+					mapFunction(input));
+			},
+			tsType_);
+	});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$TypeObject = function (a) {
+	return {$: 'TypeObject', a: a};
+};
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$object = function (propertyEncoders) {
+	var propertyTypes = $dillonkearns$elm_ts_json$Internal$TsJsonType$TypeObject(
+		A2(
+			$elm$core$List$map,
+			function (_v1) {
+				var optionality = _v1.a;
+				var propertyName = _v1.b;
+				var tsType_ = _v1.d;
+				return _Utils_Tuple3(optionality, propertyName, tsType_);
+			},
+			propertyEncoders));
+	var encodeObject = function (input) {
+		return $elm$json$Json$Encode$object(
+			A2(
+				$elm$core$List$filterMap,
+				function (_v0) {
+					var propertyName = _v0.b;
+					var encodeFn = _v0.c;
+					return A2(
+						$elm$core$Maybe$map,
+						function (encoded) {
+							return _Utils_Tuple2(propertyName, encoded);
+						},
+						encodeFn(input));
+				},
+				propertyEncoders));
+	};
+	return A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder, encodeObject, propertyTypes);
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$Property = F4(
+	function (a, b, c, d) {
+		return {$: 'Property', a: a, b: b, c: c, d: d};
+	});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Required = {$: 'Required'};
+var $dillonkearns$elm_ts_json$TsJson$Encode$required = F3(
+	function (name, getter, _v0) {
+		var encodeFn = _v0.a;
+		var tsType_ = _v0.b;
+		return A4(
+			$dillonkearns$elm_ts_json$TsJson$Encode$Property,
+			$dillonkearns$elm_ts_json$Internal$TsJsonType$Required,
+			name,
+			function (input) {
+				return $elm$core$Maybe$Just(
+					encodeFn(
+						getter(input)));
+			},
+			tsType_);
+	});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$String = {$: 'String'};
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $dillonkearns$elm_ts_json$TsJson$Encode$string = A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder, $elm$json$Json$Encode$string, $dillonkearns$elm_ts_json$Internal$TsJsonType$String);
+var $author$project$Gen$Sound$toString = function (sound) {
+	switch (sound.$) {
+		case 'Explosion':
+			return 'explosion.wav';
+		case 'Move':
+			return 'move.wav';
+		case 'Push':
+			return 'push.wav';
+		case 'Retry':
+			return 'retry.wav';
+		case 'Undo':
+			return 'undo.wav';
+		default:
+			return 'win.wav';
+	}
+};
+var $dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionBuilder = F2(
+	function (a, b) {
+		return {$: 'UnionBuilder', a: a, b: b};
+	});
+var $dillonkearns$elm_ts_json$TsJson$Encode$union = function (constructor) {
+	return A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionBuilder, constructor, _List_Nil);
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$literal = function (literalValue) {
+	return A2(
+		$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
+		function (_v0) {
+			return literalValue;
+		},
+		$dillonkearns$elm_ts_json$Internal$TsJsonType$Literal(literalValue));
+};
+var $dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionEncodeValue = function (a) {
+	return {$: 'UnionEncodeValue', a: a};
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$variant = F2(
+	function (_v0, _v1) {
+		var encoder_ = _v0.a;
+		var tsType_ = _v0.b;
+		var builder = _v1.a;
+		var tsTypes_ = _v1.b;
+		return A2(
+			$dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionBuilder,
+			builder(
+				A2($elm$core$Basics$composeR, encoder_, $dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionEncodeValue)),
+			A2($elm$core$List$cons, tsType_, tsTypes_));
+	});
+var $dillonkearns$elm_ts_json$TsJson$Encode$variantObject = F3(
+	function (variantName, objectFields, unionBuilder) {
+		return A2(
+			$dillonkearns$elm_ts_json$TsJson$Encode$variant,
+			$dillonkearns$elm_ts_json$TsJson$Encode$object(
+				A2(
+					$elm$core$List$cons,
+					A3(
+						$dillonkearns$elm_ts_json$TsJson$Encode$required,
+						'tag',
+						$elm$core$Basics$identity,
+						$dillonkearns$elm_ts_json$TsJson$Encode$literal(
+							$elm$json$Json$Encode$string(variantName))),
+					objectFields)),
+			unionBuilder);
+	});
+var $dillonkearns$elm_ts_json$TsJson$Encode$variantTagged = F3(
+	function (tagName, dataEncoder, builder) {
+		return A3(
+			$dillonkearns$elm_ts_json$TsJson$Encode$variantObject,
+			tagName,
+			_List_fromArray(
+				[
+					A3($dillonkearns$elm_ts_json$TsJson$Encode$required, 'data', $elm$core$Basics$identity, dataEncoder)
+				]),
+			builder);
+	});
+var $author$project$PortDefinition$fromElm = function () {
+	var soundEncoder = A2($dillonkearns$elm_ts_json$TsJson$Encode$map, $author$project$Gen$Sound$toString, $dillonkearns$elm_ts_json$TsJson$Encode$string);
+	return $dillonkearns$elm_ts_json$TsJson$Encode$buildUnion(
+		A3(
+			$dillonkearns$elm_ts_json$TsJson$Encode$variantTagged,
+			'registerSounds',
+			$dillonkearns$elm_ts_json$TsJson$Encode$list(soundEncoder),
+			A3(
+				$dillonkearns$elm_ts_json$TsJson$Encode$variantTagged,
+				'stopSound',
+				soundEncoder,
+				A3(
+					$dillonkearns$elm_ts_json$TsJson$Encode$variantTagged,
+					'playSound',
+					$dillonkearns$elm_ts_json$TsJson$Encode$object(
+						_List_fromArray(
+							[
+								A3(
+								$dillonkearns$elm_ts_json$TsJson$Encode$required,
+								'sound',
+								function (obj) {
+									return $author$project$Gen$Sound$toString(obj.sound);
+								},
+								$dillonkearns$elm_ts_json$TsJson$Encode$string),
+								A3(
+								$dillonkearns$elm_ts_json$TsJson$Encode$required,
+								'looping',
+								function ($) {
+									return $.looping;
+								},
+								$dillonkearns$elm_ts_json$TsJson$Encode$bool)
+							])),
+					$dillonkearns$elm_ts_json$TsJson$Encode$union(
+						F4(
+							function (playSound, stopSound, registerSounds, value) {
+								switch (value.$) {
+									case 'RegisterSounds':
+										var list = value.a;
+										return registerSounds(list);
+									case 'PlaySound':
+										var args = value.a;
+										return playSound(args);
+									default:
+										var args = value.a;
+										return stopSound(args);
+								}
+							}))))));
+}();
+var $author$project$PortDefinition$SoundEnded = function (a) {
+	return {$: 'SoundEnded', a: a};
+};
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$ArrayIndex = F2(
+	function (a, b) {
+		return {$: 'ArrayIndex', a: a, b: b};
+	});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Intersection = function (a) {
+	return {$: 'Intersection', a: a};
+};
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Optional = {$: 'Optional'};
+var $elm$core$Dict$values = function (dict) {
+	return A3(
+		$elm$core$Dict$foldr,
+		F3(
+			function (key, value, valueList) {
+				return A2($elm$core$List$cons, value, valueList);
+			}),
+		_List_Nil,
+		dict);
+};
+var $dillonkearns$elm_ts_json$Internal$TypeReducer$deduplicateBy = F2(
+	function (toComparable, list) {
+		return $elm$core$Dict$values(
+			A3(
+				$elm$core$List$foldl,
+				F2(
+					function (value, accum) {
+						return A3(
+							$elm$core$Dict$insert,
+							toComparable(value),
+							value,
+							accum);
+					}),
+				$elm$core$Dict$empty,
+				list));
+	});
 var $elm$core$Dict$update = F3(
 	function (targetKey, alter, dictionary) {
 		var _v0 = alter(
@@ -6243,18 +6692,6 @@ var $dillonkearns$elm_ts_json$Internal$TypeReducer$isPrimitive = function (tsTyp
 var $dillonkearns$elm_ts_json$Internal$TypeReducer$isContradictory = function (types) {
 	return A2($dillonkearns$elm_ts_json$Internal$TypeReducer$either, $dillonkearns$elm_ts_json$Internal$TypeReducer$isNonEmptyObject, types) && A2($dillonkearns$elm_ts_json$Internal$TypeReducer$either, $dillonkearns$elm_ts_json$Internal$TypeReducer$isPrimitive, types);
 };
-var $elm$core$Dict$fromList = function (assocs) {
-	return A3(
-		$elm$core$List$foldl,
-		F2(
-			function (_v0, dict) {
-				var key = _v0.a;
-				var value = _v0.b;
-				return A3($elm$core$Dict$insert, key, value, dict);
-			}),
-		$elm$core$Dict$empty,
-		assocs);
-};
 var $elm$core$List$maximum = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -6312,7 +6749,6 @@ var $dillonkearns$elm_ts_json$Internal$TypeToString$quoteObjectKey = function (k
 	var needsQuotes = $dillonkearns$elm_ts_json$Internal$TypeToString$isIdentifier(key);
 	return needsQuotes ? $dillonkearns$elm_ts_json$Internal$TypeToString$doubleQuote(key) : key;
 };
-var $elm$core$List$sortBy = _List_sortBy;
 var $dillonkearns$elm_ts_json$Internal$TypeToString$parenthesizeToString = function (type_) {
 	var needsParens = function () {
 		if (type_.$ === 'Union') {
@@ -6639,6 +7075,18 @@ var $dillonkearns$elm_ts_json$Internal$TypeReducer$simplifyIntersection = functi
 	}();
 	return thing;
 };
+var $dillonkearns$elm_ts_json$TsJson$Decode$map2 = F3(
+	function (mapFn, _v0, _v1) {
+		var innerDecoder1 = _v0.a;
+		var innerType1 = _v0.b;
+		var innerDecoder2 = _v1.a;
+		var innerType2 = _v1.b;
+		return A2(
+			$dillonkearns$elm_ts_json$TsJson$Internal$Decode$Decoder,
+			A3($elm$json$Json$Decode$map2, mapFn, innerDecoder1, innerDecoder2),
+			A2($dillonkearns$elm_ts_json$Internal$TypeReducer$intersect, innerType1, innerType2));
+	});
+var $dillonkearns$elm_ts_json$TsJson$Decode$andMap = $dillonkearns$elm_ts_json$TsJson$Decode$map2($elm$core$Basics$apR);
 var $dillonkearns$elm_ts_json$TsJson$Decode$andThen = F2(
 	function (_v0, _v1) {
 		var _function = _v0.a;
@@ -6720,11 +7168,35 @@ var $dillonkearns$elm_ts_json$TsJson$Decode$fail = function (message) {
 		$elm$json$Json$Decode$fail(message),
 		$dillonkearns$elm_ts_json$Internal$TsJsonType$Unknown);
 };
+var $dillonkearns$elm_ts_json$TsJson$Decode$field = F2(
+	function (fieldName, _v0) {
+		var innerDecoder = _v0.a;
+		var innerType = _v0.b;
+		return A2(
+			$dillonkearns$elm_ts_json$TsJson$Internal$Decode$Decoder,
+			A2($elm$json$Json$Decode$field, fieldName, innerDecoder),
+			$dillonkearns$elm_ts_json$Internal$TsJsonType$TypeObject(
+				_List_fromArray(
+					[
+						_Utils_Tuple3($dillonkearns$elm_ts_json$Internal$TsJsonType$Required, fieldName, innerType)
+					])));
+	});
 var $author$project$Gen$Sound$fromString = function (string) {
-	if (string === 'ClickButton.mp3') {
-		return $elm$core$Maybe$Just($author$project$Gen$Sound$ClickButton);
-	} else {
-		return $elm$core$Maybe$Nothing;
+	switch (string) {
+		case 'explosion.wav':
+			return $elm$core$Maybe$Just($author$project$Gen$Sound$Explosion);
+		case 'move.wav':
+			return $elm$core$Maybe$Just($author$project$Gen$Sound$Move);
+		case 'push.wav':
+			return $elm$core$Maybe$Just($author$project$Gen$Sound$Push);
+		case 'retry.wav':
+			return $elm$core$Maybe$Just($author$project$Gen$Sound$Retry);
+		case 'undo.wav':
+			return $elm$core$Maybe$Just($author$project$Gen$Sound$Undo);
+		case 'win.wav':
+			return $elm$core$Maybe$Just($author$project$Gen$Sound$Win);
+		default:
+			return $elm$core$Maybe$Nothing;
 	}
 };
 var $dillonkearns$elm_ts_json$TsJson$Decode$string = A2($dillonkearns$elm_ts_json$TsJson$Internal$Decode$Decoder, $elm$json$Json$Decode$string, $dillonkearns$elm_ts_json$Internal$TsJsonType$String);
@@ -6734,7 +7206,7 @@ var $dillonkearns$elm_ts_json$TsJson$Decode$succeed = function (value_) {
 		$elm$json$Json$Decode$succeed(value_),
 		$dillonkearns$elm_ts_json$Internal$TsJsonType$Unknown);
 };
-var $author$project$InteropDefinitions$toElm = A2(
+var $author$project$PortDefinition$toElm = A2(
 	$dillonkearns$elm_ts_json$TsJson$Decode$discriminatedUnion,
 	'type',
 	_List_fromArray(
@@ -6742,37 +7214,160 @@ var $author$project$InteropDefinitions$toElm = A2(
 			_Utils_Tuple2(
 			'soundEnded',
 			A2(
-				$dillonkearns$elm_ts_json$TsJson$Decode$andThen,
-				$dillonkearns$elm_ts_json$TsJson$Decode$andThenInit(
-					function (string) {
-						return A2(
-							$elm$core$Maybe$withDefault,
-							$dillonkearns$elm_ts_json$TsJson$Decode$fail('Unkown sound ended: ' + string),
-							A2(
-								$elm$core$Maybe$map,
-								function (sound) {
-									return $dillonkearns$elm_ts_json$TsJson$Decode$succeed(
-										$author$project$InteropDefinitions$SoundEnded(sound));
-								},
-								$author$project$Gen$Sound$fromString(string)));
-					}),
-				$dillonkearns$elm_ts_json$TsJson$Decode$string))
+				$dillonkearns$elm_ts_json$TsJson$Decode$andMap,
+				A2(
+					$dillonkearns$elm_ts_json$TsJson$Decode$field,
+					'sound',
+					A2(
+						$dillonkearns$elm_ts_json$TsJson$Decode$andThen,
+						$dillonkearns$elm_ts_json$TsJson$Decode$andThenInit(
+							function (string) {
+								return A2(
+									$elm$core$Maybe$withDefault,
+									$dillonkearns$elm_ts_json$TsJson$Decode$fail('Unkown sound ended: ' + string),
+									A2(
+										$elm$core$Maybe$map,
+										$dillonkearns$elm_ts_json$TsJson$Decode$succeed,
+										$author$project$Gen$Sound$fromString(string)));
+							}),
+						$dillonkearns$elm_ts_json$TsJson$Decode$string)),
+				$dillonkearns$elm_ts_json$TsJson$Decode$succeed($author$project$PortDefinition$SoundEnded)))
 		]));
-var $author$project$InteropDefinitions$interop = {flags: $author$project$InteropDefinitions$flags, fromElm: $author$project$InteropDefinitions$fromElm, toElm: $author$project$InteropDefinitions$toElm};
-var $author$project$InteropPorts$interopFromElm = _Platform_outgoingPort('interopFromElm', $elm$core$Basics$identity);
-var $author$project$InteropPorts$fromElm = function (value) {
-	return $author$project$InteropPorts$interopFromElm(
-		A3($elm$core$Basics$apR, $author$project$InteropDefinitions$interop.fromElm, $dillonkearns$elm_ts_json$TsJson$Encode$encoder, value));
+var $author$project$PortDefinition$interop = {flags: $author$project$PortDefinition$flags, fromElm: $author$project$PortDefinition$fromElm, toElm: $author$project$PortDefinition$toElm};
+var $author$project$Port$interopFromElm = _Platform_outgoingPort('interopFromElm', $elm$core$Basics$identity);
+var $author$project$Port$fromElm = function (value) {
+	return $author$project$Port$interopFromElm(
+		A3($elm$core$Basics$apR, $author$project$PortDefinition$interop.fromElm, $dillonkearns$elm_ts_json$TsJson$Encode$encoder, value));
 };
-var $elm$random$Random$Seed = F2(
-	function (a, b) {
-		return {$: 'Seed', a: a, b: b};
+var $author$project$World$Trial$crateTails = _List_fromArray(
+	[
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['⬜📦⬜📦⬜', '⬜⬜📦⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜😊⬜⬜']),
+		_List_Nil),
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['⬜📦⬜📦⬜', '⬜⬜📦⬜⬜', '📦📦📦📦📦', '⬜📦⬜⬜📦', '⬜⬜😊⬜⬜']),
+		_List_Nil),
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['⬜⬜⬜⬜⬜', '📦📦📦⬜📦', '⬜⬜📦⬜⬜', '📦📦📦📦📦', '📦⬜😊⬜📦']),
+		_List_Nil),
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['📦⬜📦📦📦', '📦💣📦📦⬜', '📦📦⬜⬜📦', '⬜⬜💣⬜⬜', '⬜⬜😊⬜⬜']),
+		_List_Nil),
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['📦📦📦⬜📦', '📦⬜📦📦⬜', '📦💣💣⬜📦', '⬜⬜📦📦⬜', '⬜⬜😊⬜📦']),
+		_List_Nil),
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['📦📦📦⬜📦', '📦⬜💣📦⬜', '⬜💣📦📦⬜', '⬜⬜📦⬜📦', '⬜⬜😊⬜📦']),
+		_List_Nil),
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['📦⬜📦📦📦', '📦⬜⬜📦⬜', '⬜⬜📦⬜⬜', '⬜💣📦📦📦', '⬜📦😊📦⬜']),
+		_List_Nil),
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['⬜⬜📦💣📦', '⬜⬜📦⬜⬜', '⬜📦⬜📦📦', '📦📦📦⬜⬜', '📦⬜😊💣⬜']),
+		_List_Nil),
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['📦📦💣📦📦', '📦📦📦📦📦', '📦⬜⬜💣⬜', '⬜📦⬜⬜⬜', '⬜⬜😊⬜⬜']),
+		_List_Nil)
+	]);
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
 	});
-var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
-var $elm$random$Random$next = function (_v0) {
-	var state0 = _v0.a;
-	var incr = _v0.b;
-	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
+};
+var $author$project$World$Trial$asArray = $elm$core$Array$fromList($author$project$World$Trial$crateTails);
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (_v0.$ === 'SubTree') {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $author$project$World$Trial$fromInt = function (i) {
+	return A2($elm$core$Array$get, i, $author$project$World$Trial$asArray);
+};
+var $elm$random$Random$Generate = function (a) {
+	return {$: 'Generate', a: a};
 };
 var $elm$random$Random$initialSeed = function (x) {
 	var _v0 = $elm$random$Random$next(
@@ -6783,31 +7378,1350 @@ var $elm$random$Random$initialSeed = function (x) {
 	return $elm$random$Random$next(
 		A2($elm$random$Random$Seed, state2, incr));
 };
-var $author$project$Game$new = {};
+var $elm$time$Time$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 'Offset', a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
+var $elm$time$Time$posixToMillis = function (_v0) {
+	var millis = _v0.a;
+	return millis;
+};
+var $elm$random$Random$init = A2(
+	$elm$core$Task$andThen,
+	function (time) {
+		return $elm$core$Task$succeed(
+			$elm$random$Random$initialSeed(
+				$elm$time$Time$posixToMillis(time)));
+	},
+	$elm$time$Time$now);
+var $elm$random$Random$step = F2(
+	function (_v0, seed) {
+		var generator = _v0.a;
+		return generator(seed);
+	});
+var $elm$random$Random$onEffects = F3(
+	function (router, commands, seed) {
+		if (!commands.b) {
+			return $elm$core$Task$succeed(seed);
+		} else {
+			var generator = commands.a.a;
+			var rest = commands.b;
+			var _v1 = A2($elm$random$Random$step, generator, seed);
+			var value = _v1.a;
+			var newSeed = _v1.b;
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$random$Random$onEffects, router, rest, newSeed);
+				},
+				A2($elm$core$Platform$sendToApp, router, value));
+		}
+	});
+var $elm$random$Random$onSelfMsg = F3(
+	function (_v0, _v1, seed) {
+		return $elm$core$Task$succeed(seed);
+	});
+var $elm$random$Random$cmdMap = F2(
+	function (func, _v0) {
+		var generator = _v0.a;
+		return $elm$random$Random$Generate(
+			A2($elm$random$Random$map, func, generator));
+	});
+_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
+var $elm$random$Random$command = _Platform_leaf('Random');
+var $elm$random$Random$generate = F2(
+	function (tagger, generator) {
+		return $elm$random$Random$command(
+			$elm$random$Random$Generate(
+				A2($elm$random$Random$map, tagger, generator)));
+	});
+var $elm$random$Random$int = F2(
+	function (a, b) {
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
+				var lo = _v0.a;
+				var hi = _v0.b;
+				var range = (hi - lo) + 1;
+				if (!((range - 1) & range)) {
+					return _Utils_Tuple2(
+						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
+						$elm$random$Random$next(seed0));
+				} else {
+					var threshhold = (((-range) >>> 0) % range) >>> 0;
+					var accountForBias = function (seed) {
+						accountForBias:
+						while (true) {
+							var x = $elm$random$Random$peel(seed);
+							var seedN = $elm$random$Random$next(seed);
+							if (_Utils_cmp(x, threshhold) < 0) {
+								var $temp$seed = seedN;
+								seed = $temp$seed;
+								continue accountForBias;
+							} else {
+								return _Utils_Tuple2((x % range) + lo, seedN);
+							}
+						}
+					};
+					return accountForBias(seed0);
+				}
+			});
+	});
+var $elm$random$Random$map3 = F4(
+	function (func, _v0, _v1, _v2) {
+		var genA = _v0.a;
+		var genB = _v1.a;
+		var genC = _v2.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v3 = genA(seed0);
+				var a = _v3.a;
+				var seed1 = _v3.b;
+				var _v4 = genB(seed1);
+				var b = _v4.a;
+				var seed2 = _v4.b;
+				var _v5 = genC(seed2);
+				var c = _v5.a;
+				var seed3 = _v5.b;
+				return _Utils_Tuple2(
+					A3(func, a, b, c),
+					seed3);
+			});
+	});
+var $elm$core$Bitwise$or = _Bitwise_or;
+var $elm$random$Random$independentSeed = $elm$random$Random$Generator(
+	function (seed0) {
+		var makeIndependentSeed = F3(
+			function (state, b, c) {
+				return $elm$random$Random$next(
+					A2($elm$random$Random$Seed, state, (1 | (b ^ c)) >>> 0));
+			});
+		var gen = A2($elm$random$Random$int, 0, 4294967295);
+		return A2(
+			$elm$random$Random$step,
+			A4($elm$random$Random$map3, makeIndependentSeed, gen, gen, gen),
+			seed0);
+	});
+var $author$project$World$Room = function (a) {
+	return {$: 'Room', a: a};
+};
+var $author$project$World$Trial = function (a) {
+	return {$: 'Trial', a: a};
+};
+var $author$project$World$new = function (seed) {
+	return {
+		difficulty: 0,
+		nodes: $elm$core$Dict$fromList(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					_Utils_Tuple2(0, 0),
+					$author$project$World$Room(
+						{
+							seed: seed,
+							solved: false,
+							sort: $author$project$World$Trial(0)
+						}))
+				])),
+		player: _Utils_Tuple2(0, 0),
+		stages: $elm$core$Dict$empty,
+		trials: 1
+	};
+};
 var $author$project$Main$init = function (_v0) {
+	var room = 0;
+	var level = A2(
+		$elm$core$Maybe$withDefault,
+		$author$project$World$Level$empty,
+		$author$project$World$Trial$fromInt(0));
+	var _v1 = A2(
+		$elm$random$Random$step,
+		level,
+		$elm$random$Random$initialSeed(42));
+	var game = _v1.a;
+	var seed = _v1.b;
 	return _Utils_Tuple2(
 		{
-			game: $author$project$Game$new,
-			overlay: $elm$core$Maybe$Just($author$project$Overlay$GameMenu),
-			seed: $elm$random$Random$initialSeed(42)
+			frame: 0,
+			game: game,
+			history: _List_Nil,
+			initialItem: $elm$core$Maybe$Nothing,
+			levelSeed: seed,
+			overlay: $elm$core$Maybe$Just($author$project$Main$Menu),
+			room: room,
+			seed: seed,
+			world: $author$project$World$new(seed)
 		},
-		$author$project$InteropPorts$fromElm(
-			$author$project$InteropDefinitions$RegisterSounds($author$project$Gen$Sound$asList)));
+		$elm$core$Platform$Cmd$batch(
+			_List_fromArray(
+				[
+					$author$project$Port$fromElm(
+					$author$project$PortDefinition$RegisterSounds($author$project$Gen$Sound$asList)),
+					A2($elm$random$Random$generate, $author$project$Main$GotSeed, $elm$random$Random$independentSeed)
+				])));
 };
+var $author$project$Main$NextFrameRequested = {$: 'NextFrameRequested'};
 var $author$project$Main$Received = function (a) {
 	return {$: 'Received', a: a};
 };
-var $elm$core$Platform$Sub$map = _Platform_map;
-var $elm$json$Json$Decode$decodeValue = _Json_run;
-var $author$project$InteropPorts$interopToElm = _Platform_incomingPort('interopToElm', $elm$json$Json$Decode$value);
-var $author$project$InteropPorts$toElm = $author$project$InteropPorts$interopToElm(
-	$elm$json$Json$Decode$decodeValue(
-		$dillonkearns$elm_ts_json$TsJson$Decode$decoder($author$project$InteropDefinitions$interop.toElm)));
-var $author$project$Main$subscriptions = function (_v0) {
-	return A2($elm$core$Platform$Sub$map, $author$project$Main$Received, $author$project$InteropPorts$toElm);
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$time$Time$Every = F2(
+	function (a, b) {
+		return {$: 'Every', a: a, b: b};
+	});
+var $elm$time$Time$State = F2(
+	function (taggers, processes) {
+		return {processes: processes, taggers: taggers};
+	});
+var $elm$time$Time$init = $elm$core$Task$succeed(
+	A2($elm$time$Time$State, $elm$core$Dict$empty, $elm$core$Dict$empty));
+var $elm$time$Time$addMySub = F2(
+	function (_v0, state) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		var _v1 = A2($elm$core$Dict$get, interval, state);
+		if (_v1.$ === 'Nothing') {
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				_List_fromArray(
+					[tagger]),
+				state);
+		} else {
+			var taggers = _v1.a;
+			return A3(
+				$elm$core$Dict$insert,
+				interval,
+				A2($elm$core$List$cons, tagger, taggers),
+				state);
+		}
+	});
+var $elm$core$Process$kill = _Scheduler_kill;
+var $elm$core$Dict$foldl = F3(
+	function (func, acc, dict) {
+		foldl:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return acc;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var $temp$func = func,
+					$temp$acc = A3(
+					func,
+					key,
+					value,
+					A3($elm$core$Dict$foldl, func, acc, left)),
+					$temp$dict = right;
+				func = $temp$func;
+				acc = $temp$acc;
+				dict = $temp$dict;
+				continue foldl;
+			}
+		}
+	});
+var $elm$core$Dict$merge = F6(
+	function (leftStep, bothStep, rightStep, leftDict, rightDict, initialResult) {
+		var stepState = F3(
+			function (rKey, rValue, _v0) {
+				stepState:
+				while (true) {
+					var list = _v0.a;
+					var result = _v0.b;
+					if (!list.b) {
+						return _Utils_Tuple2(
+							list,
+							A3(rightStep, rKey, rValue, result));
+					} else {
+						var _v2 = list.a;
+						var lKey = _v2.a;
+						var lValue = _v2.b;
+						var rest = list.b;
+						if (_Utils_cmp(lKey, rKey) < 0) {
+							var $temp$rKey = rKey,
+								$temp$rValue = rValue,
+								$temp$_v0 = _Utils_Tuple2(
+								rest,
+								A3(leftStep, lKey, lValue, result));
+							rKey = $temp$rKey;
+							rValue = $temp$rValue;
+							_v0 = $temp$_v0;
+							continue stepState;
+						} else {
+							if (_Utils_cmp(lKey, rKey) > 0) {
+								return _Utils_Tuple2(
+									list,
+									A3(rightStep, rKey, rValue, result));
+							} else {
+								return _Utils_Tuple2(
+									rest,
+									A4(bothStep, lKey, lValue, rValue, result));
+							}
+						}
+					}
+				}
+			});
+		var _v3 = A3(
+			$elm$core$Dict$foldl,
+			stepState,
+			_Utils_Tuple2(
+				$elm$core$Dict$toList(leftDict),
+				initialResult),
+			rightDict);
+		var leftovers = _v3.a;
+		var intermediateResult = _v3.b;
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v4, result) {
+					var k = _v4.a;
+					var v = _v4.b;
+					return A3(leftStep, k, v, result);
+				}),
+			intermediateResult,
+			leftovers);
+	});
+var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
+var $elm$time$Time$setInterval = _Time_setInterval;
+var $elm$core$Process$spawn = _Scheduler_spawn;
+var $elm$time$Time$spawnHelp = F3(
+	function (router, intervals, processes) {
+		if (!intervals.b) {
+			return $elm$core$Task$succeed(processes);
+		} else {
+			var interval = intervals.a;
+			var rest = intervals.b;
+			var spawnTimer = $elm$core$Process$spawn(
+				A2(
+					$elm$time$Time$setInterval,
+					interval,
+					A2($elm$core$Platform$sendToSelf, router, interval)));
+			var spawnRest = function (id) {
+				return A3(
+					$elm$time$Time$spawnHelp,
+					router,
+					rest,
+					A3($elm$core$Dict$insert, interval, id, processes));
+			};
+			return A2($elm$core$Task$andThen, spawnRest, spawnTimer);
+		}
+	});
+var $elm$time$Time$onEffects = F3(
+	function (router, subs, _v0) {
+		var processes = _v0.processes;
+		var rightStep = F3(
+			function (_v6, id, _v7) {
+				var spawns = _v7.a;
+				var existing = _v7.b;
+				var kills = _v7.c;
+				return _Utils_Tuple3(
+					spawns,
+					existing,
+					A2(
+						$elm$core$Task$andThen,
+						function (_v5) {
+							return kills;
+						},
+						$elm$core$Process$kill(id)));
+			});
+		var newTaggers = A3($elm$core$List$foldl, $elm$time$Time$addMySub, $elm$core$Dict$empty, subs);
+		var leftStep = F3(
+			function (interval, taggers, _v4) {
+				var spawns = _v4.a;
+				var existing = _v4.b;
+				var kills = _v4.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, interval, spawns),
+					existing,
+					kills);
+			});
+		var bothStep = F4(
+			function (interval, taggers, id, _v3) {
+				var spawns = _v3.a;
+				var existing = _v3.b;
+				var kills = _v3.c;
+				return _Utils_Tuple3(
+					spawns,
+					A3($elm$core$Dict$insert, interval, id, existing),
+					kills);
+			});
+		var _v1 = A6(
+			$elm$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			newTaggers,
+			processes,
+			_Utils_Tuple3(
+				_List_Nil,
+				$elm$core$Dict$empty,
+				$elm$core$Task$succeed(_Utils_Tuple0)));
+		var spawnList = _v1.a;
+		var existingDict = _v1.b;
+		var killTask = _v1.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (newProcesses) {
+				return $elm$core$Task$succeed(
+					A2($elm$time$Time$State, newTaggers, newProcesses));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$time$Time$spawnHelp, router, spawnList, existingDict);
+				},
+				killTask));
+	});
+var $elm$time$Time$onSelfMsg = F3(
+	function (router, interval, state) {
+		var _v0 = A2($elm$core$Dict$get, interval, state.taggers);
+		if (_v0.$ === 'Nothing') {
+			return $elm$core$Task$succeed(state);
+		} else {
+			var taggers = _v0.a;
+			var tellTaggers = function (time) {
+				return $elm$core$Task$sequence(
+					A2(
+						$elm$core$List$map,
+						function (tagger) {
+							return A2(
+								$elm$core$Platform$sendToApp,
+								router,
+								tagger(time));
+						},
+						taggers));
+			};
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$succeed(state);
+				},
+				A2($elm$core$Task$andThen, tellTaggers, $elm$time$Time$now));
+		}
+	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $elm$time$Time$subMap = F2(
+	function (f, _v0) {
+		var interval = _v0.a;
+		var tagger = _v0.b;
+		return A2(
+			$elm$time$Time$Every,
+			interval,
+			A2($elm$core$Basics$composeL, f, tagger));
+	});
+_Platform_effectManagers['Time'] = _Platform_createManager($elm$time$Time$init, $elm$time$Time$onEffects, $elm$time$Time$onSelfMsg, 0, $elm$time$Time$subMap);
+var $elm$time$Time$subscription = _Platform_leaf('Time');
+var $elm$time$Time$every = F2(
+	function (interval, tagger) {
+		return $elm$time$Time$subscription(
+			A2($elm$time$Time$Every, interval, tagger));
+	});
+var $author$project$Main$Input = function (a) {
+	return {$: 'Input', a: a};
 };
-var $author$project$InteropDefinitions$PlaySound = function (a) {
+var $author$project$Input$InputDir = function (a) {
+	return {$: 'InputDir', a: a};
+};
+var $author$project$Input$InputReset = {$: 'InputReset'};
+var $author$project$Input$InputUndo = {$: 'InputUndo'};
+var $author$project$Direction$Left = {$: 'Left'};
+var $author$project$Main$NoOps = {$: 'NoOps'};
+var $author$project$Direction$Right = {$: 'Right'};
+var $author$project$Direction$Up = {$: 'Up'};
+var $author$project$Main$toDirection = function (string) {
+	switch (string) {
+		case 'a':
+			return $author$project$Main$Input(
+				$author$project$Input$InputDir($author$project$Direction$Left));
+		case 'd':
+			return $author$project$Main$Input(
+				$author$project$Input$InputDir($author$project$Direction$Right));
+		case 'w':
+			return $author$project$Main$Input(
+				$author$project$Input$InputDir($author$project$Direction$Up));
+		case 's':
+			return $author$project$Main$Input(
+				$author$project$Input$InputDir($author$project$Direction$Down));
+		case 'r':
+			return $author$project$Main$Input($author$project$Input$InputUndo);
+		case 'c':
+			return $author$project$Main$Input($author$project$Input$InputReset);
+		default:
+			return $author$project$Main$NoOps;
+	}
+};
+var $author$project$Main$keyDecoder = A2(
+	$elm$json$Json$Decode$map,
+	$author$project$Main$toDirection,
+	A2($elm$json$Json$Decode$field, 'key', $elm$json$Json$Decode$string));
+var $elm$core$Platform$Sub$map = _Platform_map;
+var $elm$browser$Browser$Events$Document = {$: 'Document'};
+var $elm$browser$Browser$Events$MySub = F3(
+	function (a, b, c) {
+		return {$: 'MySub', a: a, b: b, c: c};
+	});
+var $elm$browser$Browser$Events$State = F2(
+	function (subs, pids) {
+		return {pids: pids, subs: subs};
+	});
+var $elm$browser$Browser$Events$init = $elm$core$Task$succeed(
+	A2($elm$browser$Browser$Events$State, _List_Nil, $elm$core$Dict$empty));
+var $elm$browser$Browser$Events$nodeToKey = function (node) {
+	if (node.$ === 'Document') {
+		return 'd_';
+	} else {
+		return 'w_';
+	}
+};
+var $elm$browser$Browser$Events$addKey = function (sub) {
+	var node = sub.a;
+	var name = sub.b;
+	return _Utils_Tuple2(
+		_Utils_ap(
+			$elm$browser$Browser$Events$nodeToKey(node),
+			name),
+		sub);
+};
+var $elm$browser$Browser$Events$Event = F2(
+	function (key, event) {
+		return {event: event, key: key};
+	});
+var $elm$browser$Browser$Events$spawn = F3(
+	function (router, key, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var actualNode = function () {
+			if (node.$ === 'Document') {
+				return _Browser_doc;
+			} else {
+				return _Browser_window;
+			}
+		}();
+		return A2(
+			$elm$core$Task$map,
+			function (value) {
+				return _Utils_Tuple2(key, value);
+			},
+			A3(
+				_Browser_on,
+				actualNode,
+				name,
+				function (event) {
+					return A2(
+						$elm$core$Platform$sendToSelf,
+						router,
+						A2($elm$browser$Browser$Events$Event, key, event));
+				}));
+	});
+var $elm$core$Dict$union = F2(
+	function (t1, t2) {
+		return A3($elm$core$Dict$foldl, $elm$core$Dict$insert, t2, t1);
+	});
+var $elm$browser$Browser$Events$onEffects = F3(
+	function (router, subs, state) {
+		var stepRight = F3(
+			function (key, sub, _v6) {
+				var deads = _v6.a;
+				var lives = _v6.b;
+				var news = _v6.c;
+				return _Utils_Tuple3(
+					deads,
+					lives,
+					A2(
+						$elm$core$List$cons,
+						A3($elm$browser$Browser$Events$spawn, router, key, sub),
+						news));
+			});
+		var stepLeft = F3(
+			function (_v4, pid, _v5) {
+				var deads = _v5.a;
+				var lives = _v5.b;
+				var news = _v5.c;
+				return _Utils_Tuple3(
+					A2($elm$core$List$cons, pid, deads),
+					lives,
+					news);
+			});
+		var stepBoth = F4(
+			function (key, pid, _v2, _v3) {
+				var deads = _v3.a;
+				var lives = _v3.b;
+				var news = _v3.c;
+				return _Utils_Tuple3(
+					deads,
+					A3($elm$core$Dict$insert, key, pid, lives),
+					news);
+			});
+		var newSubs = A2($elm$core$List$map, $elm$browser$Browser$Events$addKey, subs);
+		var _v0 = A6(
+			$elm$core$Dict$merge,
+			stepLeft,
+			stepBoth,
+			stepRight,
+			state.pids,
+			$elm$core$Dict$fromList(newSubs),
+			_Utils_Tuple3(_List_Nil, $elm$core$Dict$empty, _List_Nil));
+		var deadPids = _v0.a;
+		var livePids = _v0.b;
+		var makeNewPids = _v0.c;
+		return A2(
+			$elm$core$Task$andThen,
+			function (pids) {
+				return $elm$core$Task$succeed(
+					A2(
+						$elm$browser$Browser$Events$State,
+						newSubs,
+						A2(
+							$elm$core$Dict$union,
+							livePids,
+							$elm$core$Dict$fromList(pids))));
+			},
+			A2(
+				$elm$core$Task$andThen,
+				function (_v1) {
+					return $elm$core$Task$sequence(makeNewPids);
+				},
+				$elm$core$Task$sequence(
+					A2($elm$core$List$map, $elm$core$Process$kill, deadPids))));
+	});
+var $elm$browser$Browser$Events$onSelfMsg = F3(
+	function (router, _v0, state) {
+		var key = _v0.key;
+		var event = _v0.event;
+		var toMessage = function (_v2) {
+			var subKey = _v2.a;
+			var _v3 = _v2.b;
+			var node = _v3.a;
+			var name = _v3.b;
+			var decoder = _v3.c;
+			return _Utils_eq(subKey, key) ? A2(_Browser_decodeEvent, decoder, event) : $elm$core$Maybe$Nothing;
+		};
+		var messages = A2($elm$core$List$filterMap, toMessage, state.subs);
+		return A2(
+			$elm$core$Task$andThen,
+			function (_v1) {
+				return $elm$core$Task$succeed(state);
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Platform$sendToApp(router),
+					messages)));
+	});
+var $elm$browser$Browser$Events$subMap = F2(
+	function (func, _v0) {
+		var node = _v0.a;
+		var name = _v0.b;
+		var decoder = _v0.c;
+		return A3(
+			$elm$browser$Browser$Events$MySub,
+			node,
+			name,
+			A2($elm$json$Json$Decode$map, func, decoder));
+	});
+_Platform_effectManagers['Browser.Events'] = _Platform_createManager($elm$browser$Browser$Events$init, $elm$browser$Browser$Events$onEffects, $elm$browser$Browser$Events$onSelfMsg, 0, $elm$browser$Browser$Events$subMap);
+var $elm$browser$Browser$Events$subscription = _Platform_leaf('Browser.Events');
+var $elm$browser$Browser$Events$on = F3(
+	function (node, name, decoder) {
+		return $elm$browser$Browser$Events$subscription(
+			A3($elm$browser$Browser$Events$MySub, node, name, decoder));
+	});
+var $elm$browser$Browser$Events$onKeyDown = A2($elm$browser$Browser$Events$on, $elm$browser$Browser$Events$Document, 'keydown');
+var $elm$json$Json$Decode$decodeValue = _Json_run;
+var $author$project$Port$interopToElm = _Platform_incomingPort('interopToElm', $elm$json$Json$Decode$value);
+var $author$project$Port$toElm = $author$project$Port$interopToElm(
+	$elm$json$Json$Decode$decodeValue(
+		$dillonkearns$elm_ts_json$TsJson$Decode$decoder($author$project$PortDefinition$interop.toElm)));
+var $author$project$Main$subscriptions = function (_v0) {
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				$elm$browser$Browser$Events$onKeyDown($author$project$Main$keyDecoder),
+				A2(
+				$elm$time$Time$every,
+				500,
+				function (_v1) {
+					return $author$project$Main$NextFrameRequested;
+				}),
+				A2($elm$core$Platform$Sub$map, $author$project$Main$Received, $author$project$Port$toElm)
+			]));
+};
+var $author$project$Game$Event$Fx = function (a) {
+	return {$: 'Fx', a: a};
+};
+var $author$project$PortDefinition$PlaySound = function (a) {
 	return {$: 'PlaySound', a: a};
+};
+var $author$project$Game$Event$StageComplete = {$: 'StageComplete'};
+var $author$project$Main$WorldMap = {$: 'WorldMap'};
+var $author$project$Game$Event$andThen = F2(
+	function (fun, output) {
+		var newOutput = fun(output.game);
+		return _Utils_update(
+			output,
+			{
+				game: newOutput.game,
+				kill: _Utils_ap(newOutput.kill, output.kill)
+			});
+	});
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Main$NextLevelRequested = {$: 'NextLevelRequested'};
+var $author$project$Entity$ActivatedBomb = function (a) {
+	return {$: 'ActivatedBomb', a: a};
+};
+var $author$project$Entity$Bone = {$: 'Bone'};
+var $author$project$Entity$Smoke = {$: 'Smoke'};
+var $author$project$Game$Event$attackPlayer = F2(
+	function (position, game) {
+		return A2(
+			$elm$core$Maybe$andThen,
+			function (cell) {
+				var _v0 = cell.entity;
+				if (_v0.$ === 'Player') {
+					return $elm$core$Maybe$Just(
+						_Utils_update(
+							game,
+							{
+								cells: A2($elm$core$Dict$remove, position, game.cells),
+								particles: A3($elm$core$Dict$insert, position, $author$project$Entity$Bone, game.particles)
+							}));
+				} else {
+					return $elm$core$Maybe$Nothing;
+				}
+			},
+			A2($elm$core$Dict$get, position, game.cells));
+	});
+var $author$project$Game$get = F2(
+	function (pos, game) {
+		return A2(
+			$elm$core$Maybe$map,
+			function ($) {
+				return $.entity;
+			},
+			A2($elm$core$Dict$get, pos, game.cells));
+	});
+var $author$project$Game$remove = F2(
+	function (pos, game) {
+		return _Utils_update(
+			game,
+			{
+				cells: A2($elm$core$Dict$remove, pos, game.cells)
+			});
+	});
+var $author$project$Game$update = F3(
+	function (pos, fun, game) {
+		return _Utils_update(
+			game,
+			{
+				cells: A3(
+					$elm$core$Dict$update,
+					pos,
+					$elm$core$Maybe$map(
+						function (cell) {
+							return _Utils_update(
+								cell,
+								{
+									entity: fun(cell.entity)
+								});
+						}),
+					game.cells)
+			});
+	});
+var $author$project$Game$Event$kill = F2(
+	function (pos, game) {
+		var _v0 = A2($author$project$Game$get, pos, game);
+		if (_v0.$ === 'Nothing') {
+			return _Utils_update(
+				game,
+				{
+					particles: A3($elm$core$Dict$insert, pos, $author$project$Entity$Smoke, game.particles)
+				});
+		} else {
+			switch (_v0.a.$) {
+				case 'Player':
+					var _v1 = _v0.a;
+					return A2(
+						$elm$core$Maybe$withDefault,
+						game,
+						A2($author$project$Game$Event$attackPlayer, pos, game));
+				case 'Crate':
+					var _v2 = _v0.a;
+					return A2(
+						$author$project$Game$remove,
+						pos,
+						_Utils_update(
+							game,
+							{
+								particles: A3($elm$core$Dict$insert, pos, $author$project$Entity$Bone, game.particles)
+							}));
+				case 'Enemy':
+					if (_v0.a.a.$ === 'ActivatedBomb') {
+						return A2(
+							$author$project$Game$remove,
+							pos,
+							_Utils_update(
+								game,
+								{
+									particles: A3($elm$core$Dict$insert, pos, $author$project$Entity$Smoke, game.particles)
+								}));
+					} else {
+						return A2(
+							$author$project$Game$remove,
+							pos,
+							_Utils_update(
+								game,
+								{
+									particles: A3($elm$core$Dict$insert, pos, $author$project$Entity$Bone, game.particles)
+								}));
+					}
+				case 'InactiveBomb':
+					var item = _v0.a.a;
+					return A3(
+						$author$project$Game$update,
+						pos,
+						function (_v3) {
+							return $author$project$Entity$Enemy(
+								$author$project$Entity$ActivatedBomb(item));
+						},
+						game);
+				default:
+					return game;
+			}
+		}
+	});
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Process$sleep = _Process_sleep;
+var $author$project$Main$applyEvent = F2(
+	function (event, model) {
+		switch (event.$) {
+			case 'Kill':
+				var pos = event.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							game: A2($author$project$Game$Event$kill, pos, model.game)
+						}),
+					$elm$core$Platform$Cmd$none);
+			case 'Fx':
+				var sound = event.a;
+				return _Utils_Tuple2(
+					model,
+					$author$project$Port$fromElm(
+						$author$project$PortDefinition$PlaySound(
+							{looping: false, sound: sound})));
+			default:
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								A2(
+								$elm$core$Task$perform,
+								function (_v1) {
+									return $author$project$Main$NextLevelRequested;
+								},
+								$elm$core$Process$sleep(200)),
+								$author$project$Port$fromElm(
+								$author$project$PortDefinition$PlaySound(
+									{looping: false, sound: $author$project$Gen$Sound$Win}))
+							])));
+		}
+	});
+var $elm$core$Tuple$mapSecond = F2(
+	function (func, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return _Utils_Tuple2(
+			x,
+			func(y));
+	});
+var $author$project$Main$applyEvents = F2(
+	function (events, model) {
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (event, _v0) {
+					var m = _v0.a;
+					var c1 = _v0.b;
+					return A2(
+						$elm$core$Tuple$mapSecond,
+						function (c2) {
+							return $elm$core$Platform$Cmd$batch(
+								_List_fromArray(
+									[c1, c2]));
+						},
+						A2($author$project$Main$applyEvent, event, m));
+				}),
+			_Utils_Tuple2(model, $elm$core$Platform$Cmd$none),
+			events);
+	});
+var $author$project$Main$ApplyEvents = function (a) {
+	return {$: 'ApplyEvents', a: a};
+};
+var $author$project$Main$setGame = F2(
+	function (model, game) {
+		return _Utils_update(
+			model,
+			{
+				game: game,
+				history: A2($elm$core$List$cons, model.game, model.history)
+			});
+	});
+var $author$project$Main$applyGameAndKill = F2(
+	function (model, output) {
+		return _Utils_Tuple2(
+			A2($author$project$Main$setGame, model, output.game),
+			A2(
+				$elm$core$Task$perform,
+				function (_v0) {
+					return $author$project$Main$ApplyEvents(output.kill);
+				},
+				$elm$core$Process$sleep(100)));
+	});
+var $author$project$Main$GameWon = {$: 'GameWon'};
+var $elm$random$Random$addOne = function (value) {
+	return _Utils_Tuple2(1, value);
+};
+var $elm$random$Random$getByWeight = F3(
+	function (_v0, others, countdown) {
+		getByWeight:
+		while (true) {
+			var weight = _v0.a;
+			var value = _v0.b;
+			if (!others.b) {
+				return value;
+			} else {
+				var second = others.a;
+				var otherOthers = others.b;
+				if (_Utils_cmp(
+					countdown,
+					$elm$core$Basics$abs(weight)) < 1) {
+					return value;
+				} else {
+					var $temp$_v0 = second,
+						$temp$others = otherOthers,
+						$temp$countdown = countdown - $elm$core$Basics$abs(weight);
+					_v0 = $temp$_v0;
+					others = $temp$others;
+					countdown = $temp$countdown;
+					continue getByWeight;
+				}
+			}
+		}
+	});
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
+var $elm$random$Random$weighted = F2(
+	function (first, others) {
+		var normalize = function (_v0) {
+			var weight = _v0.a;
+			return $elm$core$Basics$abs(weight);
+		};
+		var total = normalize(first) + $elm$core$List$sum(
+			A2($elm$core$List$map, normalize, others));
+		return A2(
+			$elm$random$Random$map,
+			A2($elm$random$Random$getByWeight, first, others),
+			A2($elm$random$Random$float, 0, total));
+	});
+var $elm$random$Random$uniform = F2(
+	function (value, valueList) {
+		return A2(
+			$elm$random$Random$weighted,
+			$elm$random$Random$addOne(value),
+			A2($elm$core$List$map, $elm$random$Random$addOne, valueList));
+	});
+var $author$project$World$Level$crateDungeonNoBombs = A2(
+	$elm$random$Random$andThen,
+	function (layout) {
+		return A2($author$project$Game$Build$generator, layout, _List_Nil);
+	},
+	A2(
+		$elm$random$Random$uniform,
+		_List_fromArray(
+			['❌❌📦❌❌', '❌⬜⬜📦❌', '❌⬜📦⬜❌', '❌📦⬜⬜❌', '❌⬜😊⬜❌']),
+		_List_fromArray(
+			[
+				_List_fromArray(
+				['📦⬜📦⬜⬜', '⬜📦⬜📦⬜', '❌❌❌❌❌', '⬜⬜📦⬜⬜', '⬜⬜😊⬜⬜']),
+				_List_fromArray(
+				['📦⬜⬜📦⬜', '⬜📦❌⬜📦', '❌❌❌❌❌', '⬜⬜📦⬜📦', '⬜⬜😊⬜⬜']),
+				_List_fromArray(
+				['❌📦⬜⬜❌', '📦⬜⬜⬜📦', '⬜⬜❌📦⬜', '📦⬜📦⬜📦', '❌⬜😊⬜❌'])
+			])));
+var $author$project$World$Level$crateDungeonNoLava = A2(
+	$elm$random$Random$andThen,
+	$elm$core$Basics$identity,
+	A2(
+		$elm$random$Random$uniform,
+		A2(
+			$author$project$Game$Build$generator,
+			_List_fromArray(
+				['⬜⬜📦⬜⬜', '⬜📦⬜📦⬜', '📦📦📦📦📦', '📦⬜💣📦⬜', '⬜⬜😊⬜⬜']),
+			_List_Nil),
+		_List_fromArray(
+			[
+				A2(
+				$author$project$Game$Build$generator,
+				_List_fromArray(
+					['⬜⬜📦⬜⬜', '📦⬜⬜📦⬜', '📦📦📦📦📦', '📦⬜💣⬜📦', '⬜⬜😊⬜⬜']),
+				_List_Nil),
+				A2(
+				$author$project$Game$Build$generator,
+				_List_fromArray(
+					['⬜⬜📦⬜⬜', '⬜📦📦📦📦', '📦⬜💣📦⬜', '⬜📦📦⬜⬜', '⬜⬜😊⬜⬜']),
+				_List_Nil),
+				A2(
+				$author$project$Game$Build$generator,
+				_List_fromArray(
+					['⬜📦📦📦⬜', '⬜⬜📦⬜⬜', '📦📦📦📦📦', '⬜⬜💣⬜⬜', '⬜⬜😊⬜⬜']),
+				_List_Nil)
+			])));
+var $author$project$World$Level$crateDungeonNoLavaNoBombs = A2(
+	$elm$random$Random$andThen,
+	$elm$core$Basics$identity,
+	A2(
+		$elm$random$Random$uniform,
+		A2(
+			$author$project$Game$Build$generator,
+			_List_fromArray(
+				['⬜⬜⬜⬜⬜', '⬜📦⬜📦⬜', '📦📦📦📦📦', '📦⬜⬜📦⬜', '⬜⬜😊⬜⬜']),
+			_List_Nil),
+		_List_fromArray(
+			[
+				A2(
+				$author$project$Game$Build$generator,
+				_List_fromArray(
+					['⬜⬜⬜⬜⬜', '📦⬜⬜📦⬜', '📦📦📦📦📦', '📦⬜⬜⬜📦', '⬜⬜😊⬜⬜']),
+				_List_Nil),
+				A2(
+				$author$project$Game$Build$generator,
+				_List_fromArray(
+					['⬜⬜⬜⬜⬜', '⬜📦📦📦📦', '📦⬜⬜📦⬜', '⬜📦📦⬜⬜', '⬜⬜😊⬜⬜']),
+				_List_Nil),
+				A2(
+				$author$project$Game$Build$generator,
+				_List_fromArray(
+					['⬜📦⬜📦⬜', '⬜⬜📦⬜⬜', '📦📦📦📦📦', '⬜⬜⬜⬜⬜', '⬜⬜😊⬜⬜']),
+				_List_Nil)
+			])));
+var $author$project$Game$Build$ItemBlock = function (a) {
+	return {$: 'ItemBlock', a: a};
+};
+var $author$project$Entity$Orc = function (a) {
+	return {$: 'Orc', a: a};
+};
+var $author$project$Entity$Rat = {$: 'Rat'};
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $elm$core$List$repeatHelp = F3(
+	function (result, n, value) {
+		repeatHelp:
+		while (true) {
+			if (n <= 0) {
+				return result;
+			} else {
+				var $temp$result = A2($elm$core$List$cons, value, result),
+					$temp$n = n - 1,
+					$temp$value = value;
+				result = $temp$result;
+				n = $temp$n;
+				value = $temp$value;
+				continue repeatHelp;
+			}
+		}
+	});
+var $elm$core$List$repeat = F2(
+	function (n, value) {
+		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
+	});
+var $author$project$World$Level$ratDungeon = function (difficulty) {
+	var maxEnemies = A2(
+		$elm$core$Basics$max,
+		1,
+		A2($elm$core$Basics$min, 3, difficulty));
+	var maxCrates = difficulty + 1;
+	var maxBombs = A2($elm$core$Basics$max, 1, maxEnemies - 1);
+	return A2(
+		$elm$random$Random$andThen,
+		function (layout) {
+			return A2(
+				$elm$random$Random$andThen,
+				$author$project$Game$Build$generator(layout),
+				A2(
+					$elm$random$Random$uniform,
+					$elm$core$List$concat(
+						_List_fromArray(
+							[
+								A2(
+								$elm$core$List$repeat,
+								maxEnemies,
+								$author$project$Game$Build$EntityBlock(
+									$author$project$Entity$Enemy($author$project$Entity$Rat))),
+								A2(
+								$elm$core$List$repeat,
+								maxBombs + 1,
+								$author$project$Game$Build$ItemBlock($author$project$Entity$Bomb)),
+								A2(
+								$elm$core$List$repeat,
+								maxCrates - 1,
+								$author$project$Game$Build$EntityBlock($author$project$Entity$Crate))
+							])),
+					_List_fromArray(
+						[
+							$elm$core$List$concat(
+							_List_fromArray(
+								[
+									A2(
+									$elm$core$List$repeat,
+									maxEnemies,
+									$author$project$Game$Build$EntityBlock(
+										$author$project$Entity$Enemy($author$project$Entity$Rat))),
+									A2(
+									$elm$core$List$repeat,
+									maxBombs,
+									$author$project$Game$Build$ItemBlock($author$project$Entity$Bomb)),
+									A2(
+									$elm$core$List$repeat,
+									maxCrates,
+									$author$project$Game$Build$EntityBlock($author$project$Entity$Crate))
+								])),
+							$elm$core$List$concat(
+							_List_fromArray(
+								[
+									A2(
+									$elm$core$List$repeat,
+									maxEnemies - 1,
+									$author$project$Game$Build$EntityBlock(
+										$author$project$Entity$Enemy($author$project$Entity$Rat))),
+									A2(
+									$elm$core$List$repeat,
+									1,
+									$author$project$Game$Build$EntityBlock(
+										$author$project$Entity$Enemy(
+											$author$project$Entity$Orc($author$project$Direction$Down)))),
+									A2(
+									$elm$core$List$repeat,
+									maxBombs,
+									$author$project$Game$Build$ItemBlock($author$project$Entity$Bomb)),
+									A2(
+									$elm$core$List$repeat,
+									maxCrates,
+									$author$project$Game$Build$EntityBlock($author$project$Entity$Crate))
+								]))
+						])));
+		},
+		A2(
+			$elm$random$Random$uniform,
+			_List_fromArray(
+				['💣⬜⬜⬜💣', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '💣⬜😊⬜💣']),
+			_List_fromArray(
+				[
+					_List_fromArray(
+					['⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜❌⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜😊⬜⬜']),
+					_List_fromArray(
+					['📦⬜⬜⬜💣', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '💣⬜😊⬜📦'])
+				])));
+};
+var $author$project$World$Level$dungeons = $elm$core$Array$fromList(
+	_List_fromArray(
+		[
+			$author$project$World$Level$crateDungeonNoLavaNoBombs,
+			$author$project$World$Level$crateDungeonNoBombs,
+			$author$project$World$Level$crateDungeonNoLava,
+			$author$project$World$Level$ratDungeon(1)
+		]));
+var $author$project$World$Level$goblinDungeon = A2(
+	$elm$random$Random$andThen,
+	function (layout) {
+		return A2(
+			$elm$random$Random$andThen,
+			$author$project$Game$Build$generator(layout),
+			A2(
+				$elm$random$Random$uniform,
+				$elm$core$List$concat(
+					_List_fromArray(
+						[
+							A2(
+							$elm$core$List$repeat,
+							1,
+							$author$project$Game$Build$EntityBlock(
+								$author$project$Entity$Enemy($author$project$Entity$Goblin))),
+							A2(
+							$elm$core$List$repeat,
+							1,
+							$author$project$Game$Build$EntityBlock(
+								$author$project$Entity$Enemy($author$project$Entity$Goblin))),
+							A2(
+							$elm$core$List$repeat,
+							1,
+							$author$project$Game$Build$EntityBlock(
+								$author$project$Entity$Enemy($author$project$Entity$Goblin))),
+							A2(
+							$elm$core$List$repeat,
+							3,
+							$author$project$Game$Build$ItemBlock($author$project$Entity$Bomb)),
+							A2(
+							$elm$core$List$repeat,
+							2,
+							$author$project$Game$Build$EntityBlock($author$project$Entity$Crate))
+						])),
+				_List_fromArray(
+					[
+						$elm$core$List$concat(
+						_List_fromArray(
+							[
+								A2(
+								$elm$core$List$repeat,
+								1,
+								$author$project$Game$Build$EntityBlock(
+									$author$project$Entity$Enemy($author$project$Entity$Goblin))),
+								A2(
+								$elm$core$List$repeat,
+								1,
+								$author$project$Game$Build$EntityBlock(
+									$author$project$Entity$Enemy($author$project$Entity$Goblin))),
+								A2(
+								$elm$core$List$repeat,
+								3,
+								$author$project$Game$Build$ItemBlock($author$project$Entity$Bomb)),
+								A2(
+								$elm$core$List$repeat,
+								3,
+								$author$project$Game$Build$EntityBlock($author$project$Entity$Crate))
+							])),
+						$elm$core$List$concat(
+						_List_fromArray(
+							[
+								A2(
+								$elm$core$List$repeat,
+								1,
+								$author$project$Game$Build$EntityBlock(
+									$author$project$Entity$Enemy($author$project$Entity$Goblin))),
+								A2(
+								$elm$core$List$repeat,
+								1,
+								$author$project$Game$Build$EntityBlock(
+									$author$project$Entity$Enemy($author$project$Entity$Rat))),
+								A2(
+								$elm$core$List$repeat,
+								3,
+								$author$project$Game$Build$ItemBlock($author$project$Entity$Bomb)),
+								A2(
+								$elm$core$List$repeat,
+								3,
+								$author$project$Game$Build$EntityBlock($author$project$Entity$Crate))
+							]))
+					])));
+	},
+	A2(
+		$elm$random$Random$uniform,
+		_List_fromArray(
+			['❌⬜⬜⬜❌', '❌⬜⬜⬜❌', '❌⬜⬜⬜❌', '❌⬜⬜⬜❌', '❌⬜😊⬜❌']),
+		_List_fromArray(
+			[
+				_List_fromArray(
+				['⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '❌❌❌❌❌', '⬜⬜📦⬜⬜', '⬜⬜😊⬜⬜']),
+				_List_fromArray(
+				['❌⬜⬜⬜❌', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '❌⬜😊⬜❌'])
+			])));
+var $author$project$World$Level$generate = function (difficulty) {
+	return A2(
+		$elm$core$Maybe$withDefault,
+		$author$project$World$Level$goblinDungeon,
+		A2($elm$core$Array$get, difficulty, $author$project$World$Level$dungeons));
+};
+var $author$project$Main$generateLevel = F3(
+	function (seed, trial, model) {
+		var maybeGenerator = function () {
+			var _v1 = $author$project$World$Trial(trial);
+			if (_v1.$ === 'Stage') {
+				var level = _v1.a;
+				return $elm$core$Maybe$Just(
+					$author$project$World$Level$generate(level.difficulty));
+			} else {
+				var i = _v1.a;
+				return $author$project$World$Trial$fromInt(i);
+			}
+		}();
+		return A2(
+			$elm$core$Maybe$withDefault,
+			_Utils_update(
+				model,
+				{
+					overlay: $elm$core$Maybe$Just($author$project$Main$GameWon)
+				}),
+			A2(
+				$elm$core$Maybe$map,
+				function (_v0) {
+					var game = _v0.a;
+					return _Utils_update(
+						model,
+						{
+							game: _Utils_update(
+								game,
+								{item: model.game.item}),
+							levelSeed: seed,
+							overlay: $elm$core$Maybe$Nothing,
+							room: trial
+						});
+				},
+				A2(
+					$elm$core$Maybe$map,
+					function (generator) {
+						return A2($elm$random$Random$step, generator, seed);
+					},
+					maybeGenerator)));
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Game$getPlayerPosition = function (game) {
+	return $elm$core$List$head(
+		A2(
+			$elm$core$List$filterMap,
+			function (_v0) {
+				var key = _v0.a;
+				var cell = _v0.b;
+				return _Utils_eq(cell.entity, $author$project$Entity$Player) ? $elm$core$Maybe$Just(key) : $elm$core$Maybe$Nothing;
+			},
+			$elm$core$Dict$toList(game.cells)));
 };
 var $author$project$Main$gotSeed = F2(
 	function (seed, model) {
@@ -6815,70 +8729,961 @@ var $author$project$Main$gotSeed = F2(
 			model,
 			{seed: seed});
 	});
-var $elm$core$Debug$log = _Debug_log;
-var $author$project$Main$setOverlay = F2(
-	function (maybeOverlay, model) {
-		return _Utils_update(
-			model,
-			{overlay: maybeOverlay});
-	});
-var $author$project$Main$newGame = function (model) {
-	return A2(
-		$author$project$Main$setOverlay,
-		$elm$core$Maybe$Nothing,
-		_Utils_update(
-			model,
-			{game: $author$project$Game$new}));
+var $author$project$Game$isWon = function (game) {
+	return game.won;
 };
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$update = F2(
-	function (msg, model) {
-		var withNoCmd = function (a) {
-			return _Utils_Tuple2(a, $elm$core$Platform$Cmd$none);
-		};
-		switch (msg.$) {
-			case 'NewGame':
-				return withNoCmd(
-					$author$project$Main$newGame(model));
-			case 'GotSeed':
-				var seed = msg.a;
-				return withNoCmd(
-					A2($author$project$Main$gotSeed, seed, model));
-			case 'SoundRequested':
-				return _Utils_Tuple2(
-					model,
-					$author$project$InteropPorts$fromElm(
-						$author$project$InteropDefinitions$PlaySound(
-							{looping: false, sound: $author$project$Gen$Sound$ClickButton})));
-			case 'Received':
-				var result = msg.a;
-				if (result.$ === 'Err') {
-					var error = result.a;
-					var _v2 = A2($elm$core$Debug$log, 'received invalid json', error);
-					return withNoCmd(model);
+var $author$project$Game$face = F2(
+	function (direction, game) {
+		return _Utils_update(
+			game,
+			{playerDirection: direction});
+	});
+var $author$project$Game$Event$Kill = function (a) {
+	return {$: 'Kill', a: a};
+};
+var $author$project$Entity$Stunned = function (a) {
+	return {$: 'Stunned', a: a};
+};
+var $author$project$Position$addToVector = F2(
+	function (_v0, _v1) {
+		var x2 = _v0.a;
+		var y2 = _v0.b;
+		var x = _v1.x;
+		var y = _v1.y;
+		return _Utils_Tuple2(x2 + x, y2 + y);
+	});
+var $author$project$Math$posIsValid = function (_v0) {
+	var x = _v0.a;
+	var y = _v0.b;
+	return ((0 <= x) && (_Utils_cmp(x, $author$project$Config$roomSize) < 0)) && ((0 <= y) && (_Utils_cmp(y, $author$project$Config$roomSize) < 0));
+};
+var $author$project$Direction$toVector = function (dir) {
+	switch (dir.$) {
+		case 'Right':
+			return {x: 1, y: 0};
+		case 'Down':
+			return {x: 0, y: 1};
+		case 'Left':
+			return {x: -1, y: 0};
+		default:
+			return {x: 0, y: -1};
+	}
+};
+var $author$project$Game$findFirstEmptyCellInDirection = F3(
+	function (pos, direction, game) {
+		findFirstEmptyCellInDirection:
+		while (true) {
+			var newPos = A2(
+				$author$project$Position$addToVector,
+				pos,
+				$author$project$Direction$toVector(direction));
+			if ($author$project$Math$posIsValid(newPos)) {
+				var _v0 = A2($author$project$Game$get, newPos, game);
+				if (_v0.$ === 'Just') {
+					return pos;
 				} else {
-					var sound = result.a.a;
-					return withNoCmd(model);
+					var $temp$pos = newPos,
+						$temp$direction = direction,
+						$temp$game = game;
+					pos = $temp$pos;
+					direction = $temp$direction;
+					game = $temp$game;
+					continue findFirstEmptyCellInDirection;
 				}
-			default:
-				var maybeOverlay = msg.a;
-				return withNoCmd(
-					A2($author$project$Main$setOverlay, maybeOverlay, model));
+			} else {
+				return pos;
+			}
 		}
 	});
-var $author$project$Main$SoundRequested = {$: 'SoundRequested'};
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
+var $author$project$Game$move = F2(
+	function (args, game) {
+		return ($author$project$Math$posIsValid(args.to) && (!A2($elm$core$Dict$member, args.to, game.cells))) ? A2(
+			$elm$core$Maybe$map,
+			function (a) {
+				return function (cells) {
+					return _Utils_update(
+						game,
+						{cells: cells});
+				}(
+					A2(
+						$elm$core$Dict$remove,
+						args.from,
+						A3($elm$core$Dict$insert, args.to, a, game.cells)));
+			},
+			A2($elm$core$Dict$get, args.from, game.cells)) : $elm$core$Maybe$Nothing;
 	});
-var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $elm$html$Html$div = _VirtualDom_node('div');
+var $author$project$Game$Event$none = function (game) {
+	return {game: game, kill: _List_Nil};
+};
+var $author$project$Game$addFloor = F2(
+	function (pos, game) {
+		return _Utils_update(
+			game,
+			{
+				floor: A3($elm$core$Dict$insert, pos, $author$project$Entity$Ground, game.floor)
+			});
+	});
+var $author$project$Game$Update$push = F3(
+	function (pos, dir, game) {
+		var newPos = A2(
+			$author$project$Position$addToVector,
+			pos,
+			$author$project$Direction$toVector(dir));
+		return (_Utils_eq(
+			A2($author$project$Game$get, newPos, game),
+			$elm$core$Maybe$Nothing) && $author$project$Math$posIsValid(newPos)) ? (A2($elm$core$Dict$member, newPos, game.floor) ? A2(
+			$author$project$Game$move,
+			{from: pos, to: newPos},
+			game) : $elm$core$Maybe$Just(
+			A2(
+				$author$project$Game$remove,
+				pos,
+				A2($author$project$Game$addFloor, newPos, game)))) : $elm$core$Maybe$Nothing;
+	});
+var $author$project$Direction$mirror = function (direction) {
+	switch (direction.$) {
+		case 'Up':
+			return $author$project$Direction$Down;
+		case 'Down':
+			return $author$project$Direction$Up;
+		case 'Left':
+			return $author$project$Direction$Right;
+		default:
+			return $author$project$Direction$Left;
+	}
+};
+var $author$project$Game$Enemy$stun = F2(
+	function (direction, enemy) {
+		if (enemy.$ === 'Orc') {
+			return $author$project$Entity$Orc(
+				$author$project$Direction$mirror(direction));
+		} else {
+			return enemy;
+		}
+	});
+var $author$project$Game$addItem = F2(
+	function (item, game) {
+		return _Utils_eq(game.item, $elm$core$Maybe$Nothing) ? $elm$core$Maybe$Just(
+			_Utils_update(
+				game,
+				{
+					item: $elm$core$Maybe$Just(item)
+				})) : $elm$core$Maybe$Nothing;
+	});
+var $author$project$Game$Update$takeItem = F2(
+	function (pos, game) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			game,
+			A2(
+				$elm$core$Maybe$map,
+				function (g) {
+					return _Utils_update(
+						g,
+						{
+							items: A2($elm$core$Dict$remove, pos, g.items)
+						});
+				},
+				A2(
+					$elm$core$Maybe$andThen,
+					function (item) {
+						return A2($author$project$Game$addItem, item, game);
+					},
+					A2($elm$core$Dict$get, pos, game.items))));
+	});
+var $author$project$Game$Update$movePlayer = F2(
+	function (position, game) {
+		var newLocation = A2(
+			$author$project$Position$addToVector,
+			position,
+			$author$project$Direction$toVector(game.playerDirection));
+		var _v0 = A2(
+			$elm$core$Maybe$map,
+			function ($) {
+				return $.entity;
+			},
+			A2($elm$core$Dict$get, newLocation, game.cells));
+		if (_v0.$ === 'Just') {
+			switch (_v0.a.$) {
+				case 'Crate':
+					var _v1 = _v0.a;
+					return A2(
+						$elm$core$Maybe$map,
+						function (g) {
+							return {
+								game: g,
+								kill: _List_fromArray(
+									[
+										$author$project$Game$Event$Fx($author$project$Gen$Sound$Push)
+									])
+							};
+						},
+						A2(
+							$elm$core$Maybe$map,
+							$author$project$Game$Update$takeItem(newLocation),
+							A2(
+								$elm$core$Maybe$andThen,
+								$author$project$Game$move(
+									{from: position, to: newLocation}),
+								A3($author$project$Game$Update$push, newLocation, game.playerDirection, game))));
+				case 'InactiveBomb':
+					var item = _v0.a.a;
+					var newPos = A3($author$project$Game$findFirstEmptyCellInDirection, newLocation, game.playerDirection, game);
+					return $elm$core$Maybe$Just(
+						{
+							game: function (g) {
+								return A2(
+									$elm$core$Maybe$withDefault,
+									g,
+									A2(
+										$author$project$Game$move,
+										{from: newLocation, to: newPos},
+										g));
+							}(
+								A3(
+									$author$project$Game$update,
+									newLocation,
+									function (_v2) {
+										return $author$project$Entity$Stunned(
+											A2(
+												$author$project$Game$Enemy$stun,
+												game.playerDirection,
+												$author$project$Entity$ActivatedBomb(item)));
+									},
+									game)),
+							kill: A2($elm$core$Dict$member, newPos, game.floor) ? _List_fromArray(
+								[
+									$author$project$Game$Event$Fx($author$project$Gen$Sound$Push)
+								]) : _List_fromArray(
+								[
+									$author$project$Game$Event$Kill(newPos),
+									$author$project$Game$Event$Fx($author$project$Gen$Sound$Push)
+								])
+						});
+				case 'Door':
+					var _v3 = _v0.a;
+					return $elm$core$Maybe$Just(
+						{
+							game: _Utils_update(
+								game,
+								{
+									cells: A2(
+										$elm$core$Maybe$withDefault,
+										game.cells,
+										A2(
+											$elm$core$Maybe$map,
+											function (a) {
+												return A2(
+													$elm$core$Dict$remove,
+													position,
+													A3($elm$core$Dict$insert, newLocation, a, game.cells));
+											},
+											A2($elm$core$Dict$get, position, game.cells))),
+									won: true
+								}),
+							kill: _List_Nil
+						});
+				default:
+					return $elm$core$Maybe$Nothing;
+			}
+		} else {
+			return ($author$project$Math$posIsValid(newLocation) && A2($elm$core$Dict$member, newLocation, game.floor)) ? $elm$core$Maybe$Just(
+				$author$project$Game$Event$none(
+					A2(
+						$elm$core$Maybe$withDefault,
+						game,
+						A2(
+							$elm$core$Maybe$map,
+							$author$project$Game$Update$takeItem(newLocation),
+							A2(
+								$author$project$Game$move,
+								{from: position, to: newLocation},
+								game))))) : $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Game$clearParticles = function (game) {
+	return _Utils_update(
+		game,
+		{particles: $elm$core$Dict$empty});
+};
+var $author$project$Direction$asList = _List_fromArray(
+	[$author$project$Direction$Up, $author$project$Direction$Down, $author$project$Direction$Left, $author$project$Direction$Right]);
+var $author$project$Game$Enemy$updateCrossBomb = F2(
+	function (pos, game) {
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (newPos, output) {
+					if ($author$project$Math$posIsValid(newPos)) {
+						var _v0 = A2($author$project$Game$get, newPos, output.game);
+						if ((_v0.$ === 'Just') && (_v0.a.$ === 'Player')) {
+							var _v1 = _v0.a;
+							return output;
+						} else {
+							return _Utils_update(
+								output,
+								{
+									kill: A2(
+										$elm$core$List$cons,
+										$author$project$Game$Event$Kill(newPos),
+										output.kill)
+								});
+						}
+					} else {
+						return output;
+					}
+				}),
+			{
+				game: A2($author$project$Game$removeFloor, pos, game),
+				kill: _List_fromArray(
+					[
+						$author$project$Game$Event$Kill(pos)
+					])
+			},
+			A2(
+				$elm$core$List$concatMap,
+				function (direction) {
+					return A2(
+						$elm$core$List$map,
+						function (n) {
+							return A2(
+								$author$project$Position$addToVector,
+								pos,
+								function (v) {
+									return {x: v.x * n, y: v.y * n};
+								}(
+									$author$project$Direction$toVector(direction)));
+						},
+						A2($elm$core$List$range, 1, $author$project$Config$roomSize - 1));
+				},
+				_List_fromArray(
+					[$author$project$Direction$Up, $author$project$Direction$Down, $author$project$Direction$Left, $author$project$Direction$Right])));
+	});
+var $author$project$Game$Enemy$tryMoving = F2(
+	function (args, game) {
+		return A2($elm$core$Dict$member, args.to, game.floor) ? A2($author$project$Game$move, args, game) : $elm$core$Maybe$Nothing;
+	});
+var $author$project$Game$Enemy$updateDoppelganger = F2(
+	function (pos, game) {
+		var newPos = A2(
+			$author$project$Position$addToVector,
+			pos,
+			$author$project$Direction$toVector(
+				$author$project$Direction$mirror(game.playerDirection)));
+		var _v0 = A2($author$project$Game$get, newPos, game);
+		if (_v0.$ === 'Just') {
+			if (_v0.a.$ === 'Player') {
+				var _v1 = _v0.a;
+				return game;
+			} else {
+				return game;
+			}
+		} else {
+			return A2(
+				$elm$core$Maybe$withDefault,
+				game,
+				A2(
+					$author$project$Game$Enemy$tryMoving,
+					{from: pos, to: newPos},
+					game));
+		}
+	});
+var $author$project$Game$Enemy$updateDynamite = F2(
+	function (location, game) {
+		return A3(
+			$elm$core$List$foldl,
+			F2(
+				function (direction, output) {
+					var newLocation = A2(
+						$author$project$Position$addToVector,
+						location,
+						$author$project$Direction$toVector(direction));
+					if ($author$project$Math$posIsValid(newLocation)) {
+						var _v0 = A2($author$project$Game$get, newLocation, output.game);
+						if ((_v0.$ === 'Just') && (_v0.a.$ === 'Player')) {
+							var _v1 = _v0.a;
+							return output;
+						} else {
+							return _Utils_update(
+								output,
+								{
+									kill: A2(
+										$elm$core$List$cons,
+										$author$project$Game$Event$Kill(newLocation),
+										output.kill)
+								});
+						}
+					} else {
+						return output;
+					}
+				}),
+			{
+				game: game,
+				kill: _List_fromArray(
+					[
+						$author$project$Game$Event$Kill(location),
+						$author$project$Game$Event$Fx($author$project$Gen$Sound$Explosion)
+					])
+			},
+			_List_fromArray(
+				[$author$project$Direction$Up, $author$project$Direction$Down, $author$project$Direction$Left, $author$project$Direction$Right]));
+	});
+var $author$project$Game$findFirstInDirection = F3(
+	function (position, direction, game) {
+		findFirstInDirection:
+		while (true) {
+			var newPos = A2(
+				$author$project$Position$addToVector,
+				position,
+				$author$project$Direction$toVector(direction));
+			if ($author$project$Math$posIsValid(newPos)) {
+				var _v0 = A2($elm$core$Dict$get, newPos, game.cells);
+				if (_v0.$ === 'Nothing') {
+					var $temp$position = newPos,
+						$temp$direction = direction,
+						$temp$game = game;
+					position = $temp$position;
+					direction = $temp$direction;
+					game = $temp$game;
+					continue findFirstInDirection;
+				} else {
+					var a = _v0.a;
+					return $elm$core$Maybe$Just(a.entity);
+				}
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		}
+	});
+var $author$project$Game$Enemy$updateGoblin = F2(
+	function (position, game) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			game,
+			A3(
+				$elm$core$List$foldl,
+				F2(
+					function (direction, out) {
+						if (_Utils_eq(out, $elm$core$Maybe$Nothing)) {
+							var _v0 = A3($author$project$Game$findFirstInDirection, position, direction, game);
+							_v0$2:
+							while (true) {
+								if (_v0.$ === 'Just') {
+									switch (_v0.a.$) {
+										case 'Player':
+											var _v1 = _v0.a;
+											return A2(
+												$author$project$Game$Enemy$tryMoving,
+												{
+													from: position,
+													to: A2(
+														$author$project$Position$addToVector,
+														position,
+														$author$project$Direction$toVector(direction))
+												},
+												game);
+										case 'Enemy':
+											if (_v0.a.a.$ === 'ActivatedBomb') {
+												return A2(
+													$author$project$Game$Enemy$tryMoving,
+													{
+														from: position,
+														to: A2(
+															$author$project$Position$addToVector,
+															position,
+															$author$project$Direction$toVector(
+																$author$project$Direction$mirror(direction)))
+													},
+													game);
+											} else {
+												break _v0$2;
+											}
+										default:
+											break _v0$2;
+									}
+								} else {
+									break _v0$2;
+								}
+							}
+							return $elm$core$Maybe$Nothing;
+						} else {
+							return out;
+						}
+					}),
+				$elm$core$Maybe$Nothing,
+				_List_fromArray(
+					[$author$project$Direction$Up, $author$project$Direction$Down, $author$project$Direction$Left, $author$project$Direction$Right])));
+	});
+var $author$project$Game$Enemy$updateOrc = F3(
+	function (pos, direction, game) {
+		var newPos = A2(
+			$author$project$Position$addToVector,
+			pos,
+			$author$project$Direction$toVector(direction));
+		var moveToPosOr = F3(
+			function (p, fun, g) {
+				if ($author$project$Math$posIsValid(p)) {
+					var _v3 = A2($author$project$Game$get, p, g);
+					if (_v3.$ === 'Just') {
+						return fun(_Utils_Tuple0);
+					} else {
+						var _v4 = A2(
+							$elm$core$Maybe$map,
+							function (newGame) {
+								return newGame;
+							},
+							A2(
+								$author$project$Game$Enemy$tryMoving,
+								{from: pos, to: p},
+								g));
+						if (_v4.$ === 'Just') {
+							var a = _v4.a;
+							return a;
+						} else {
+							return fun(_Utils_Tuple0);
+						}
+					}
+				} else {
+					return fun(_Utils_Tuple0);
+				}
+			});
+		var backPos = A2(
+			$author$project$Position$addToVector,
+			pos,
+			$author$project$Direction$toVector(
+				$author$project$Direction$mirror(direction)));
+		return A3(
+			moveToPosOr,
+			newPos,
+			function (_v0) {
+				return A3(
+					moveToPosOr,
+					backPos,
+					function (_v1) {
+						return game;
+					},
+					A3(
+						$author$project$Game$update,
+						pos,
+						function (_v2) {
+							return $author$project$Entity$Enemy(
+								$author$project$Entity$Orc(
+									$author$project$Direction$mirror(direction)));
+						},
+						game));
+			},
+			game);
+	});
+var $author$project$Game$Enemy$updateRat = F2(
+	function (position, game) {
+		return A2(
+			$elm$core$Maybe$withDefault,
+			game,
+			A3(
+				$elm$core$List$foldl,
+				F2(
+					function (direction, out) {
+						if (_Utils_eq(out, $elm$core$Maybe$Nothing)) {
+							var _v0 = A3($author$project$Game$findFirstInDirection, position, direction, game);
+							if ((_v0.$ === 'Just') && (_v0.a.$ === 'Player')) {
+								var _v1 = _v0.a;
+								return A2(
+									$author$project$Game$Enemy$tryMoving,
+									{
+										from: position,
+										to: A2(
+											$author$project$Position$addToVector,
+											position,
+											$author$project$Direction$toVector(direction))
+									},
+									game);
+							} else {
+								return $elm$core$Maybe$Nothing;
+							}
+						} else {
+							return out;
+						}
+					}),
+				$elm$core$Maybe$Nothing,
+				_List_fromArray(
+					[$author$project$Direction$Up, $author$project$Direction$Down, $author$project$Direction$Left, $author$project$Direction$Right])));
+	});
+var $author$project$Game$Enemy$update = F2(
+	function (args, game) {
+		var neighboringPlayer = A2(
+			$elm$core$List$filter,
+			function (newPos) {
+				return _Utils_eq(
+					A2($author$project$Game$get, newPos, game),
+					$elm$core$Maybe$Just($author$project$Entity$Player));
+			},
+			A2(
+				$elm$core$List$map,
+				function (dir) {
+					return A2(
+						$author$project$Position$addToVector,
+						args.pos,
+						$author$project$Direction$toVector(dir));
+				},
+				$author$project$Direction$asList));
+		return function (out) {
+			return _Utils_update(
+				out,
+				{
+					kill: _Utils_ap(
+						A2($elm$core$List$map, $author$project$Game$Event$Kill, neighboringPlayer),
+						out.kill)
+				});
+		}(
+			function () {
+				var _v0 = args.enemy;
+				switch (_v0.$) {
+					case 'ActivatedBomb':
+						var item = _v0.a;
+						if (item.$ === 'Bomb') {
+							return A2($author$project$Game$Enemy$updateDynamite, args.pos, game);
+						} else {
+							return A2($author$project$Game$Enemy$updateCrossBomb, args.pos, game);
+						}
+					case 'Goblin':
+						return $author$project$Game$Event$none(
+							A2($author$project$Game$Enemy$updateGoblin, args.pos, game));
+					case 'Orc':
+						var dir = _v0.a;
+						return $author$project$Game$Event$none(
+							A3($author$project$Game$Enemy$updateOrc, args.pos, dir, game));
+					case 'Doppelganger':
+						return $author$project$Game$Event$none(
+							A2($author$project$Game$Enemy$updateDoppelganger, args.pos, game));
+					default:
+						return $author$project$Game$Event$none(
+							A2($author$project$Game$Enemy$updateRat, args.pos, game));
+				}
+			}());
+	});
+var $author$project$Game$Update$updateCell = F2(
+	function (_v0, game) {
+		var position = _v0.a;
+		var cell = _v0.b;
+		var _v1 = cell.entity;
+		switch (_v1.$) {
+			case 'Enemy':
+				var enemy = _v1.a;
+				return A2(
+					$author$project$Game$Enemy$update,
+					{enemy: enemy, pos: position},
+					game);
+			case 'Stunned':
+				var enemy = _v1.a;
+				return $author$project$Game$Event$none(
+					A3(
+						$author$project$Game$update,
+						position,
+						function (_v2) {
+							return $author$project$Entity$Enemy(enemy);
+						},
+						game));
+			default:
+				return $author$project$Game$Event$none(game);
+		}
+	});
+var $author$project$Game$Update$updateGame = function (game) {
+	return A3(
+		$elm$core$List$foldl,
+		function (tuple) {
+			return $author$project$Game$Event$andThen(
+				$author$project$Game$Update$updateCell(tuple));
+		},
+		$author$project$Game$Event$none(
+			$author$project$Game$clearParticles(game)),
+		$elm$core$Dict$toList(game.cells));
+};
+var $author$project$Game$Update$movePlayerInDirectionAndUpdateGame = F3(
+	function (dir, location, game) {
+		return A2(
+			$elm$core$Maybe$map,
+			$author$project$Game$Event$andThen($author$project$Game$Update$updateGame),
+			A2(
+				$author$project$Game$Update$movePlayer,
+				location,
+				A2($author$project$Game$face, dir, game)));
+	});
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $author$project$Main$nextFrameRequested = function (model) {
+	return _Utils_update(
+		model,
+		{
+			frame: A2($elm$core$Basics$modBy, 2, model.frame + 1)
+		});
+};
+var $author$project$Main$nextRoom = function (model) {
+	return _Utils_Tuple2(
+		A3(
+			$author$project$Main$generateLevel,
+			model.seed,
+			model.room + 1,
+			_Utils_update(
+				model,
+				{history: _List_Nil, room: model.room + 1})),
+		$elm$core$Platform$Cmd$none);
+};
+var $author$project$Game$Update$applyBomb = F2(
+	function (position, game) {
+		var newPosition = A2(
+			$author$project$Position$addToVector,
+			position,
+			$author$project$Direction$toVector(game.playerDirection));
+		return A2(
+			$elm$core$Maybe$andThen,
+			function (item) {
+				if ($author$project$Math$posIsValid(newPosition)) {
+					var _v0 = A2(
+						$elm$core$Maybe$map,
+						function ($) {
+							return $.entity;
+						},
+						A2($elm$core$Dict$get, newPosition, game.cells));
+					if (_v0.$ === 'Nothing') {
+						return A2($elm$core$Dict$member, newPosition, game.floor) ? $elm$core$Maybe$Just(
+							A3(
+								$author$project$Game$insert,
+								newPosition,
+								$author$project$Entity$Stunned(
+									$author$project$Entity$ActivatedBomb(item)),
+								game)) : $elm$core$Maybe$Nothing;
+					} else {
+						return $elm$core$Maybe$Nothing;
+					}
+				} else {
+					return $elm$core$Maybe$Nothing;
+				}
+			},
+			game.item);
+	});
+var $author$project$Game$removeItem = function (game) {
+	return _Utils_update(
+		game,
+		{item: $elm$core$Maybe$Nothing});
+};
+var $author$project$Game$Update$placeBombeAndUpdateGame = F2(
+	function (playerCell, game) {
+		return A2(
+			$elm$core$Maybe$map,
+			$author$project$Game$Update$updateGame,
+			A2(
+				$elm$core$Maybe$map,
+				$author$project$Game$removeItem,
+				A2($author$project$Game$Update$applyBomb, playerCell, game)));
+	});
+var $author$project$Main$restartRoom = function (model) {
+	return _Utils_Tuple2(
+		A3(
+			$author$project$Main$generateLevel,
+			model.levelSeed,
+			model.room,
+			_Utils_update(
+				model,
+				{
+					game: function (game) {
+						return _Utils_update(
+							game,
+							{item: model.initialItem});
+					}(model.game),
+					history: _List_Nil
+				})),
+		$author$project$Port$fromElm(
+			$author$project$PortDefinition$PlaySound(
+				{looping: false, sound: $author$project$Gen$Sound$Retry})));
+};
+var $author$project$World$move = F2(
+	function (dir, world) {
+		var newPos = A2(
+			$author$project$Position$addToVector,
+			world.player,
+			$author$project$Direction$toVector(dir));
+		var _v0 = A2($elm$core$Dict$get, newPos, world.nodes);
+		if ((_v0.$ === 'Just') && (_v0.a.$ === 'Room')) {
+			return $elm$core$Maybe$Just(
+				_Utils_update(
+					world,
+					{player: newPos}));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Main$updateWorldMap = F2(
+	function (input, model) {
+		switch (input.$) {
+			case 'InputActivate':
+				var _v1 = A2($elm$core$Dict$get, model.world.player, model.world.nodes);
+				if ((_v1.$ === 'Just') && (_v1.a.$ === 'Room')) {
+					var sort = _v1.a.a.sort;
+					var seed = _v1.a.a.seed;
+					return _Utils_Tuple2(
+						A3($author$project$Main$generateLevel, seed, model.room, model),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+			case 'InputDir':
+				var dir = input.a;
+				return _Utils_Tuple2(
+					A2(
+						$elm$core$Maybe$withDefault,
+						model,
+						A2(
+							$elm$core$Maybe$map,
+							function (world) {
+								return _Utils_update(
+									model,
+									{world: world});
+							},
+							A2($author$project$World$move, dir, model.world))),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+		}
+	});
+var $author$project$Main$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'Input':
+				var input = msg.a;
+				var _v1 = model.overlay;
+				if (_v1.$ === 'Just') {
+					switch (_v1.a.$) {
+						case 'GameWon':
+							var _v2 = _v1.a;
+							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+						case 'WorldMap':
+							var _v3 = _v1.a;
+							return A2($author$project$Main$updateWorldMap, input, model);
+						default:
+							var _v4 = _v1.a;
+							return _Utils_Tuple2(
+								A3($author$project$Main$generateLevel, model.seed, model.room, model),
+								$elm$core$Platform$Cmd$none);
+					}
+				} else {
+					if ($author$project$Game$isWon(model.game)) {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					} else {
+						switch (input.$) {
+							case 'InputActivate':
+								return A2(
+									$elm$core$Maybe$withDefault,
+									_Utils_Tuple2(model, $elm$core$Platform$Cmd$none),
+									A2(
+										$elm$core$Maybe$andThen,
+										function (playerPosition) {
+											return A2(
+												$elm$core$Maybe$map,
+												$author$project$Main$applyGameAndKill(model),
+												A2($author$project$Game$Update$placeBombeAndUpdateGame, playerPosition, model.game));
+										},
+										$author$project$Game$getPlayerPosition(model.game)));
+							case 'InputDir':
+								var dir = input.a;
+								return A2(
+									$elm$core$Maybe$withDefault,
+									_Utils_Tuple2(model, $elm$core$Platform$Cmd$none),
+									A2(
+										$elm$core$Maybe$andThen,
+										function (playerPosition) {
+											return A2(
+												$elm$core$Maybe$map,
+												$author$project$Main$applyGameAndKill(model),
+												A2(
+													$elm$core$Maybe$map,
+													$author$project$Game$Event$andThen(
+														function (m) {
+															return {
+																game: m,
+																kill: _List_fromArray(
+																	[
+																		$author$project$Game$Event$Fx($author$project$Gen$Sound$Move)
+																	])
+															};
+														}),
+													A3($author$project$Game$Update$movePlayerInDirectionAndUpdateGame, dir, playerPosition, model.game)));
+										},
+										$author$project$Game$getPlayerPosition(model.game)));
+							case 'InputUndo':
+								var _v6 = model.history;
+								if (_v6.b) {
+									var head = _v6.a;
+									var tail = _v6.b;
+									return _Utils_Tuple2(
+										_Utils_update(
+											model,
+											{game: head, history: tail}),
+										$author$project$Port$fromElm(
+											$author$project$PortDefinition$PlaySound(
+												{looping: false, sound: $author$project$Gen$Sound$Undo})));
+								} else {
+									return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+								}
+							case 'InputReset':
+								return $author$project$Main$restartRoom(model);
+							default:
+								return _Utils_Tuple2(
+									_Utils_update(
+										model,
+										{
+											overlay: $elm$core$Maybe$Just($author$project$Main$WorldMap)
+										}),
+									$elm$core$Platform$Cmd$none);
+						}
+					}
+				}
+			case 'ApplyEvents':
+				var events = msg.a;
+				return A2(
+					$author$project$Main$applyEvents,
+					$author$project$Game$isWon(model.game) ? A2($elm$core$List$cons, $author$project$Game$Event$StageComplete, events) : events,
+					model);
+			case 'NextFrameRequested':
+				return _Utils_Tuple2(
+					$author$project$Main$nextFrameRequested(model),
+					$elm$core$Platform$Cmd$none);
+			case 'GotSeed':
+				var seed = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$gotSeed, seed, model),
+					$elm$core$Platform$Cmd$none);
+			case 'NoOps':
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			case 'NextLevelRequested':
+				return $author$project$Main$nextRoom(model);
+			default:
+				var result = msg.a;
+				if (result.$ === 'Ok') {
+					var sound = result.a.a;
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				}
+		}
+	});
+var $author$project$Input$InputActivate = {$: 'InputActivate'};
+var $author$project$Config$cellSize = 64;
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $Orasund$elm_layout$Layout$alignAtCenter = A2($elm$html$Html$Attributes$style, 'align-items', 'center');
+var $Orasund$elm_layout$Layout$contentCentered = A2($elm$html$Html$Attributes$style, 'justify-content', 'center');
+var $Orasund$elm_layout$Layout$centered = _List_fromArray(
+	[$Orasund$elm_layout$Layout$contentCentered, $Orasund$elm_layout$Layout$alignAtCenter]);
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $Orasund$elm_layout$Layout$column = function (attrs) {
+	return $elm$html$Html$div(
+		_Utils_ap(
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+					A2($elm$html$Html$Attributes$style, 'flex-direction', 'column')
+				]),
+			attrs));
+};
 var $Orasund$elm_layout$Layout$el = F2(
 	function (attrs, content) {
 		return A2(
@@ -6890,15 +9695,54 @@ var $Orasund$elm_layout$Layout$el = F2(
 			_List_fromArray(
 				[content]));
 	});
-var $elm$core$String$fromFloat = _String_fromNumber;
-var $author$project$Config$screenMinHeight = 700;
-var $author$project$Config$screenMinWidth = 400;
-var $elm$core$List$singleton = function (value) {
-	return _List_fromArray(
-		[value]);
-};
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $Orasund$elm_layout$Html$Style$height = $elm$html$Html$Attributes$style('height');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $Orasund$elm_layout$Layout$text = F2(
+	function (attrs, content) {
+		return A2(
+			$Orasund$elm_layout$Layout$el,
+			attrs,
+			$elm$html$Html$text(content));
+	});
+var $Orasund$elm_layout$Html$Style$width = $elm$html$Html$Attributes$style('width');
+var $author$project$View$Screen$gameWon = A2(
+	$Orasund$elm_layout$Layout$column,
+	_Utils_ap(
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('dark-background'),
+				$Orasund$elm_layout$Html$Style$width('400px'),
+				$Orasund$elm_layout$Html$Style$height('400px'),
+				A2($elm$html$Html$Attributes$style, 'color', 'white')
+			]),
+		$Orasund$elm_layout$Layout$centered),
+	_List_fromArray(
+		[
+			A2(
+			$Orasund$elm_layout$Layout$text,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'font-size', '46px'),
+					$Orasund$elm_layout$Layout$contentCentered
+				]),
+			'Thanks for playing')
+		]));
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $Orasund$elm_layout$Layout$gap = function (n) {
+	return A2(
+		$elm$html$Html$Attributes$style,
+		'gap',
+		$elm$core$String$fromFloat(n) + 'px');
+};
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -6945,175 +9789,877 @@ var $Orasund$elm_layout$Layout$asButton = function (args) {
 				},
 				args.onPress)));
 };
-var $elm$html$Html$button = _VirtualDom_node('button');
-var $Orasund$elm_layout$Layout$textButton = F2(
+var $author$project$Config$title = 'Sokobomb';
+var $author$project$View$Screen$menu = F2(
 	function (attrs, args) {
 		return A2(
-			$elm$html$Html$button,
-			_Utils_ap(
-				$Orasund$elm_layout$Layout$asButton(args),
-				attrs),
-			_List_fromArray(
-				[
-					$elm$html$Html$text(args.label)
-				]));
-	});
-var $author$project$Config$title = 'Game Template';
-var $author$project$Main$NewGame = {$: 'NewGame'};
-var $author$project$View$Overlay$asFullScreenOverlay = function (attrs) {
-	return $Orasund$elm_layout$Layout$el(
-		_Utils_ap(
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-					A2($elm$html$Html$Attributes$style, 'inset', '0 0'),
-					A2($elm$html$Html$Attributes$style, 'height', '100%'),
-					A2($elm$html$Html$Attributes$style, 'width', '100%')
-				]),
-			attrs));
-};
-var $Orasund$elm_layout$Layout$alignAtCenter = A2($elm$html$Html$Attributes$style, 'align-items', 'center');
-var $Orasund$elm_layout$Layout$contentCentered = A2($elm$html$Html$Attributes$style, 'justify-content', 'center');
-var $Orasund$elm_layout$Layout$centered = _List_fromArray(
-	[$Orasund$elm_layout$Layout$contentCentered, $Orasund$elm_layout$Layout$alignAtCenter]);
-var $Orasund$elm_layout$Layout$column = function (attrs) {
-	return $elm$html$Html$div(
-		_Utils_ap(
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-					A2($elm$html$Html$Attributes$style, 'flex-direction', 'column')
-				]),
-			attrs));
-};
-var $Orasund$elm_layout$Layout$text = F2(
-	function (attrs, content) {
-		return A2(
-			$Orasund$elm_layout$Layout$el,
-			attrs,
-			$elm$html$Html$text(content));
-	});
-var $author$project$View$Overlay$gameMenu = function (args) {
-	return A2(
-		$author$project$View$Overlay$asFullScreenOverlay,
-		_Utils_ap(
-			_List_fromArray(
-				[
-					A2($elm$html$Html$Attributes$style, 'background-color', 'var(--secondary-color)'),
-					A2($elm$html$Html$Attributes$style, 'color', 'white')
-				]),
-			$Orasund$elm_layout$Layout$centered),
-		A2(
 			$Orasund$elm_layout$Layout$column,
-			A2(
-				$elm$core$List$cons,
-				A2($elm$html$Html$Attributes$style, 'gap', 'var(--big-space)'),
-				$Orasund$elm_layout$Layout$centered),
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('dark-background'),
+						$Orasund$elm_layout$Html$Style$width('400px'),
+						$Orasund$elm_layout$Html$Style$height('400px')
+					]),
+				_Utils_ap(
+					$Orasund$elm_layout$Layout$asButton(
+						{
+							label: 'Next Level',
+							onPress: $elm$core$Maybe$Just(args.onClick)
+						}),
+					_Utils_ap(attrs, $Orasund$elm_layout$Layout$centered))),
 			_List_fromArray(
 				[
 					A2(
 					$Orasund$elm_layout$Layout$column,
-					$Orasund$elm_layout$Layout$centered,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'color', 'white'),
+							$Orasund$elm_layout$Layout$gap(32)
+						]),
 					_List_fromArray(
 						[
 							A2(
 							$Orasund$elm_layout$Layout$text,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('font-size-title')
+									A2($elm$html$Html$Attributes$style, 'font-size', '46px'),
+									$Orasund$elm_layout$Layout$contentCentered
 								]),
-							'🎲'),
+							$author$project$Config$title),
 							A2(
 							$Orasund$elm_layout$Layout$text,
 							_List_fromArray(
 								[
-									$elm$html$Html$Attributes$class('font-size-big')
+									A2($elm$html$Html$Attributes$style, 'font-size', '16px'),
+									$Orasund$elm_layout$Layout$contentCentered
 								]),
-							'Game-Template')
-						])),
-					A2(
-					$Orasund$elm_layout$Layout$textButton,
-					_List_Nil,
-					{
-						label: 'Start',
-						onPress: $elm$core$Maybe$Just(args.startGame)
-					})
-				])));
-};
-var $author$project$Main$viewOverlay = F2(
-	function (_v0, overlay) {
-		return $author$project$View$Overlay$gameMenu(
-			{startGame: $author$project$Main$NewGame});
+							'Press any button to start')
+						]))
+				]));
 	});
-var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
-var $elm$virtual_dom$VirtualDom$node = function (tag) {
-	return _VirtualDom_node(
-		_VirtualDom_noScript(tag));
+var $Orasund$elm_layout$Html$Style$bottom = $elm$html$Html$Attributes$style('bottom');
+var $Orasund$elm_layout$Html$Style$boxSizing = $elm$html$Html$Attributes$style('box-sizing');
+var $Orasund$elm_layout$Html$Style$boxSizingBorderBox = $Orasund$elm_layout$Html$Style$boxSizing('border-box');
+var $Orasund$elm_layout$Html$Style$left = $elm$html$Html$Attributes$style('left');
+var $Orasund$elm_layout$Layout$none = $elm$html$Html$text('');
+var $Orasund$elm_layout$Html$Style$position = $elm$html$Html$Attributes$style('position');
+var $Orasund$elm_layout$Html$Style$positionAbsolute = $Orasund$elm_layout$Html$Style$position('absolute');
+var $Orasund$elm_layout$Html$Style$positionRelative = $Orasund$elm_layout$Html$Style$position('relative');
+var $Orasund$elm_layout$Html$Style$right = $elm$html$Html$Attributes$style('right');
+var $Orasund$elm_layout$Layout$row = function (attrs) {
+	return $elm$html$Html$div(
+		_Utils_ap(
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+					A2($elm$html$Html$Attributes$style, 'flex-direction', 'row'),
+					A2($elm$html$Html$Attributes$style, 'flex-wrap', 'wrap')
+				]),
+			attrs));
 };
-var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
-var $author$project$View$viewportMeta = function () {
-	var width = $elm$core$String$fromFloat($author$project$Config$screenMinWidth);
-	return A3(
-		$elm$html$Html$node,
-		'meta',
-		_List_fromArray(
-			[
-				$elm$html$Html$Attributes$name('viewport'),
-				A2($elm$html$Html$Attributes$attribute, 'content', 'user-scalable=no,width=' + width)
-			]),
-		_List_Nil);
-}();
-var $author$project$Main$view = function (model) {
-	var content = $elm$html$Html$text('');
-	return {
-		body: _List_fromArray(
-			[
-				$author$project$View$viewportMeta,
-				A2(
-				$Orasund$elm_layout$Layout$textButton,
-				_List_Nil,
-				{
-					label: 'Play Sound',
-					onPress: $elm$core$Maybe$Just($author$project$Main$SoundRequested)
-				}),
-				A2(
-				$elm$html$Html$div,
+var $author$project$Image$pixelated = A2($elm$html$Html$Attributes$style, 'image-rendering', 'pixelated');
+var $author$project$Image$sprite = F2(
+	function (attrs, args) {
+		var _v0 = args.pos;
+		var x = _v0.a;
+		var y = _v0.b;
+		return A2(
+			$elm$html$Html$div,
+			_Utils_ap(
 				_List_fromArray(
 					[
 						A2(
 						$elm$html$Html$Attributes$style,
 						'width',
-						$elm$core$String$fromFloat($author$project$Config$screenMinWidth) + 'px'),
+						$elm$core$String$fromFloat(args.width) + 'px'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'height',
-						$elm$core$String$fromFloat($author$project$Config$screenMinHeight) + 'px'),
-						$elm$html$Html$Attributes$class('container')
+						$elm$core$String$fromFloat(args.height) + 'px'),
+						A2($elm$html$Html$Attributes$style, 'background-image', 'url(' + (args.url + ') ')),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'background-position',
+						$elm$core$String$fromFloat((-args.width) * x) + ('px ' + ($elm$core$String$fromFloat((-args.height) * y) + 'px'))),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'background-size',
+						$elm$core$String$fromFloat(args.width * args.sheetColumns) + ('px ' + ($elm$core$String$fromFloat(args.height * args.sheetRows) + 'px'))),
+						A2($elm$html$Html$Attributes$style, 'background-repeat', 'no-repeat')
 					]),
+				attrs),
+			_List_Nil);
+	});
+var $author$project$View$Controls$sprite = F2(
+	function (attrs, pos) {
+		return A2(
+			$author$project$Image$sprite,
+			A2($elm$core$List$cons, $author$project$Image$pixelated, attrs),
+			{height: 72, pos: pos, sheetColumns: 2, sheetRows: 1, url: 'assets/controls.png', width: 72});
+	});
+var $Orasund$elm_layout$Html$Style$top = $elm$html$Html$Attributes$style('top');
+var $author$project$View$Controls$toHtml = function (args) {
+	return A2(
+		$Orasund$elm_layout$Layout$column,
+		$Orasund$elm_layout$Layout$centered,
+		_List_fromArray(
+			[
 				A2(
-					$elm$core$List$cons,
-					A2(
+				$Orasund$elm_layout$Layout$row,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						_Utils_ap(
+							$Orasund$elm_layout$Layout$asButton(
+								{
+									label: 'Retry',
+									onPress: $elm$core$Maybe$Just(
+										args.onInput($author$project$Input$InputReset))
+								}),
+							_List_fromArray(
+								[
+									$Orasund$elm_layout$Html$Style$positionRelative,
+									$Orasund$elm_layout$Html$Style$width('72px'),
+									$Orasund$elm_layout$Html$Style$height('72px')
+								])),
+						_List_fromArray(
+							[
+								A2(
+								$Orasund$elm_layout$Layout$text,
+								_Utils_ap(
+									_List_fromArray(
+										[
+											$Orasund$elm_layout$Html$Style$positionAbsolute,
+											A2($elm$html$Html$Attributes$style, 'color', 'white'),
+											$Orasund$elm_layout$Html$Style$bottom('0px'),
+											$Orasund$elm_layout$Html$Style$width('72px')
+										]),
+									$Orasund$elm_layout$Layout$centered),
+								args.isLevelSelect ? '' : 'Retry'),
+								A2(
+								$Orasund$elm_layout$Layout$text,
+								_Utils_ap(
+									_List_fromArray(
+										[
+											$Orasund$elm_layout$Html$Style$positionAbsolute,
+											$Orasund$elm_layout$Html$Style$top('16px'),
+											$Orasund$elm_layout$Html$Style$left('20px'),
+											$Orasund$elm_layout$Html$Style$width('32px'),
+											$Orasund$elm_layout$Html$Style$height('32px'),
+											A2($elm$html$Html$Attributes$style, 'border', '4px solid white'),
+											A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+											A2($elm$html$Html$Attributes$style, 'color', 'white'),
+											$Orasund$elm_layout$Html$Style$boxSizingBorderBox
+										]),
+									$Orasund$elm_layout$Layout$centered),
+								'C')
+							])),
+						A2(
+						$elm$html$Html$div,
+						A2(
+							$elm$core$List$cons,
+							$Orasund$elm_layout$Html$Style$positionRelative,
+							$Orasund$elm_layout$Layout$asButton(
+								{
+									label: 'Move Up',
+									onPress: $elm$core$Maybe$Just(
+										args.onInput(
+											$author$project$Input$InputDir($author$project$Direction$Up)))
+								})),
+						_List_fromArray(
+							[
+								A2(
+								$author$project$View$Controls$sprite,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'transform', 'rotate(90deg)')
+									]),
+								_Utils_Tuple2(0, 0)),
+								A2(
+								$Orasund$elm_layout$Layout$text,
+								_Utils_ap(
+									_List_fromArray(
+										[
+											$Orasund$elm_layout$Html$Style$positionAbsolute,
+											$Orasund$elm_layout$Html$Style$bottom('16px'),
+											$Orasund$elm_layout$Html$Style$width('72px'),
+											A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+											A2($elm$html$Html$Attributes$style, 'color', 'white')
+										]),
+									$Orasund$elm_layout$Layout$centered),
+								'W')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_Utils_ap(
+							_List_fromArray(
+								[
+									$Orasund$elm_layout$Html$Style$positionRelative,
+									$Orasund$elm_layout$Html$Style$width('72px'),
+									$Orasund$elm_layout$Html$Style$height('72px')
+								]),
+							$Orasund$elm_layout$Layout$asButton(
+								{
+									label: 'Undo',
+									onPress: $elm$core$Maybe$Just(
+										args.onInput($author$project$Input$InputUndo))
+								})),
+						_List_fromArray(
+							[
+								A2(
+								$Orasund$elm_layout$Layout$text,
+								_Utils_ap(
+									_List_fromArray(
+										[
+											$Orasund$elm_layout$Html$Style$positionAbsolute,
+											A2($elm$html$Html$Attributes$style, 'color', 'white'),
+											$Orasund$elm_layout$Html$Style$bottom('0px'),
+											$Orasund$elm_layout$Html$Style$width('72px')
+										]),
+									$Orasund$elm_layout$Layout$centered),
+								args.isLevelSelect ? '' : 'Undo'),
+								A2(
+								$Orasund$elm_layout$Layout$text,
+								_Utils_ap(
+									_List_fromArray(
+										[
+											$Orasund$elm_layout$Html$Style$positionAbsolute,
+											$Orasund$elm_layout$Html$Style$top('16px'),
+											$Orasund$elm_layout$Html$Style$left('20px'),
+											$Orasund$elm_layout$Html$Style$width('32px'),
+											$Orasund$elm_layout$Html$Style$height('32px'),
+											A2($elm$html$Html$Attributes$style, 'border', '4px solid white'),
+											A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+											A2($elm$html$Html$Attributes$style, 'color', 'white'),
+											$Orasund$elm_layout$Html$Style$boxSizingBorderBox
+										]),
+									$Orasund$elm_layout$Layout$centered),
+								'R')
+							]))
+					])),
+				A2(
+				$Orasund$elm_layout$Layout$row,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						A2(
+							$elm$core$List$cons,
+							$Orasund$elm_layout$Html$Style$positionRelative,
+							$Orasund$elm_layout$Layout$asButton(
+								{
+									label: 'Move Left',
+									onPress: $elm$core$Maybe$Just(
+										args.onInput(
+											$author$project$Input$InputDir($author$project$Direction$Left)))
+								})),
+						_List_fromArray(
+							[
+								A2(
+								$author$project$View$Controls$sprite,
+								_List_Nil,
+								_Utils_Tuple2(0, 0)),
+								A2(
+								$Orasund$elm_layout$Layout$text,
+								_Utils_ap(
+									_List_fromArray(
+										[
+											$Orasund$elm_layout$Html$Style$positionAbsolute,
+											$Orasund$elm_layout$Html$Style$top('0'),
+											$Orasund$elm_layout$Html$Style$right('20px'),
+											$Orasund$elm_layout$Html$Style$height('72px'),
+											A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+											A2($elm$html$Html$Attributes$style, 'color', 'white')
+										]),
+									$Orasund$elm_layout$Layout$centered),
+								'A')
+							])),
+						A2(
 						$Orasund$elm_layout$Layout$el,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('content')
+								$Orasund$elm_layout$Html$Style$width('72px'),
+								$Orasund$elm_layout$Html$Style$height('72px')
 							]),
-						content),
-					A2(
-						$elm$core$Maybe$withDefault,
-						_List_Nil,
+						$Orasund$elm_layout$Layout$none),
 						A2(
-							$elm$core$Maybe$map,
-							$elm$core$List$singleton,
-							A2(
-								$elm$core$Maybe$map,
-								$author$project$Main$viewOverlay(model),
-								model.overlay)))))
-			]),
-		title: $author$project$Config$title
-	};
+						$elm$html$Html$div,
+						A2(
+							$elm$core$List$cons,
+							$Orasund$elm_layout$Html$Style$positionRelative,
+							$Orasund$elm_layout$Layout$asButton(
+								{
+									label: 'Move Right',
+									onPress: $elm$core$Maybe$Just(
+										args.onInput(
+											$author$project$Input$InputDir($author$project$Direction$Right)))
+								})),
+						_List_fromArray(
+							[
+								A2(
+								$author$project$View$Controls$sprite,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'transform', 'rotate(180deg)')
+									]),
+								_Utils_Tuple2(0, 0)),
+								A2(
+								$Orasund$elm_layout$Layout$text,
+								_Utils_ap(
+									_List_fromArray(
+										[
+											$Orasund$elm_layout$Html$Style$positionAbsolute,
+											$Orasund$elm_layout$Html$Style$top('0'),
+											$Orasund$elm_layout$Html$Style$left('20px'),
+											$Orasund$elm_layout$Html$Style$height('72px'),
+											A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+											A2($elm$html$Html$Attributes$style, 'color', 'white')
+										]),
+									$Orasund$elm_layout$Layout$centered),
+								'D')
+							]))
+					])),
+				A2(
+				$Orasund$elm_layout$Layout$row,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$div,
+						A2(
+							$elm$core$List$cons,
+							$Orasund$elm_layout$Html$Style$positionRelative,
+							$Orasund$elm_layout$Layout$asButton(
+								{
+									label: 'Move Down',
+									onPress: $elm$core$Maybe$Just(
+										args.onInput(
+											$author$project$Input$InputDir($author$project$Direction$Down)))
+								})),
+						_List_fromArray(
+							[
+								A2(
+								$author$project$View$Controls$sprite,
+								_List_fromArray(
+									[
+										A2($elm$html$Html$Attributes$style, 'transform', 'rotate(-90deg)')
+									]),
+								_Utils_Tuple2(0, 0)),
+								A2(
+								$Orasund$elm_layout$Layout$text,
+								_Utils_ap(
+									_List_fromArray(
+										[
+											$Orasund$elm_layout$Html$Style$positionAbsolute,
+											$Orasund$elm_layout$Html$Style$top('16px'),
+											$Orasund$elm_layout$Html$Style$width('72px'),
+											A2($elm$html$Html$Attributes$style, 'font-size', '20px'),
+											A2($elm$html$Html$Attributes$style, 'color', 'white')
+										]),
+									$Orasund$elm_layout$Layout$centered),
+								'S')
+							]))
+					]))
+			]));
 };
-var $author$project$Main$main = $elm$browser$Browser$document(
+var $author$project$View$World$nodeSize = ($author$project$Config$cellSize / 2) | 0;
+var $author$project$View$World$image = F2(
+	function (attrs, pos) {
+		return A2(
+			$author$project$Image$sprite,
+			A2($elm$core$List$cons, $author$project$Image$pixelated, attrs),
+			{height: $author$project$View$World$nodeSize, pos: pos, sheetColumns: 4, sheetRows: 4, url: 'overworld.png', width: $author$project$View$World$nodeSize});
+	});
+var $elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
+	return _VirtualDom_keyedNode(
+		_VirtualDom_noScript(tag));
+};
+var $elm$html$Html$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNode;
+var $author$project$View$World$toHtml = F2(
+	function (attrs, world) {
+		var scale = 5;
+		var _v0 = _Utils_Tuple2(((-$author$project$View$World$nodeSize) / 2) | 0, -$author$project$View$World$nodeSize);
+		var offsetX = _v0.a;
+		var offsetY = _v0.b;
+		var _v1 = world.player;
+		var centerX = _v1.a;
+		var centerY = _v1.b;
+		return A3(
+			$elm$html$Html$Keyed$node,
+			'div',
+			A2($elm$core$List$cons, $Orasund$elm_layout$Html$Style$positionRelative, attrs),
+			A2(
+				$elm$core$List$sortBy,
+				$elm$core$Tuple$first,
+				A2(
+					$elm$core$List$map,
+					function (_v2) {
+						var _v3 = _v2.a;
+						var x = _v3.a;
+						var y = _v3.b;
+						var node = _v2.b;
+						return _Utils_Tuple2(
+							'node_' + ($elm$core$String$fromInt(x) + ('_' + $elm$core$String$fromInt(y))),
+							A2(
+								$author$project$View$World$image,
+								_List_fromArray(
+									[
+										$Orasund$elm_layout$Html$Style$width(
+										$elm$core$String$fromInt($author$project$View$World$nodeSize) + 'px'),
+										$Orasund$elm_layout$Html$Style$height(
+										$elm$core$String$fromInt($author$project$View$World$nodeSize) + 'px'),
+										$Orasund$elm_layout$Html$Style$top(
+										$elm$core$String$fromInt(((y - centerY) * $author$project$View$World$nodeSize) + offsetY) + 'px'),
+										$Orasund$elm_layout$Html$Style$left(
+										$elm$core$String$fromInt(((x - centerX) * $author$project$View$World$nodeSize) + offsetX) + 'px'),
+										$Orasund$elm_layout$Html$Style$positionAbsolute
+									]),
+								function () {
+									if (node.$ === 'Wall') {
+										return _Utils_Tuple2(3, 0);
+									} else {
+										var solved = node.a.solved;
+										var sort = node.a.sort;
+										return _Utils_Tuple2(
+											function () {
+												if (solved) {
+													return 0;
+												} else {
+													if (sort.$ === 'Trial') {
+														return 2;
+													} else {
+														return 1;
+													}
+												}
+											}(),
+											_Utils_eq(
+												world.player,
+												_Utils_Tuple2(x, y)) ? 1 : 0);
+									}
+								}()));
+					},
+					A2(
+						$elm$core$List$concatMap,
+						function (y) {
+							return A2(
+								$elm$core$List$filterMap,
+								function (x) {
+									return A2(
+										$elm$core$Maybe$map,
+										$elm$core$Tuple$pair(
+											_Utils_Tuple2(x, y)),
+										A2(
+											$elm$core$Dict$get,
+											_Utils_Tuple2(x, y),
+											world.nodes));
+								},
+								A2($elm$core$List$range, centerX - scale, centerX + scale));
+						},
+						A2($elm$core$List$range, centerY - scale, centerY + scale)))));
+	});
+var $author$project$View$Cell$border = F2(
+	function (attrs, pos) {
+		return A2(
+			$author$project$Image$sprite,
+			A2($elm$core$List$cons, $author$project$Image$pixelated, attrs),
+			{height: $author$project$Config$cellSize, pos: pos, sheetColumns: 2, sheetRows: 2, url: 'assets/border.png', width: $author$project$Config$cellSize});
+	});
+var $author$project$View$Cell$borders = F2(
+	function (_v0, game) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var attrs = _List_fromArray(
+			[
+				$Orasund$elm_layout$Html$Style$positionAbsolute,
+				$Orasund$elm_layout$Html$Style$top('0')
+			]);
+		return A2(
+			$elm$core$List$filterMap,
+			$elm$core$Basics$identity,
+			_List_fromArray(
+				[
+					A2(
+					$elm$core$Dict$member,
+					_Utils_Tuple2(x - 1, y),
+					game.floor) ? $elm$core$Maybe$Just(
+					A2(
+						$author$project$View$Cell$border,
+						attrs,
+						_Utils_Tuple2(0, 1))) : $elm$core$Maybe$Nothing,
+					A2(
+					$elm$core$Dict$member,
+					_Utils_Tuple2(x + 1, y),
+					game.floor) ? $elm$core$Maybe$Just(
+					A2(
+						$author$project$View$Cell$border,
+						attrs,
+						_Utils_Tuple2(1, 0))) : $elm$core$Maybe$Nothing,
+					A2(
+					$elm$core$Dict$member,
+					_Utils_Tuple2(x, y - 1),
+					game.floor) ? $elm$core$Maybe$Just(
+					A2(
+						$author$project$View$Cell$border,
+						attrs,
+						_Utils_Tuple2(0, 0))) : $elm$core$Maybe$Nothing,
+					A2(
+					$elm$core$Dict$member,
+					_Utils_Tuple2(x, y + 1),
+					game.floor) ? $elm$core$Maybe$Just(
+					A2(
+						$author$project$View$Cell$border,
+						attrs,
+						_Utils_Tuple2(1, 1))) : $elm$core$Maybe$Nothing
+				]));
+	});
+var $author$project$View$Cell$sprite = F2(
+	function (attrs, pos) {
+		return A2(
+			$author$project$Image$sprite,
+			A2($elm$core$List$cons, $author$project$Image$pixelated, attrs),
+			{height: $author$project$Config$cellSize, pos: pos, sheetColumns: 8, sheetRows: 8, url: 'assets/tileset.png', width: $author$project$Config$cellSize});
+	});
+var $author$project$View$Cell$floor = function (attrs) {
+	return A2(
+		$author$project$View$Cell$sprite,
+		attrs,
+		_Utils_Tuple2(0, 3));
+};
+var $author$project$View$Cell$hole = function (attrs) {
+	return A2(
+		$author$project$View$Cell$sprite,
+		attrs,
+		_Utils_Tuple2(1, 2));
+};
+var $author$project$View$Cell$holeTop = function (attrs) {
+	return A2(
+		$author$project$View$Cell$sprite,
+		attrs,
+		_Utils_Tuple2(0, 2));
+};
+var $author$project$View$Cell$item = F2(
+	function (attrs, i) {
+		return A2(
+			$author$project$View$Cell$sprite,
+			attrs,
+			function () {
+				if (i.$ === 'Bomb') {
+					return _Utils_Tuple2(1, 6);
+				} else {
+					return _Utils_Tuple2(3, 6);
+				}
+			}());
+	});
+var $author$project$View$Cell$particle = F2(
+	function (attrs, particleSort) {
+		return A2(
+			$author$project$View$Cell$sprite,
+			attrs,
+			function () {
+				if (particleSort.$ === 'Smoke') {
+					return _Utils_Tuple2(0, 0);
+				} else {
+					return _Utils_Tuple2(2, 3);
+				}
+			}());
+	});
+var $author$project$View$Cell$directional = F2(
+	function (_v0, args) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var _v1 = args.direction;
+		switch (_v1.$) {
+			case 'Down':
+				return _Utils_Tuple2(x + args.frame, y);
+			case 'Up':
+				return _Utils_Tuple2(x + args.frame, y + 1);
+			case 'Left':
+				return _Utils_Tuple2((x + 2) + args.frame, y);
+			default:
+				return _Utils_Tuple2((x + 2) + args.frame, y + 1);
+		}
+	});
+var $author$project$View$Cell$fromEnemy = F2(
+	function (args, enemy) {
+		switch (enemy.$) {
+			case 'ActivatedBomb':
+				return _Utils_Tuple2(2 + args.frame, 1);
+			case 'Orc':
+				var dir = enemy.a;
+				return A2(
+					$author$project$View$Cell$directional,
+					_Utils_Tuple2(4, 2),
+					{direction: dir, frame: args.frame});
+			case 'Goblin':
+				return A2(
+					$author$project$View$Cell$directional,
+					_Utils_Tuple2(4, 0),
+					{direction: $author$project$Direction$Down, frame: args.frame});
+			case 'Doppelganger':
+				return A2(
+					$author$project$View$Cell$directional,
+					_Utils_Tuple2(4, 2),
+					{
+						direction: $author$project$Direction$mirror(args.playerDirection),
+						frame: args.frame
+					});
+			default:
+				return _Utils_Tuple2(0 + args.frame, 1);
+		}
+	});
+var $author$project$View$Cell$toHtml = F3(
+	function (attrs, args, cell) {
+		return A2(
+			$author$project$View$Cell$sprite,
+			attrs,
+			function () {
+				switch (cell.$) {
+					case 'Door':
+						return _Utils_Tuple2(2, 2);
+					case 'Player':
+						return A2(
+							$author$project$View$Cell$directional,
+							_Utils_Tuple2(0, 4),
+							{direction: args.playerDirection, frame: args.frame});
+					case 'Sign':
+						return _Utils_Tuple2(3, 2);
+					case 'Crate':
+						return _Utils_Tuple2(1, 3);
+					case 'InactiveBomb':
+						return _Utils_Tuple2(1, 6);
+					case 'Enemy':
+						var enemy = cell.a;
+						return A2(
+							$author$project$View$Cell$fromEnemy,
+							{frame: args.frame, playerDirection: args.playerDirection},
+							enemy);
+					default:
+						var enemy = cell.a;
+						return A2(
+							$author$project$View$Cell$fromEnemy,
+							{frame: args.frame, playerDirection: args.playerDirection},
+							enemy);
+				}
+			}());
+	});
+var $author$project$View$Screen$world = F2(
+	function (args, game) {
+		return A3(
+			$elm$html$Html$Keyed$node,
+			'div',
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'width',
+					$elm$core$String$fromFloat($author$project$Config$cellSize * $author$project$Config$roomSize) + 'px'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'height',
+					$elm$core$String$fromFloat($author$project$Config$cellSize * $author$project$Config$roomSize) + 'px'),
+					A2($elm$html$Html$Attributes$style, 'border', '4px solid white')
+				]),
+			A2(
+				$elm$core$List$sortBy,
+				$elm$core$Tuple$first,
+				_Utils_ap(
+					A2(
+						$elm$core$List$map,
+						function (_v0) {
+							var x = _v0.a;
+							var y = _v0.b;
+							return _Utils_Tuple2(
+								'0_' + ($elm$core$String$fromInt(x) + ('_' + $elm$core$String$fromInt(y))),
+								A2(
+									$elm$html$Html$div,
+									_List_fromArray(
+										[
+											$Orasund$elm_layout$Html$Style$positionAbsolute,
+											A2(
+											$elm$html$Html$Attributes$style,
+											'left',
+											$elm$core$String$fromFloat($author$project$Config$cellSize * x) + 'px'),
+											A2(
+											$elm$html$Html$Attributes$style,
+											'top',
+											$elm$core$String$fromFloat($author$project$Config$cellSize * y) + 'px')
+										]),
+									_Utils_ap(
+										_List_fromArray(
+											[
+												A2(
+												$elm$core$Dict$member,
+												_Utils_Tuple2(x, y),
+												game.floor) ? $author$project$View$Cell$floor(
+												_List_fromArray(
+													[
+														$Orasund$elm_layout$Html$Style$positionAbsolute,
+														$Orasund$elm_layout$Html$Style$top('0')
+													])) : (A2(
+												$elm$core$Dict$member,
+												_Utils_Tuple2(x, y - 1),
+												game.floor) ? $author$project$View$Cell$holeTop(
+												_List_fromArray(
+													[
+														$Orasund$elm_layout$Html$Style$positionAbsolute,
+														$Orasund$elm_layout$Html$Style$top('0')
+													])) : $author$project$View$Cell$hole(
+												_List_fromArray(
+													[
+														$Orasund$elm_layout$Html$Style$positionAbsolute,
+														$Orasund$elm_layout$Html$Style$top('0')
+													]))),
+												A2(
+												$elm$core$Maybe$withDefault,
+												$Orasund$elm_layout$Layout$none,
+												A2(
+													$elm$core$Maybe$map,
+													function (item) {
+														return A2(
+															$author$project$View$Cell$item,
+															_List_fromArray(
+																[
+																	$Orasund$elm_layout$Html$Style$positionAbsolute,
+																	$Orasund$elm_layout$Html$Style$top('0')
+																]),
+															item);
+													},
+													A2(
+														$elm$core$Dict$get,
+														_Utils_Tuple2(x, y),
+														game.items))),
+												A2(
+												$elm$core$Maybe$withDefault,
+												$Orasund$elm_layout$Layout$none,
+												A2(
+													$elm$core$Maybe$map,
+													function (particle) {
+														return A2(
+															$author$project$View$Cell$particle,
+															_List_fromArray(
+																[
+																	$Orasund$elm_layout$Html$Style$positionAbsolute,
+																	$Orasund$elm_layout$Html$Style$top('0')
+																]),
+															particle);
+													},
+													A2(
+														$elm$core$Dict$get,
+														_Utils_Tuple2(x, y),
+														game.particles)))
+											]),
+										(!A2(
+											$elm$core$Dict$member,
+											_Utils_Tuple2(x, y),
+											game.floor)) ? A2(
+											$author$project$View$Cell$borders,
+											_Utils_Tuple2(x, y),
+											game) : _List_Nil)));
+						},
+						$author$project$Position$asGrid(
+							{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize})),
+					A2(
+						$elm$core$List$map,
+						function (_v1) {
+							var _v2 = _v1.a;
+							var x = _v2.a;
+							var y = _v2.b;
+							var cell = _v1.b;
+							return _Utils_Tuple2(
+								'1_' + $elm$core$String$fromInt(cell.id),
+								A3(
+									$author$project$View$Cell$toHtml,
+									_List_fromArray(
+										[
+											A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+											A2(
+											$elm$html$Html$Attributes$style,
+											'left',
+											$elm$core$String$fromFloat($author$project$Config$cellSize * x) + 'px'),
+											A2(
+											$elm$html$Html$Attributes$style,
+											'top',
+											$elm$core$String$fromFloat($author$project$Config$cellSize * y) + 'px'),
+											A2($elm$html$Html$Attributes$style, 'transition', 'left 0.2s,top 0.2s')
+										]),
+									{frame: args.frame, playerDirection: game.playerDirection},
+									cell.entity));
+						},
+						$elm$core$Dict$toList(game.cells)))));
+	});
+var $author$project$Main$view = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$Orasund$elm_layout$Layout$column,
+				_Utils_ap(
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'width', '400px'),
+							A2(
+							$elm$html$Html$Attributes$style,
+							'padding',
+							$elm$core$String$fromInt($author$project$Config$cellSize) + 'px 0'),
+							$Orasund$elm_layout$Layout$gap(16)
+						]),
+					$Orasund$elm_layout$Layout$centered),
+				_List_fromArray(
+					[
+						A2(
+						$Orasund$elm_layout$Layout$el,
+						_Utils_ap(
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'width', '400px'),
+									A2($elm$html$Html$Attributes$style, 'height', '400px')
+								]),
+							$Orasund$elm_layout$Layout$centered),
+						function () {
+							var _v0 = model.overlay;
+							if (_v0.$ === 'Nothing') {
+								return A2(
+									$author$project$View$Screen$world,
+									{frame: model.frame},
+									model.game);
+							} else {
+								switch (_v0.a.$) {
+									case 'WorldMap':
+										var _v1 = _v0.a;
+										return A2($author$project$View$World$toHtml, _List_Nil, model.world);
+									case 'Menu':
+										var _v2 = _v0.a;
+										return A2(
+											$author$project$View$Screen$menu,
+											_List_Nil,
+											{
+												frame: model.frame,
+												onClick: $author$project$Main$Input($author$project$Input$InputActivate)
+											});
+									default:
+										var _v3 = _v0.a;
+										return $author$project$View$Screen$gameWon;
+								}
+							}
+						}()),
+						$author$project$View$Controls$toHtml(
+						{
+							isLevelSelect: !_Utils_eq(model.overlay, $elm$core$Maybe$Nothing),
+							item: model.game.item,
+							onInput: $author$project$Main$Input
+						})
+					]))
+			]));
+};
+var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
+	$elm$json$Json$Decode$succeed(
+		{}))(0)}});}(this));

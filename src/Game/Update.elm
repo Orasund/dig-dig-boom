@@ -5,12 +5,13 @@ import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Item(..), ParticleSort(..))
 import Game exposing (Cell, Game)
 import Game.Enemy
-import Game.Event exposing (GameAndKill)
+import Game.Event exposing (Event(..), GameAndEvents)
+import Gen.Sound exposing (Sound(..))
 import Math
 import Position
 
 
-updateGame : Game -> GameAndKill
+updateGame : Game -> GameAndEvents
 updateGame game =
     game.cells
         |> Dict.toList
@@ -19,7 +20,7 @@ updateGame game =
             (game |> Game.clearParticles |> Game.Event.none)
 
 
-updateCell : ( ( Int, Int ), Cell ) -> Game -> GameAndKill
+updateCell : ( ( Int, Int ), Cell ) -> Game -> GameAndEvents
 updateCell ( position, cell ) game =
     case cell.entity of
         Enemy enemy ->
@@ -38,7 +39,7 @@ updateCell ( position, cell ) game =
             game |> Game.Event.none
 
 
-movePlayerInDirectionAndUpdateGame : Direction -> ( Int, Int ) -> Game -> Maybe GameAndKill
+movePlayerInDirectionAndUpdateGame : Direction -> ( Int, Int ) -> Game -> Maybe GameAndEvents
 movePlayerInDirectionAndUpdateGame dir location game =
     game
         |> Game.face dir
@@ -46,7 +47,7 @@ movePlayerInDirectionAndUpdateGame dir location game =
         |> Maybe.map (Game.Event.andThen updateGame)
 
 
-movePlayer : ( Int, Int ) -> Game -> Maybe GameAndKill
+movePlayer : ( Int, Int ) -> Game -> Maybe GameAndEvents
 movePlayer position game =
     let
         newLocation : ( Int, Int )
@@ -82,15 +83,14 @@ movePlayer position game =
                     [ newPos ]
             }--}
         Just Crate ->
-            { game =
-                game
-                    |> push newLocation game.playerDirection
-                    |> Maybe.andThen (Game.move { from = position, to = newLocation })
-                    |> Maybe.map (takeItem newLocation)
-                    |> Maybe.withDefault game
-            , kill = []
-            }
-                |> Just
+            game
+                |> push newLocation game.playerDirection
+                |> Maybe.andThen (Game.move { from = position, to = newLocation })
+                |> Maybe.map (takeItem newLocation)
+                |> Maybe.map
+                    (\g ->
+                        { game = g, kill = [ Fx Push ] }
+                    )
 
         Just (InactiveBomb item) ->
             let
@@ -112,10 +112,12 @@ movePlayer position game =
                        )
             , kill =
                 if game.floor |> Dict.member newPos then
-                    []
+                    [ Fx Push ]
 
                 else
-                    [ newPos ]
+                    [ Kill newPos
+                    , Fx Push
+                    ]
             }
                 |> Just
 
@@ -196,7 +198,7 @@ applyBomb position game =
             )
 
 
-placeBombeAndUpdateGame : ( Int, Int ) -> Game -> Maybe GameAndKill
+placeBombeAndUpdateGame : ( Int, Int ) -> Game -> Maybe GameAndEvents
 placeBombeAndUpdateGame playerCell game =
     applyBomb playerCell game
         |> Maybe.map Game.removeItem

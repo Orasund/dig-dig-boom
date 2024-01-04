@@ -17,7 +17,7 @@ sprite attrs pos =
         { pos = pos
         , sheetColumns = 8
         , sheetRows = 8
-        , url = "tileset.png"
+        , url = "assets/tileset.png"
         , height = Config.cellSize
         , width = Config.cellSize
         }
@@ -30,7 +30,7 @@ border attrs pos =
         { pos = pos
         , sheetColumns = 2
         , sheetRows = 2
-        , url = "border.png"
+        , url = "assets/border.png"
         , height = Config.cellSize
         , width = Config.cellSize
         }

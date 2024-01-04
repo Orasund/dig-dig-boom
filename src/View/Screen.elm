@@ -1,4 +1,4 @@
-module View.Screen exposing (death, gameWon, menu, world)
+module View.Screen exposing (gameWon, menu, world)
 
 import Config
 import Dict
@@ -8,58 +8,9 @@ import Html exposing (Attribute, Html)
 import Html.Attributes
 import Html.Keyed
 import Html.Style
-import Image
 import Layout
 import Position
 import View.Cell
-
-
-logo : Int -> Html msg
-logo frame =
-    Image.sprite [ Image.pixelated ]
-        { url = "title_image.png"
-        , width = 350
-        , height = 350
-        , sheetColumns = 2
-        , sheetRows = 1
-        , pos = ( frame, 0 )
-        }
-
-
-skull : Html msg
-skull =
-    Image.image [ Image.pixelated ]
-        { url = "skull.png"
-        , width = 350
-        , height = 350
-        }
-
-
-death : List (Attribute msg) -> { onClick : msg } -> Html msg
-death attrs args =
-    [ [ "You have" |> Layout.text [ Layout.contentCentered ]
-      , "died" |> Layout.text [ Layout.contentCentered ]
-      ]
-        |> Layout.column []
-    , skull
-    , [ "R to undo" |> Layout.text [ Layout.contentCentered ]
-      , "or" |> Layout.text [ Layout.contentCentered ]
-      , "Space to retry" |> Layout.text [ Layout.contentCentered ]
-      ]
-        |> Layout.column []
-    ]
-        |> Layout.column
-            ([ Html.Attributes.style "font-size" "60px"
-             , Html.Attributes.style "color" "white"
-             , Html.Attributes.class "dark-background"
-             , Html.Style.width "400px"
-             ]
-                ++ Layout.asButton
-                    { label = "Next Level"
-                    , onPress = Just args.onClick
-                    }
-                ++ attrs
-            )
 
 
 gameWon : Html msg

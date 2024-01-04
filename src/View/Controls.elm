@@ -17,7 +17,7 @@ sprite attrs pos =
         { pos = pos
         , sheetColumns = 2
         , sheetRows = 1
-        , url = "controls.png"
+        , url = "assets/controls.png"
         , height = 72
         , width = 72
         }

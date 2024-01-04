@@ -1,35 +1,43 @@
-module Game.Event exposing (GameAndKill, andThen, apply, map, none)
+module Game.Event exposing
+    ( Event(..)
+    , GameAndEvents
+    , andThen
+    , kill
+    , map
+    , none
+    )
 
 import Dict
 import Entity exposing (Enemy(..), Entity(..), ParticleSort(..))
 import Game exposing (Game)
+import Gen.Sound exposing (Sound)
 
 
-type alias GameAndKill =
-    { game : Game, kill : List ( Int, Int ) }
+type Event
+    = Kill ( Int, Int )
+    | Fx Sound
+    | StageComplete
 
 
-none : Game -> GameAndKill
+type alias GameAndEvents =
+    { game : Game, kill : List Event }
+
+
+none : Game -> GameAndEvents
 none game =
     { game = game, kill = [] }
-
-
-apply : List ( Int, Int ) -> Game -> Game
-apply kills game =
-    kills
-        |> List.foldl kill game
 
 
 
 -- |> checkIfWon
 
 
-map : (Game -> Game) -> GameAndKill -> GameAndKill
+map : (Game -> Game) -> GameAndEvents -> GameAndEvents
 map fun output =
     { output | game = fun output.game }
 
 
-andThen : (Game -> GameAndKill) -> GameAndKill -> GameAndKill
+andThen : (Game -> GameAndEvents) -> GameAndEvents -> GameAndEvents
 andThen fun output =
     let
         newOutput =
