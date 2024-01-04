@@ -9789,7 +9789,35 @@ var $Orasund$elm_layout$Layout$asButton = function (args) {
 				},
 				args.onPress)));
 };
-var $author$project$Config$title = 'Sokobomb';
+var $elm$html$Html$img = _VirtualDom_node('img');
+var $author$project$Image$pixelated = A2($elm$html$Html$Attributes$style, 'image-rendering', 'pixelated');
+var $elm$html$Html$Attributes$src = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'src',
+		_VirtualDom_noJavaScriptOrHtmlUri(url));
+};
+var $author$project$Image$image = F2(
+	function (attrs, args) {
+		return A2(
+			$elm$html$Html$img,
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$author$project$Image$pixelated,
+						$elm$html$Html$Attributes$src(args.url),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'width',
+						$elm$core$String$fromFloat(args.width) + 'px'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'height',
+						$elm$core$String$fromFloat(args.height) + 'px')
+					]),
+				attrs),
+			_List_Nil);
+	});
 var $author$project$View$Screen$menu = F2(
 	function (attrs, args) {
 		return A2(
@@ -9820,21 +9848,10 @@ var $author$project$View$Screen$menu = F2(
 					_List_fromArray(
 						[
 							A2(
-							$Orasund$elm_layout$Layout$text,
+							$author$project$Image$image,
 							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'font-size', '46px'),
-									$Orasund$elm_layout$Layout$contentCentered
-								]),
-							$author$project$Config$title),
-							A2(
-							$Orasund$elm_layout$Layout$text,
-							_List_fromArray(
-								[
-									A2($elm$html$Html$Attributes$style, 'font-size', '16px'),
-									$Orasund$elm_layout$Layout$contentCentered
-								]),
-							'Press any button to start')
+								[$author$project$Image$pixelated, $Orasund$elm_layout$Layout$contentCentered]),
+							{height: 19 * 8, url: 'assets/logo.png', width: 39 * 8})
 						]))
 				]));
 	});
@@ -9858,7 +9875,6 @@ var $Orasund$elm_layout$Layout$row = function (attrs) {
 				]),
 			attrs));
 };
-var $author$project$Image$pixelated = A2($elm$html$Html$Attributes$style, 'image-rendering', 'pixelated');
 var $author$project$Image$sprite = F2(
 	function (attrs, args) {
 		var _v0 = args.pos;

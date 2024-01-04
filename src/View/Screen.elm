@@ -8,6 +8,7 @@ import Html exposing (Attribute, Html)
 import Html.Attributes
 import Html.Keyed
 import Html.Style
+import Image
 import Layout
 import Position
 import View.Cell
@@ -33,16 +34,14 @@ gameWon =
 
 menu : List (Attribute msg) -> { frame : Int, onClick : msg } -> Html msg
 menu attrs args =
-    [ [ Config.title
-            |> Layout.text
-                [ Html.Attributes.style "font-size" "46px"
-                , Layout.contentCentered
-                ]
-      , "Press any button to start"
-            |> Layout.text
-                [ Html.Attributes.style "font-size" "16px"
-                , Layout.contentCentered
-                ]
+    [ [ Image.image
+            [ Image.pixelated
+            , Layout.contentCentered
+            ]
+            { url = "assets/logo.png"
+            , width = 39 * 8
+            , height = 19 * 8
+            }
       ]
         |> Layout.column
             [ Html.Attributes.style "color" "white"
