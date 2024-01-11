@@ -391,25 +391,44 @@ toDirection string =
         "a" ->
             Input (InputDir Left)
 
+        "LeftArrow" ->
+            Input (InputDir Left)
+
         "d" ->
+            Input (InputDir Right)
+
+        "RightArrow" ->
             Input (InputDir Right)
 
         "w" ->
             Input (InputDir Up)
 
+        "UpArrow" ->
+            Input (InputDir Up)
+
         "s" ->
             Input (InputDir Down)
 
-        "r" ->
+        "DownArrow" ->
+            Input (InputDir Down)
+
+        "y" ->
+            Input InputUndo
+
+        "z" ->
             Input InputUndo
 
         "c" ->
+            Input InputUndo
+
+        "r" ->
             Input InputReset
 
         -- "Escape" ->
         --    Input InputOpenMap
-        --" " ->
-        --    Input InputActivate
+        " " ->
+            Input InputActivate
+
         _ ->
             NoOps
 

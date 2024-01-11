@@ -7269,11 +7269,6 @@ var $author$project$World$Trial$crateTails = _List_fromArray(
 		A2(
 		$author$project$Game$Build$generator,
 		_List_fromArray(
-			['📦📦📦⬜📦', '📦⬜💣📦⬜', '⬜💣📦📦⬜', '⬜⬜📦⬜📦', '⬜⬜😊⬜📦']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
 			['📦⬜📦📦📦', '📦⬜⬜📦⬜', '⬜⬜📦⬜⬜', '⬜💣📦📦📦', '⬜📦😊📦⬜']),
 		_List_Nil),
 		A2(
@@ -7285,6 +7280,16 @@ var $author$project$World$Trial$crateTails = _List_fromArray(
 		$author$project$Game$Build$generator,
 		_List_fromArray(
 			['📦📦💣📦📦', '📦📦📦📦📦', '📦⬜⬜💣⬜', '⬜📦⬜⬜⬜', '⬜⬜😊⬜⬜']),
+		_List_Nil),
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['📦📦📦⬜📦', '📦⬜💣📦⬜', '⬜💣📦📦⬜', '⬜⬜📦⬜📦', '⬜⬜😊⬜📦']),
+		_List_Nil),
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['⬜📦📦📦⬜', '⬜💣⬜⬜💣', '📦📦📦📦💣', '📦💣💣⬜💣', '⬜💣😊💣⬜']),
 		_List_Nil)
 	]);
 var $elm$core$Array$fromListHelp = F3(
@@ -7837,6 +7842,7 @@ var $elm$time$Time$every = F2(
 var $author$project$Main$Input = function (a) {
 	return {$: 'Input', a: a};
 };
+var $author$project$Input$InputActivate = {$: 'InputActivate'};
 var $author$project$Input$InputDir = function (a) {
 	return {$: 'InputDir', a: a};
 };
@@ -7851,19 +7857,37 @@ var $author$project$Main$toDirection = function (string) {
 		case 'a':
 			return $author$project$Main$Input(
 				$author$project$Input$InputDir($author$project$Direction$Left));
+		case 'LeftArrow':
+			return $author$project$Main$Input(
+				$author$project$Input$InputDir($author$project$Direction$Left));
 		case 'd':
+			return $author$project$Main$Input(
+				$author$project$Input$InputDir($author$project$Direction$Right));
+		case 'RightArrow':
 			return $author$project$Main$Input(
 				$author$project$Input$InputDir($author$project$Direction$Right));
 		case 'w':
 			return $author$project$Main$Input(
 				$author$project$Input$InputDir($author$project$Direction$Up));
+		case 'UpArrow':
+			return $author$project$Main$Input(
+				$author$project$Input$InputDir($author$project$Direction$Up));
 		case 's':
 			return $author$project$Main$Input(
 				$author$project$Input$InputDir($author$project$Direction$Down));
-		case 'r':
+		case 'DownArrow':
+			return $author$project$Main$Input(
+				$author$project$Input$InputDir($author$project$Direction$Down));
+		case 'y':
+			return $author$project$Main$Input($author$project$Input$InputUndo);
+		case 'z':
 			return $author$project$Main$Input($author$project$Input$InputUndo);
 		case 'c':
+			return $author$project$Main$Input($author$project$Input$InputUndo);
+		case 'r':
 			return $author$project$Main$Input($author$project$Input$InputReset);
+		case ' ':
+			return $author$project$Main$Input($author$project$Input$InputActivate);
 		default:
 			return $author$project$Main$NoOps;
 	}
@@ -9665,7 +9689,6 @@ var $author$project$Main$update = F2(
 				}
 		}
 	});
-var $author$project$Input$InputActivate = {$: 'InputActivate'};
 var $author$project$Config$cellSize = 64;
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
@@ -9703,6 +9726,13 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $Orasund$elm_layout$Layout$gap = function (n) {
+	return A2(
+		$elm$html$Html$Attributes$style,
+		'gap',
+		$elm$core$String$fromFloat(n) + 'px');
+};
 var $Orasund$elm_layout$Html$Style$height = $elm$html$Html$Attributes$style('height');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
@@ -9722,7 +9752,8 @@ var $author$project$View$Screen$gameWon = A2(
 				$elm$html$Html$Attributes$class('dark-background'),
 				$Orasund$elm_layout$Html$Style$width('400px'),
 				$Orasund$elm_layout$Html$Style$height('400px'),
-				A2($elm$html$Html$Attributes$style, 'color', 'white')
+				A2($elm$html$Html$Attributes$style, 'color', 'white'),
+				$Orasund$elm_layout$Layout$gap(16)
 			]),
 		$Orasund$elm_layout$Layout$centered),
 	_List_fromArray(
@@ -9734,15 +9765,16 @@ var $author$project$View$Screen$gameWon = A2(
 					A2($elm$html$Html$Attributes$style, 'font-size', '46px'),
 					$Orasund$elm_layout$Layout$contentCentered
 				]),
-			'Thanks for playing')
+			'Thanks'),
+			A2(
+			$Orasund$elm_layout$Layout$text,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'font-size', '46px'),
+					$Orasund$elm_layout$Layout$contentCentered
+				]),
+			'for playing')
 		]));
-var $elm$core$String$fromFloat = _String_fromNumber;
-var $Orasund$elm_layout$Layout$gap = function (n) {
-	return A2(
-		$elm$html$Html$Attributes$style,
-		'gap',
-		$elm$core$String$fromFloat(n) + 'px');
-};
 var $elm$virtual_dom$VirtualDom$attribute = F2(
 	function (key, value) {
 		return A2(
@@ -9840,21 +9872,136 @@ var $author$project$View$Screen$menu = F2(
 				[
 					A2(
 					$Orasund$elm_layout$Layout$column,
-					_List_fromArray(
-						[
-							A2($elm$html$Html$Attributes$style, 'color', 'white'),
-							$Orasund$elm_layout$Layout$gap(32)
-						]),
+					_Utils_ap(
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'color', 'white'),
+								$Orasund$elm_layout$Layout$gap(32)
+							]),
+						$Orasund$elm_layout$Layout$centered),
 					_List_fromArray(
 						[
 							A2(
 							$author$project$Image$image,
 							_List_fromArray(
 								[$author$project$Image$pixelated, $Orasund$elm_layout$Layout$contentCentered]),
-							{height: 19 * 8, url: 'assets/logo.png', width: 39 * 8})
+							{height: 19 * 8, url: 'assets/logo.png', width: 39 * 8}),
+							A2(
+							$Orasund$elm_layout$Layout$text,
+							_List_fromArray(
+								[
+									A2($elm$html$Html$Attributes$style, 'font-size', '18px')
+								]),
+							'Tap or press SPACE to start')
 						]))
 				]));
 	});
+var $elm$core$Debug$log = _Debug_log;
+var $author$project$Image$bitmap = F3(
+	function (attrs, args, list) {
+		var width = $elm$core$String$fromFloat(args.columns * args.pixelSize) + 'px';
+		var height = $elm$core$String$fromFloat(args.rows * args.pixelSize) + 'px';
+		return A2(
+			$elm$html$Html$div,
+			_Utils_ap(
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'width', width),
+						A2($elm$html$Html$Attributes$style, 'height', height)
+					]),
+				attrs),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2(
+							$elm$html$Html$Attributes$style,
+							'box-shadow',
+							A2(
+								$elm$core$Debug$log,
+								'string',
+								A2(
+									$elm$core$String$join,
+									',',
+									A2(
+										$elm$core$List$map,
+										function (_v0) {
+											var _v1 = _v0.a;
+											var x = _v1.a;
+											var y = _v1.b;
+											var color = _v0.b;
+											return A2(
+												$elm$core$String$join,
+												' ',
+												_List_fromArray(
+													[
+														$elm$core$String$fromFloat(x * args.pixelSize) + 'px',
+														$elm$core$String$fromFloat(y * args.pixelSize) + 'px',
+														color
+													]));
+										},
+										list)))),
+							A2(
+							$elm$html$Html$Attributes$style,
+							'width',
+							$elm$core$String$fromFloat(args.pixelSize) + 'px'),
+							A2(
+							$elm$html$Html$Attributes$style,
+							'height',
+							$elm$core$String$fromFloat(args.pixelSize) + 'px')
+						]),
+					_List_Nil)
+				]));
+	});
+var $author$project$View$Bitmap$fromEmojis = F3(
+	function (attrs, color, rows) {
+		return A3(
+			$author$project$Image$bitmap,
+			attrs,
+			{columns: 16, pixelSize: 72 / 16, rows: 16},
+			A2(
+				$elm$core$List$filterMap,
+				function (_v0) {
+					var pos = _v0.a;
+					var _char = _v0.b;
+					switch (_char.valueOf()) {
+						case '🔘':
+							return $elm$core$Maybe$Just(
+								_Utils_Tuple2(pos, color));
+						case '❌':
+							return $elm$core$Maybe$Nothing;
+						default:
+							return $elm$core$Maybe$Nothing;
+					}
+				},
+				$elm$core$List$concat(
+					A2(
+						$elm$core$List$indexedMap,
+						F2(
+							function (y, string) {
+								return A2(
+									$elm$core$List$indexedMap,
+									function (x) {
+										return $elm$core$Tuple$pair(
+											_Utils_Tuple2(x, y));
+									},
+									$elm$core$String$toList(string));
+							}),
+						rows))));
+	});
+var $author$project$View$Bitmap$control = function (attrs) {
+	return A3(
+		$author$project$View$Bitmap$fromEmojis,
+		attrs,
+		'white',
+		_List_fromArray(
+			['❌❌❌❌❌❌❌❌❌❌❌❌❌🔘🔘❌', '❌❌❌❌❌❌❌❌❌❌❌🔘🔘❌🔘❌', '❌❌❌❌❌❌❌❌❌🔘🔘❌❌❌🔘❌', '❌❌❌❌❌❌❌❌🔘❌❌❌❌❌🔘❌', '❌❌❌❌❌❌🔘🔘❌❌❌❌❌❌🔘❌', '❌❌❌❌🔘🔘❌❌❌❌❌❌❌❌🔘❌', '❌❌❌🔘❌❌❌❌❌❌❌❌❌❌🔘❌', '❌❌🔘❌❌❌❌❌❌❌❌❌❌❌🔘❌', '❌❌🔘❌❌❌❌❌❌❌❌❌❌❌🔘❌', '❌❌❌🔘❌❌❌❌❌❌❌❌❌❌🔘❌', '❌❌❌❌🔘🔘❌❌❌❌❌❌❌❌🔘❌', '❌❌❌❌❌❌🔘🔘❌❌❌❌❌❌🔘❌', '❌❌❌❌❌❌❌❌🔘❌❌❌❌❌🔘❌', '❌❌❌❌❌❌❌❌❌🔘🔘❌❌❌🔘❌', '❌❌❌❌❌❌❌❌❌❌❌🔘🔘❌🔘❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌🔘🔘❌']));
+};
+var $author$project$View$Controls$arrow = function (attrs) {
+	return $author$project$View$Bitmap$control(attrs);
+};
 var $Orasund$elm_layout$Html$Style$bottom = $elm$html$Html$Attributes$style('bottom');
 var $Orasund$elm_layout$Html$Style$boxSizing = $elm$html$Html$Attributes$style('box-sizing');
 var $Orasund$elm_layout$Html$Style$boxSizingBorderBox = $Orasund$elm_layout$Html$Style$boxSizing('border-box');
@@ -9875,45 +10022,6 @@ var $Orasund$elm_layout$Layout$row = function (attrs) {
 				]),
 			attrs));
 };
-var $author$project$Image$sprite = F2(
-	function (attrs, args) {
-		var _v0 = args.pos;
-		var x = _v0.a;
-		var y = _v0.b;
-		return A2(
-			$elm$html$Html$div,
-			_Utils_ap(
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$Attributes$style,
-						'width',
-						$elm$core$String$fromFloat(args.width) + 'px'),
-						A2(
-						$elm$html$Html$Attributes$style,
-						'height',
-						$elm$core$String$fromFloat(args.height) + 'px'),
-						A2($elm$html$Html$Attributes$style, 'background-image', 'url(' + (args.url + ') ')),
-						A2(
-						$elm$html$Html$Attributes$style,
-						'background-position',
-						$elm$core$String$fromFloat((-args.width) * x) + ('px ' + ($elm$core$String$fromFloat((-args.height) * y) + 'px'))),
-						A2(
-						$elm$html$Html$Attributes$style,
-						'background-size',
-						$elm$core$String$fromFloat(args.width * args.sheetColumns) + ('px ' + ($elm$core$String$fromFloat(args.height * args.sheetRows) + 'px'))),
-						A2($elm$html$Html$Attributes$style, 'background-repeat', 'no-repeat')
-					]),
-				attrs),
-			_List_Nil);
-	});
-var $author$project$View$Controls$sprite = F2(
-	function (attrs, pos) {
-		return A2(
-			$author$project$Image$sprite,
-			A2($elm$core$List$cons, $author$project$Image$pixelated, attrs),
-			{height: 72, pos: pos, sheetColumns: 2, sheetRows: 1, url: 'assets/controls.png', width: 72});
-	});
 var $Orasund$elm_layout$Html$Style$top = $elm$html$Html$Attributes$style('top');
 var $author$project$View$Controls$toHtml = function (args) {
 	return A2(
@@ -9971,7 +10079,7 @@ var $author$project$View$Controls$toHtml = function (args) {
 											$Orasund$elm_layout$Html$Style$boxSizingBorderBox
 										]),
 									$Orasund$elm_layout$Layout$centered),
-								'C')
+								'R')
 							])),
 						A2(
 						$elm$html$Html$div,
@@ -9987,13 +10095,11 @@ var $author$project$View$Controls$toHtml = function (args) {
 								})),
 						_List_fromArray(
 							[
-								A2(
-								$author$project$View$Controls$sprite,
+								$author$project$View$Controls$arrow(
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'transform', 'rotate(90deg)')
-									]),
-								_Utils_Tuple2(0, 0)),
+									])),
 								A2(
 								$Orasund$elm_layout$Layout$text,
 								_Utils_ap(
@@ -10053,7 +10159,7 @@ var $author$project$View$Controls$toHtml = function (args) {
 											$Orasund$elm_layout$Html$Style$boxSizingBorderBox
 										]),
 									$Orasund$elm_layout$Layout$centered),
-								'R')
+								'C')
 							]))
 					])),
 				A2(
@@ -10075,10 +10181,7 @@ var $author$project$View$Controls$toHtml = function (args) {
 								})),
 						_List_fromArray(
 							[
-								A2(
-								$author$project$View$Controls$sprite,
-								_List_Nil,
-								_Utils_Tuple2(0, 0)),
+								$author$project$View$Controls$arrow(_List_Nil),
 								A2(
 								$Orasund$elm_layout$Layout$text,
 								_Utils_ap(
@@ -10116,13 +10219,11 @@ var $author$project$View$Controls$toHtml = function (args) {
 								})),
 						_List_fromArray(
 							[
-								A2(
-								$author$project$View$Controls$sprite,
+								$author$project$View$Controls$arrow(
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'transform', 'rotate(180deg)')
-									]),
-								_Utils_Tuple2(0, 0)),
+									])),
 								A2(
 								$Orasund$elm_layout$Layout$text,
 								_Utils_ap(
@@ -10158,13 +10259,11 @@ var $author$project$View$Controls$toHtml = function (args) {
 								})),
 						_List_fromArray(
 							[
-								A2(
-								$author$project$View$Controls$sprite,
+								$author$project$View$Controls$arrow(
 								_List_fromArray(
 									[
 										A2($elm$html$Html$Attributes$style, 'transform', 'rotate(-90deg)')
-									]),
-								_Utils_Tuple2(0, 0)),
+									])),
 								A2(
 								$Orasund$elm_layout$Layout$text,
 								_Utils_ap(
@@ -10183,6 +10282,38 @@ var $author$project$View$Controls$toHtml = function (args) {
 			]));
 };
 var $author$project$View$World$nodeSize = ($author$project$Config$cellSize / 2) | 0;
+var $author$project$Image$sprite = F2(
+	function (attrs, args) {
+		var _v0 = args.pos;
+		var x = _v0.a;
+		var y = _v0.b;
+		return A2(
+			$elm$html$Html$div,
+			_Utils_ap(
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$Attributes$style,
+						'width',
+						$elm$core$String$fromFloat(args.width) + 'px'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'height',
+						$elm$core$String$fromFloat(args.height) + 'px'),
+						A2($elm$html$Html$Attributes$style, 'background-image', 'url(' + (args.url + ') ')),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'background-position',
+						$elm$core$String$fromFloat((-args.width) * x) + ('px ' + ($elm$core$String$fromFloat((-args.height) * y) + 'px'))),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'background-size',
+						$elm$core$String$fromFloat(args.width * args.sheetColumns) + ('px ' + ($elm$core$String$fromFloat(args.height * args.sheetRows) + 'px'))),
+						A2($elm$html$Html$Attributes$style, 'background-repeat', 'no-repeat')
+					]),
+				attrs),
+			_List_Nil);
+	});
 var $author$project$View$World$image = F2(
 	function (attrs, pos) {
 		return A2(

@@ -71,8 +71,8 @@ image attrs args =
 bitmap :
     List (Attribute msg)
     ->
-        { width : Int
-        , height : Int
+        { columns : Int
+        , rows : Int
         , pixelSize : Float
         }
     -> List ( ( Int, Int ), String )
@@ -80,10 +80,10 @@ bitmap :
 bitmap attrs args list =
     let
         width =
-            String.fromFloat (toFloat args.width * args.pixelSize) ++ "px"
+            String.fromFloat (toFloat args.columns * args.pixelSize) ++ "px"
 
         height =
-            String.fromFloat (toFloat args.height * args.pixelSize) ++ "px"
+            String.fromFloat (toFloat args.rows * args.pixelSize) ++ "px"
     in
     Html.div
         ([ Html.Attributes.style "width" width
@@ -95,14 +95,17 @@ bitmap attrs args list =
             [ list
                 |> List.map
                     (\( ( x, y ), color ) ->
-                        [ String.fromFloat (toFloat x * args.pixelSize)
-                        , String.fromFloat (toFloat y * args.pixelSize)
+                        [ String.fromFloat (toFloat x * args.pixelSize) ++ "px"
+                        , String.fromFloat (toFloat y * args.pixelSize) ++ "px"
                         , color
                         ]
                             |> String.join " "
                     )
                 |> String.join ","
+                |> Debug.log "string"
                 |> Html.Attributes.style "box-shadow"
+            , Html.Attributes.style "width" (String.fromFloat args.pixelSize ++ "px")
+            , Html.Attributes.style "height" (String.fromFloat args.pixelSize ++ "px")
             ]
             []
         ]

@@ -5,22 +5,14 @@ import Entity exposing (Item(..))
 import Html exposing (Attribute, Html)
 import Html.Attributes
 import Html.Style
-import Image
 import Input exposing (Input(..))
 import Layout
+import View.Bitmap
 
 
-sprite : List (Attribute msg) -> ( Int, Int ) -> Html msg
-sprite attrs pos =
-    Image.sprite
-        (Image.pixelated :: attrs)
-        { pos = pos
-        , sheetColumns = 2
-        , sheetRows = 1
-        , url = "assets/controls.png"
-        , height = 72
-        , width = 72
-        }
+arrow : List (Attribute msg) -> Html msg
+arrow attrs =
+    View.Bitmap.control attrs
 
 
 label : List (Attribute msg) -> String -> Html msg
@@ -83,7 +75,7 @@ toHtml args =
                  ]
                     ++ Layout.centered
                 )
-        , "C"
+        , "R"
             |> Layout.text
                 ([ Html.Style.positionAbsolute
                  , Html.Style.top "16px"
@@ -108,9 +100,8 @@ toHtml args =
                        , Html.Style.height "72px"
                        ]
                 )
-      , [ sprite
+      , [ arrow
             [ Html.Attributes.style "transform" "rotate(90deg)" ]
-            ( 0, 0 )
         , "W"
             |> Layout.text
                 ([ Html.Style.positionAbsolute
@@ -143,7 +134,7 @@ toHtml args =
                  ]
                     ++ Layout.centered
                 )
-        , "R"
+        , "C"
             |> Layout.text
                 ([ Html.Style.positionAbsolute
                  , Html.Style.top "16px"
@@ -170,9 +161,7 @@ toHtml args =
                 )
       ]
         |> Layout.row []
-    , [ [ sprite
-            []
-            ( 0, 0 )
+    , [ [ arrow []
         , "A"
             |> Layout.text
                 ([ Html.Style.positionAbsolute
@@ -198,7 +187,7 @@ toHtml args =
             ]
             Layout.none
 
-      {--[ sprite [] ( 1, 0 )
+      {--[ View.Bitmap.controlSquare [] 
         , if args.isLevelSelect then
             "Play"
                 |> Layout.text [ Html.Attributes.style "color" "white" ]
@@ -240,10 +229,9 @@ toHtml args =
                         , label = "Place Bombe"
                         }
                 )--}
-      , [ sprite
+      , [ arrow
             [ Html.Attributes.style "transform" "rotate(180deg)"
             ]
-            ( 0, 0 )
         , "D"
             |> Layout.text
                 ([ Html.Style.positionAbsolute
@@ -265,9 +253,8 @@ toHtml args =
                 )
       ]
         |> Layout.row []
-    , [ [ sprite
+    , [ [ arrow
             [ Html.Attributes.style "transform" "rotate(-90deg)" ]
-            ( 0, 0 )
         , "S"
             |> Layout.text
                 ([ Html.Style.positionAbsolute

@@ -16,7 +16,12 @@ import View.Cell
 
 gameWon : Html msg
 gameWon =
-    [ "Thanks for playing"
+    [ "Thanks"
+        |> Layout.text
+            [ Html.Attributes.style "font-size" "46px"
+            , Layout.contentCentered
+            ]
+    , "for playing"
         |> Layout.text
             [ Html.Attributes.style "font-size" "46px"
             , Layout.contentCentered
@@ -27,6 +32,7 @@ gameWon =
              , Html.Style.width "400px"
              , Html.Style.height "400px"
              , Html.Attributes.style "color" "white"
+             , Layout.gap 16
              ]
                 ++ Layout.centered
             )
@@ -42,11 +48,14 @@ menu attrs args =
             , width = 39 * 8
             , height = 19 * 8
             }
+      , "Tap or press SPACE to start" |> Layout.text [ Html.Attributes.style "font-size" "18px" ]
       ]
         |> Layout.column
-            [ Html.Attributes.style "color" "white"
-            , Layout.gap 32
-            ]
+            ([ Html.Attributes.style "color" "white"
+             , Layout.gap 32
+             ]
+                ++ Layout.centered
+            )
 
     --, logo args.frame
     ]
