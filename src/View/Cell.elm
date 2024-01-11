@@ -65,24 +65,25 @@ particle attrs particleSort =
 
 toHtml : List (Attribute msg) -> { frame : Int, playerDirection : Direction } -> Entity -> Html msg
 toHtml attrs args cell =
-    (case cell of
+    case cell of
         Door ->
-            ( 2, 2 )
+            ( 2, 2 ) |> sprite attrs
 
         Player ->
             directional ( 0, 4 )
                 { direction = args.playerDirection
                 , frame = args.frame
                 }
+                |> sprite attrs
 
         Sign _ ->
-            ( 3, 2 )
+            ( 3, 2 ) |> sprite attrs
 
         Crate ->
-            ( 1, 3 )
+            ( 1, 3 ) |> sprite attrs
 
         InactiveBomb _ ->
-            ( 1, 6 )
+            ( 1, 6 ) |> sprite attrs
 
         Enemy enemy ->
             fromEnemy
@@ -90,6 +91,7 @@ toHtml attrs args cell =
                 , playerDirection = args.playerDirection
                 }
                 enemy
+                |> sprite attrs
 
         Stunned enemy ->
             fromEnemy
@@ -97,8 +99,7 @@ toHtml attrs args cell =
                 , playerDirection = args.playerDirection
                 }
                 enemy
-    )
-        |> sprite attrs
+                |> sprite attrs
 
 
 directional : ( Int, Int ) -> { direction : Direction, frame : Int } -> ( Int, Int )
