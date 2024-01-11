@@ -2,10 +2,11 @@ module View.Bitmap exposing (..)
 
 import Html exposing (Attribute, Html)
 import Image
+import View.Color
 
 
-fromEmojis : List (Attribute msg) -> String -> List String -> Html msg
-fromEmojis attrs color rows =
+fromEmojis : List (Attribute msg) -> { color : String, pixelSize : Float } -> List String -> Html msg
+fromEmojis attrs args rows =
     rows
         |> List.indexedMap
             (\y string ->
@@ -20,8 +21,20 @@ fromEmojis attrs color rows =
         |> List.filterMap
             (\( pos, char ) ->
                 case char of
+                    '⬜' ->
+                        Just ( pos, View.Color.white )
+
+                    '⬛' ->
+                        Just ( pos, View.Color.black )
+
+                    '🟨' ->
+                        Just ( pos, View.Color.yellow )
+
+                    '🟥' ->
+                        Just ( pos, View.Color.red )
+
                     '🔘' ->
-                        Just ( pos, color )
+                        Just ( pos, args.color )
 
                     '❌' ->
                         Nothing
@@ -32,14 +45,16 @@ fromEmojis attrs color rows =
         |> Image.bitmap attrs
             { columns = 16
             , rows = 16
-            , pixelSize = 72 / 16
+            , pixelSize = args.pixelSize
             }
 
 
 empty : Html msg
 empty =
     fromEmojis []
-        "white"
+        { color = "white"
+        , pixelSize = 72
+        }
         [ "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
         , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
         , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"

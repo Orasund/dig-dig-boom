@@ -9955,21 +9955,37 @@ var $author$project$Image$bitmap = F3(
 					_List_Nil)
 				]));
 	});
+var $author$project$View$Color$black = 'black';
+var $author$project$View$Color$red = '#d04648';
+var $author$project$View$Color$white = 'white';
+var $author$project$View$Color$yellow = '#dad45e';
 var $author$project$View$Bitmap$fromEmojis = F3(
-	function (attrs, color, rows) {
+	function (attrs, args, rows) {
 		return A3(
 			$author$project$Image$bitmap,
 			attrs,
-			{columns: 16, pixelSize: 72 / 16, rows: 16},
+			{columns: 16, pixelSize: args.pixelSize, rows: 16},
 			A2(
 				$elm$core$List$filterMap,
 				function (_v0) {
 					var pos = _v0.a;
 					var _char = _v0.b;
 					switch (_char.valueOf()) {
+						case '⬜':
+							return $elm$core$Maybe$Just(
+								_Utils_Tuple2(pos, $author$project$View$Color$white));
+						case '⬛':
+							return $elm$core$Maybe$Just(
+								_Utils_Tuple2(pos, $author$project$View$Color$black));
+						case '🟨':
+							return $elm$core$Maybe$Just(
+								_Utils_Tuple2(pos, $author$project$View$Color$yellow));
+						case '🟥':
+							return $elm$core$Maybe$Just(
+								_Utils_Tuple2(pos, $author$project$View$Color$red));
 						case '🔘':
 							return $elm$core$Maybe$Just(
-								_Utils_Tuple2(pos, color));
+								_Utils_Tuple2(pos, args.color));
 						case '❌':
 							return $elm$core$Maybe$Nothing;
 						default:
@@ -9991,16 +10007,21 @@ var $author$project$View$Bitmap$fromEmojis = F3(
 							}),
 						rows))));
 	});
-var $author$project$View$Bitmap$control = function (attrs) {
-	return A3(
+var $author$project$View$Controls$fromEmojis = function (attrs) {
+	return A2(
 		$author$project$View$Bitmap$fromEmojis,
 		attrs,
-		'white',
+		{color: 'white', pixelSize: 72 / 16});
+};
+var $author$project$View$Controls$control = function (attrs) {
+	return A2(
+		$author$project$View$Controls$fromEmojis,
+		attrs,
 		_List_fromArray(
 			['❌❌❌❌❌❌❌❌❌❌❌❌❌🔘🔘❌', '❌❌❌❌❌❌❌❌❌❌❌🔘🔘❌🔘❌', '❌❌❌❌❌❌❌❌❌🔘🔘❌❌❌🔘❌', '❌❌❌❌❌❌❌❌🔘❌❌❌❌❌🔘❌', '❌❌❌❌❌❌🔘🔘❌❌❌❌❌❌🔘❌', '❌❌❌❌🔘🔘❌❌❌❌❌❌❌❌🔘❌', '❌❌❌🔘❌❌❌❌❌❌❌❌❌❌🔘❌', '❌❌🔘❌❌❌❌❌❌❌❌❌❌❌🔘❌', '❌❌🔘❌❌❌❌❌❌❌❌❌❌❌🔘❌', '❌❌❌🔘❌❌❌❌❌❌❌❌❌❌🔘❌', '❌❌❌❌🔘🔘❌❌❌❌❌❌❌❌🔘❌', '❌❌❌❌❌❌🔘🔘❌❌❌❌❌❌🔘❌', '❌❌❌❌❌❌❌❌🔘❌❌❌❌❌🔘❌', '❌❌❌❌❌❌❌❌❌🔘🔘❌❌❌🔘❌', '❌❌❌❌❌❌❌❌❌❌❌🔘🔘❌🔘❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌🔘🔘❌']));
 };
 var $author$project$View$Controls$arrow = function (attrs) {
-	return $author$project$View$Bitmap$control(attrs);
+	return $author$project$View$Controls$control(attrs);
 };
 var $Orasund$elm_layout$Html$Style$bottom = $elm$html$Html$Attributes$style('bottom');
 var $Orasund$elm_layout$Html$Style$boxSizing = $elm$html$Html$Attributes$style('box-sizing');
@@ -10530,6 +10551,19 @@ var $author$project$View$Cell$directional = F2(
 				return _Utils_Tuple2((x + 2) + args.frame, y + 1);
 		}
 	});
+var $author$project$View$Cell$fromEmojis = function (attrs) {
+	return A2(
+		$author$project$View$Bitmap$fromEmojis,
+		attrs,
+		{color: 'white', pixelSize: $author$project$Config$cellSize / 16});
+};
+var $author$project$View$Cell$door = function (attrs) {
+	return A2(
+		$author$project$View$Cell$fromEmojis,
+		attrs,
+		_List_fromArray(
+			['❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌🟨❌🟨🟨🟨🟨❌🟨❌❌❌❌', '❌❌🟨🟨🟨❌🟨🟨🟨🟨❌🟨🟨🟨❌❌', '❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌', '❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌', '❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌', '❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌', '❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌', '❌🟨❌❌🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨❌', '❌❌🟨🟨❌❌❌❌❌❌❌❌❌❌❌❌', '❌🟨❌❌🟨❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌', '❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌', '❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌🟨🟨🟨🟨❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌']));
+};
 var $author$project$View$Cell$fromEnemy = F2(
 	function (args, enemy) {
 		switch (enemy.$) {
@@ -10560,38 +10594,51 @@ var $author$project$View$Cell$fromEnemy = F2(
 	});
 var $author$project$View$Cell$toHtml = F3(
 	function (attrs, args, cell) {
-		return A2(
-			$author$project$View$Cell$sprite,
-			attrs,
-			function () {
-				switch (cell.$) {
-					case 'Door':
-						return _Utils_Tuple2(2, 2);
-					case 'Player':
-						return A2(
-							$author$project$View$Cell$directional,
-							_Utils_Tuple2(0, 4),
-							{direction: args.playerDirection, frame: args.frame});
-					case 'Sign':
-						return _Utils_Tuple2(3, 2);
-					case 'Crate':
-						return _Utils_Tuple2(1, 3);
-					case 'InactiveBomb':
-						return _Utils_Tuple2(1, 6);
-					case 'Enemy':
-						var enemy = cell.a;
-						return A2(
-							$author$project$View$Cell$fromEnemy,
-							{frame: args.frame, playerDirection: args.playerDirection},
-							enemy);
-					default:
-						var enemy = cell.a;
-						return A2(
-							$author$project$View$Cell$fromEnemy,
-							{frame: args.frame, playerDirection: args.playerDirection},
-							enemy);
-				}
-			}());
+		switch (cell.$) {
+			case 'Door':
+				return $author$project$View$Cell$door(attrs);
+			case 'Player':
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					A2(
+						$author$project$View$Cell$directional,
+						_Utils_Tuple2(0, 4),
+						{direction: args.playerDirection, frame: args.frame}));
+			case 'Sign':
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					_Utils_Tuple2(3, 2));
+			case 'Crate':
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					_Utils_Tuple2(1, 3));
+			case 'InactiveBomb':
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					_Utils_Tuple2(1, 6));
+			case 'Enemy':
+				var enemy = cell.a;
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					A2(
+						$author$project$View$Cell$fromEnemy,
+						{frame: args.frame, playerDirection: args.playerDirection},
+						enemy));
+			default:
+				var enemy = cell.a;
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					A2(
+						$author$project$View$Cell$fromEnemy,
+						{frame: args.frame, playerDirection: args.playerDirection},
+						enemy));
+		}
 	});
 var $author$project$View$Screen$world = F2(
 	function (args, game) {

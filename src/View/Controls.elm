@@ -279,10 +279,17 @@ toHtml args =
         |> Layout.column Layout.centered
 
 
+fromEmojis : List (Attribute msg) -> List String -> Html msg
+fromEmojis attrs =
+    View.Bitmap.fromEmojis attrs
+        { color = "white"
+        , pixelSize = 72 / 16
+        }
+
+
 controlSquare : List (Attribute msg) -> Html msg
 controlSquare attrs =
-    View.Bitmap.fromEmojis attrs
-        "white"
+    fromEmojis attrs
         [ "🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘🔘"
         , "🔘❌❌❌❌❌❌❌❌❌❌❌❌❌❌🔘"
         , "🔘❌❌❌❌❌❌❌❌❌❌❌❌❌❌🔘"
@@ -304,8 +311,7 @@ controlSquare attrs =
 
 control : List (Attribute msg) -> Html msg
 control attrs =
-    View.Bitmap.fromEmojis attrs
-        "white"
+    fromEmojis attrs
         [ "❌❌❌❌❌❌❌❌❌❌❌❌❌🔘🔘❌"
         , "❌❌❌❌❌❌❌❌❌❌❌🔘🔘❌🔘❌"
         , "❌❌❌❌❌❌❌❌❌🔘🔘❌❌❌🔘❌"
