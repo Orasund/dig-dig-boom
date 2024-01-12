@@ -86,6 +86,14 @@ toHtml attrs args cell =
         InactiveBomb _ ->
             ( 1, 6 ) |> sprite attrs
 
+        ActiveSmallBomb ->
+            fromEnemy
+                { frame = args.frame
+                , playerDirection = args.playerDirection
+                }
+                (ActivatedBomb Bomb)
+                |> sprite attrs
+
         Enemy enemy ->
             fromEnemy
                 { frame = args.frame

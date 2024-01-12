@@ -79,6 +79,9 @@ parseEmoji string =
         '💣' ->
             EntityBlock (InactiveBomb Bomb) |> Just
 
+        '🧨' ->
+            EntityBlock ActiveSmallBomb |> Just
+
         '❌' ->
             HoleBlock |> Just
 

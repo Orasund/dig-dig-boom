@@ -6015,6 +6015,7 @@ var $elm$core$Maybe$map = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
+var $author$project$Entity$ActiveSmallBomb = {$: 'ActiveSmallBomb'};
 var $author$project$Entity$Bomb = {$: 'Bomb'};
 var $author$project$Entity$Crate = {$: 'Crate'};
 var $author$project$Entity$Enemy = function (a) {
@@ -6042,6 +6043,9 @@ var $author$project$Game$Build$parseEmoji = function (string) {
 			return $elm$core$Maybe$Just(
 				$author$project$Game$Build$EntityBlock(
 					$author$project$Entity$InactiveBomb($author$project$Entity$Bomb)));
+		case '🧨':
+			return $elm$core$Maybe$Just(
+				$author$project$Game$Build$EntityBlock($author$project$Entity$ActiveSmallBomb));
 		case '❌':
 			return $elm$core$Maybe$Just($author$project$Game$Build$HoleBlock);
 		case '🐀':
@@ -7263,47 +7267,37 @@ var $author$project$World$Trial$crateTails = _List_fromArray(
 		A2(
 		$author$project$Game$Build$generator,
 		_List_fromArray(
-			['🧱⬜📦⬜🧱', '🧱⬜⬜⬜🧱', '🧱📦💣📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
+			['🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
 		_List_Nil),
 		A2(
 		$author$project$Game$Build$generator,
 		_List_fromArray(
-			['🧱🧱🧱🧱🧱', '🧱⬜⬜⬜🧱', '🧱⬜💣⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
+			['🧱⬜📦⬜🧱', '🧱📦📦📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
 		_List_Nil),
 		A2(
 		$author$project$Game$Build$generator,
 		_List_fromArray(
-			['📦⬜📦📦📦', '📦💣📦📦⬜', '📦📦⬜⬜📦', '⬜⬜💣⬜⬜', '⬜⬜😊⬜⬜']),
+			['🧱📦📦📦🧱', '🧱📦🧨📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
 		_List_Nil),
 		A2(
 		$author$project$Game$Build$generator,
 		_List_fromArray(
-			['📦📦📦⬜📦', '📦⬜📦📦⬜', '📦💣💣⬜📦', '⬜⬜📦📦⬜', '⬜⬜😊⬜📦']),
+			['🧱🧱🧱🧱🧱', '🧱⬜⬜⬜🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
 		_List_Nil),
 		A2(
 		$author$project$Game$Build$generator,
 		_List_fromArray(
-			['📦⬜📦📦📦', '📦⬜⬜📦⬜', '⬜⬜📦⬜⬜', '⬜💣📦📦📦', '⬜📦😊📦⬜']),
+			['🧱🧱🧱🧱🧱', '🧱📦📦📦🧱', '🧱🧨🧨🧨🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
 		_List_Nil),
 		A2(
 		$author$project$Game$Build$generator,
 		_List_fromArray(
-			['⬜⬜📦💣📦', '⬜⬜📦⬜⬜', '⬜📦⬜📦📦', '📦📦📦⬜⬜', '📦⬜😊💣⬜']),
+			['🧱⬜📦⬜🧱', '🧨⬜⬜⬜🧨', '🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
 		_List_Nil),
 		A2(
 		$author$project$Game$Build$generator,
 		_List_fromArray(
-			['📦📦💣📦📦', '📦📦📦📦📦', '📦⬜⬜💣⬜', '⬜📦⬜⬜⬜', '⬜⬜😊⬜⬜']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
-			['📦📦📦⬜📦', '📦⬜💣📦⬜', '⬜💣📦📦⬜', '⬜⬜📦⬜📦', '⬜⬜😊⬜📦']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
-			['⬜📦📦📦⬜', '⬜💣⬜⬜💣', '📦📦📦📦💣', '📦💣💣⬜💣', '⬜💣😊💣⬜']),
+			['🧱🧱🧱🧱🧱', '🧱🧨📦🧨🧱', '🧱📦🧨📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
 		_List_Nil)
 	]);
 var $elm$core$Array$fromListHelp = F3(
@@ -8218,6 +8212,16 @@ var $author$project$Game$Event$kill = F2(
 							{
 								particles: A3($elm$core$Dict$insert, pos, $author$project$Entity$Bone, game.particles)
 							}));
+				case 'ActiveSmallBomb':
+					var _v3 = _v0.a;
+					return A2(
+						$author$project$Game$remove,
+						pos,
+						_Utils_update(
+							game,
+							{
+								particles: A3($elm$core$Dict$insert, pos, $author$project$Entity$Smoke, game.particles)
+							}));
 				case 'Enemy':
 					if (_v0.a.a.$ === 'ActivatedBomb') {
 						return A2(
@@ -8243,7 +8247,7 @@ var $author$project$Game$Event$kill = F2(
 					return A3(
 						$author$project$Game$update,
 						pos,
-						function (_v3) {
+						function (_v4) {
 							return $author$project$Entity$Enemy(
 								$author$project$Entity$ActivatedBomb(item));
 						},
@@ -8833,6 +8837,14 @@ var $author$project$Game$findFirstEmptyCellInDirection = F3(
 			}
 		}
 	});
+var $author$project$Game$Event$map = F2(
+	function (fun, output) {
+		return _Utils_update(
+			output,
+			{
+				game: fun(output.game)
+			});
+	});
 var $author$project$Game$move = F2(
 	function (args, game) {
 		return ($author$project$Math$posIsValid(args.to) && (!A2($elm$core$Dict$member, args.to, game.cells))) ? A2(
@@ -8861,22 +8873,94 @@ var $author$project$Game$addFloor = F2(
 				floor: A3($elm$core$Dict$insert, pos, $author$project$Entity$Ground, game.floor)
 			});
 	});
-var $author$project$Game$Update$push = F3(
+var $author$project$Game$Update$pushCrate = F3(
 	function (pos, dir, game) {
 		var newPos = A2(
 			$author$project$Position$addToVector,
 			pos,
 			$author$project$Direction$toVector(dir));
-		return (_Utils_eq(
-			A2($author$project$Game$get, newPos, game),
-			$elm$core$Maybe$Nothing) && $author$project$Math$posIsValid(newPos)) ? (A2($elm$core$Dict$member, newPos, game.floor) ? A2(
-			$author$project$Game$move,
-			{from: pos, to: newPos},
-			game) : $elm$core$Maybe$Just(
-			A2(
-				$author$project$Game$remove,
-				pos,
-				A2($author$project$Game$addFloor, newPos, game)))) : $elm$core$Maybe$Nothing;
+		if ($author$project$Math$posIsValid(newPos)) {
+			var _v0 = A2($author$project$Game$get, newPos, game);
+			if (_v0.$ === 'Nothing') {
+				return A2($elm$core$Dict$member, newPos, game.floor) ? A2(
+					$elm$core$Maybe$map,
+					$author$project$Game$Event$none,
+					A2(
+						$author$project$Game$move,
+						{from: pos, to: newPos},
+						game)) : $elm$core$Maybe$Just(
+					$author$project$Game$Event$none(
+						A2(
+							$author$project$Game$remove,
+							pos,
+							A2($author$project$Game$addFloor, newPos, game))));
+			} else {
+				if (_v0.a.$ === 'ActiveSmallBomb') {
+					var _v1 = _v0.a;
+					return A2(
+						$elm$core$Maybe$map,
+						function (g) {
+							return {
+								game: g,
+								kill: _List_fromArray(
+									[
+										$author$project$Game$Event$Kill(newPos)
+									])
+							};
+						},
+						A2(
+							$author$project$Game$move,
+							{from: pos, to: newPos},
+							A2($author$project$Game$remove, newPos, game)));
+				} else {
+					return $elm$core$Maybe$Nothing;
+				}
+			}
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Game$Update$pushSmallBomb = F3(
+	function (pos, dir, game) {
+		var newPos = A2(
+			$author$project$Position$addToVector,
+			pos,
+			$author$project$Direction$toVector(dir));
+		if ($author$project$Math$posIsValid(newPos)) {
+			var _v0 = A2($author$project$Game$get, newPos, game);
+			if (_v0.$ === 'Nothing') {
+				return A2($elm$core$Dict$member, newPos, game.floor) ? A2(
+					$elm$core$Maybe$map,
+					$author$project$Game$Event$none,
+					A2(
+						$author$project$Game$move,
+						{from: pos, to: newPos},
+						game)) : $elm$core$Maybe$Just(
+					$author$project$Game$Event$none(
+						A2(
+							$author$project$Game$remove,
+							pos,
+							A2($author$project$Game$addFloor, newPos, game))));
+			} else {
+				return A2(
+					$elm$core$Maybe$map,
+					function (g) {
+						return {
+							game: g,
+							kill: _List_fromArray(
+								[
+									$author$project$Game$Event$Kill(newPos)
+								])
+						};
+					},
+					A2(
+						$author$project$Game$move,
+						{from: pos, to: newPos},
+						A2($author$project$Game$remove, newPos, game)));
+			}
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
 	});
 var $author$project$Direction$mirror = function (direction) {
 	switch (direction.$) {
@@ -8943,27 +9027,64 @@ var $author$project$Game$Update$movePlayer = F2(
 			A2($elm$core$Dict$get, newLocation, game.cells));
 		if (_v0.$ === 'Just') {
 			switch (_v0.a.$) {
-				case 'Crate':
+				case 'ActiveSmallBomb':
 					var _v1 = _v0.a;
 					return A2(
 						$elm$core$Maybe$map,
-						function (g) {
-							return {
-								game: g,
-								kill: _List_fromArray(
-									[
-										$author$project$Game$Event$Fx($author$project$Gen$Sound$Push)
-									])
-							};
-						},
+						$author$project$Game$Event$andThen(
+							function (g) {
+								return {
+									game: A2($author$project$Game$Update$takeItem, newLocation, g),
+									kill: _List_fromArray(
+										[
+											$author$project$Game$Event$Fx($author$project$Gen$Sound$Push)
+										])
+								};
+							}),
 						A2(
 							$elm$core$Maybe$map,
-							$author$project$Game$Update$takeItem(newLocation),
+							$author$project$Game$Event$map(
+								function (g) {
+									return A2(
+										$elm$core$Maybe$withDefault,
+										g,
+										A2(
+											$author$project$Game$move,
+											{from: position, to: newLocation},
+											g));
+								}),
+							A3($author$project$Game$Update$pushSmallBomb, newLocation, game.playerDirection, game)));
+				case 'Crate':
+					var _v2 = _v0.a;
+					return A2(
+						$elm$core$Maybe$map,
+						$author$project$Game$Event$andThen(
+							function (g) {
+								return {
+									game: g,
+									kill: _List_fromArray(
+										[
+											$author$project$Game$Event$Fx($author$project$Gen$Sound$Push)
+										])
+								};
+							}),
+						A2(
+							$elm$core$Maybe$map,
+							$author$project$Game$Event$map(
+								$author$project$Game$Update$takeItem(newLocation)),
 							A2(
-								$elm$core$Maybe$andThen,
-								$author$project$Game$move(
-									{from: position, to: newLocation}),
-								A3($author$project$Game$Update$push, newLocation, game.playerDirection, game))));
+								$elm$core$Maybe$map,
+								$author$project$Game$Event$map(
+									function (g) {
+										return A2(
+											$elm$core$Maybe$withDefault,
+											g,
+											A2(
+												$author$project$Game$move,
+												{from: position, to: newLocation},
+												g));
+									}),
+								A3($author$project$Game$Update$pushCrate, newLocation, game.playerDirection, game))));
 				case 'InactiveBomb':
 					var item = _v0.a.a;
 					var newPos = A3($author$project$Game$findFirstEmptyCellInDirection, newLocation, game.playerDirection, game);
@@ -8981,7 +9102,7 @@ var $author$project$Game$Update$movePlayer = F2(
 								A3(
 									$author$project$Game$update,
 									newLocation,
-									function (_v2) {
+									function (_v3) {
 										return $author$project$Entity$Stunned(
 											A2(
 												$author$project$Game$Enemy$stun,
@@ -8999,7 +9120,7 @@ var $author$project$Game$Update$movePlayer = F2(
 								])
 						});
 				case 'Door':
-					var _v3 = _v0.a;
+					var _v4 = _v0.a;
 					return $elm$core$Maybe$Just(
 						{
 							game: _Utils_update(
@@ -10639,6 +10760,14 @@ var $author$project$View$Cell$toHtml = F3(
 					$author$project$View$Cell$sprite,
 					attrs,
 					_Utils_Tuple2(1, 6));
+			case 'ActiveSmallBomb':
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					A2(
+						$author$project$View$Cell$fromEnemy,
+						{frame: args.frame, playerDirection: args.playerDirection},
+						$author$project$Entity$ActivatedBomb($author$project$Entity$Bomb)));
 			case 'Enemy':
 				var enemy = cell.a;
 				return A2(

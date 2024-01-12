@@ -82,14 +82,27 @@ movePlayer position game =
                 else
                     [ newPos ]
             }--}
+        Just ActiveSmallBomb ->
+            game
+                |> pushSmallBomb newLocation game.playerDirection
+                |> Maybe.map (Game.Event.map (\g -> g |> Game.move { from = position, to = newLocation } |> Maybe.withDefault g))
+                |> Maybe.map
+                    (Game.Event.andThen
+                        (\g ->
+                            { game = takeItem newLocation g, kill = [ Fx Push ] }
+                        )
+                    )
+
         Just Crate ->
             game
-                |> push newLocation game.playerDirection
-                |> Maybe.andThen (Game.move { from = position, to = newLocation })
-                |> Maybe.map (takeItem newLocation)
+                |> pushCrate newLocation game.playerDirection
+                |> Maybe.map (Game.Event.map (\g -> g |> Game.move { from = position, to = newLocation } |> Maybe.withDefault g))
+                |> Maybe.map (Game.Event.map (takeItem newLocation))
                 |> Maybe.map
-                    (\g ->
-                        { game = g, kill = [ Fx Push ] }
+                    (Game.Event.andThen
+                        (\g ->
+                            { game = g, kill = [ Fx Push ] }
+                        )
                     )
 
         Just (InactiveBomb item) ->
@@ -205,29 +218,70 @@ placeBombeAndUpdateGame playerCell game =
         |> Maybe.map updateGame
 
 
-push : ( Int, Int ) -> Direction -> Game -> Maybe Game
-push pos dir game =
+pushCrate : ( Int, Int ) -> Direction -> Game -> Maybe GameAndEvents
+pushCrate pos dir game =
     let
         newPos =
             dir
                 |> Direction.toVector
                 |> Position.addToVector pos
     in
-    if
-        Game.get newPos
-            game
-            == Nothing
-            && Math.posIsValid newPos
-    then
-        if Dict.member newPos game.floor then
-            game
-                |> Game.move { from = pos, to = newPos }
+    if Math.posIsValid newPos then
+        case Game.get newPos game of
+            Nothing ->
+                if Dict.member newPos game.floor then
+                    game
+                        |> Game.move { from = pos, to = newPos }
+                        |> Maybe.map Game.Event.none
 
-        else
-            game
-                |> Game.addFloor newPos
-                |> Game.remove pos
-                |> Just
+                else
+                    game
+                        |> Game.addFloor newPos
+                        |> Game.remove pos
+                        |> Game.Event.none
+                        |> Just
+
+            Just ActiveSmallBomb ->
+                game
+                    |> Game.remove newPos
+                    |> Game.move { from = pos, to = newPos }
+                    |> Maybe.map (\g -> { game = g, kill = [ Kill newPos ] })
+
+            _ ->
+                Nothing
+
+    else
+        Nothing
+
+
+pushSmallBomb : ( Int, Int ) -> Direction -> Game -> Maybe GameAndEvents
+pushSmallBomb pos dir game =
+    let
+        newPos =
+            dir
+                |> Direction.toVector
+                |> Position.addToVector pos
+    in
+    if Math.posIsValid newPos then
+        case Game.get newPos game of
+            Nothing ->
+                if Dict.member newPos game.floor then
+                    game
+                        |> Game.move { from = pos, to = newPos }
+                        |> Maybe.map Game.Event.none
+
+                else
+                    game
+                        |> Game.addFloor newPos
+                        |> Game.remove pos
+                        |> Game.Event.none
+                        |> Just
+
+            Just _ ->
+                game
+                    |> Game.remove newPos
+                    |> Game.move { from = pos, to = newPos }
+                    |> Maybe.map (\g -> { game = g, kill = [ Kill newPos ] })
 
     else
         Nothing

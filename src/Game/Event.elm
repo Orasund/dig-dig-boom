@@ -63,6 +63,13 @@ kill pos game =
             }
                 |> Game.remove pos
 
+        Just ActiveSmallBomb ->
+            { game
+                | particles =
+                    game.particles |> Dict.insert pos Smoke
+            }
+                |> Game.remove pos
+
         Just (Enemy (ActivatedBomb _)) ->
             { game
                 | particles =

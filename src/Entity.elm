@@ -37,6 +37,7 @@ type Entity
     | Player
     | Crate
     | InactiveBomb Item
+    | ActiveSmallBomb
     | Sign String
     | Enemy Enemy
     | Stunned Enemy
