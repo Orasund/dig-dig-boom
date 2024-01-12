@@ -84,6 +84,18 @@ bitmap attrs args list =
 
         height =
             String.fromFloat (toFloat args.rows * args.pixelSize) ++ "px"
+
+        zero =
+            list
+                |> List.filterMap
+                    (\( pos, color ) ->
+                        if pos == ( 0, 0 ) then
+                            Just color
+
+                        else
+                            Nothing
+                    )
+                |> List.head
     in
     Html.div
         ([ Html.Attributes.style "width" width
@@ -102,10 +114,11 @@ bitmap attrs args list =
                             |> String.join " "
                     )
                 |> String.join ","
-                |> Debug.log "string"
                 |> Html.Attributes.style "box-shadow"
             , Html.Attributes.style "width" (String.fromFloat args.pixelSize ++ "px")
             , Html.Attributes.style "height" (String.fromFloat args.pixelSize ++ "px")
+            , Html.Attributes.style "background"
+                (zero |> Maybe.withDefault "transparent")
             ]
             []
         ]
