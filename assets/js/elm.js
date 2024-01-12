@@ -6029,6 +6029,7 @@ var $author$project$Entity$InactiveBomb = function (a) {
 	return {$: 'InactiveBomb', a: a};
 };
 var $author$project$Entity$Player = {$: 'Player'};
+var $author$project$Entity$Wall = {$: 'Wall'};
 var $author$project$Game$Build$parseEmoji = function (string) {
 	switch (string.valueOf()) {
 		case '😊':
@@ -6047,6 +6048,9 @@ var $author$project$Game$Build$parseEmoji = function (string) {
 			return $elm$core$Maybe$Just(
 				$author$project$Game$Build$EntityBlock(
 					$author$project$Entity$Enemy($author$project$Entity$Goblin)));
+		case '🧱':
+			return $elm$core$Maybe$Just(
+				$author$project$Game$Build$EntityBlock($author$project$Entity$Wall));
 		case '⬜':
 			return $elm$core$Maybe$Nothing;
 		default:
@@ -7244,17 +7248,27 @@ var $author$project$World$Trial$crateTails = _List_fromArray(
 		A2(
 		$author$project$Game$Build$generator,
 		_List_fromArray(
-			['⬜📦⬜📦⬜', '⬜⬜📦⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜😊⬜⬜']),
+			['🧱📦⬜📦🧱', '🧱⬜📦⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
 		_List_Nil),
 		A2(
 		$author$project$Game$Build$generator,
 		_List_fromArray(
-			['⬜📦⬜📦⬜', '⬜⬜📦⬜⬜', '📦📦📦📦📦', '⬜📦⬜⬜📦', '⬜⬜😊⬜⬜']),
+			['🧱📦⬜📦🧱', '🧱⬜⬜⬜🧱', '🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
 		_List_Nil),
 		A2(
 		$author$project$Game$Build$generator,
 		_List_fromArray(
-			['⬜⬜⬜⬜⬜', '📦📦📦⬜📦', '⬜⬜📦⬜⬜', '📦📦📦📦📦', '📦⬜😊⬜📦']),
+			['🧱⬜📦⬜🧱', '🧱⬜⬜⬜🧱', '🧱📦⬜📦🧱', '🧱⬜📦⬜🧱', '🧱⬜😊⬜🧱']),
+		_List_Nil),
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['🧱⬜📦⬜🧱', '🧱⬜⬜⬜🧱', '🧱📦💣📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
+		_List_Nil),
+		A2(
+		$author$project$Game$Build$generator,
+		_List_fromArray(
+			['🧱🧱🧱🧱🧱', '🧱⬜⬜⬜🧱', '🧱⬜💣⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
 		_List_Nil),
 		A2(
 		$author$project$Game$Build$generator,
@@ -9541,7 +9555,6 @@ var $author$project$Main$updateWorldMap = F2(
 			case 'InputActivate':
 				var _v1 = A2($elm$core$Dict$get, model.world.player, model.world.nodes);
 				if ((_v1.$ === 'Just') && (_v1.a.$ === 'Room')) {
-					var sort = _v1.a.a.sort;
 					var seed = _v1.a.a.seed;
 					return _Utils_Tuple2(
 						A3($author$project$Main$generateLevel, seed, model.room, model),
@@ -9682,7 +9695,6 @@ var $author$project$Main$update = F2(
 			default:
 				var result = msg.a;
 				if (result.$ === 'Ok') {
-					var sound = result.a.a;
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -10592,6 +10604,13 @@ var $author$project$View$Cell$fromEnemy = F2(
 				return _Utils_Tuple2(0 + args.frame, 1);
 		}
 	});
+var $author$project$View$Cell$wall = function (attrs) {
+	return A2(
+		$author$project$View$Cell$fromEmojis,
+		attrs,
+		_List_fromArray(
+			['❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜']));
+};
 var $author$project$View$Cell$toHtml = F3(
 	function (attrs, args, cell) {
 		switch (cell.$) {
@@ -10629,7 +10648,7 @@ var $author$project$View$Cell$toHtml = F3(
 						$author$project$View$Cell$fromEnemy,
 						{frame: args.frame, playerDirection: args.playerDirection},
 						enemy));
-			default:
+			case 'Stunned':
 				var enemy = cell.a;
 				return A2(
 					$author$project$View$Cell$sprite,
@@ -10638,6 +10657,8 @@ var $author$project$View$Cell$toHtml = F3(
 						$author$project$View$Cell$fromEnemy,
 						{frame: args.frame, playerDirection: args.playerDirection},
 						enemy));
+			default:
+				return $author$project$View$Cell$wall(attrs);
 		}
 	});
 var $author$project$View$Screen$world = F2(

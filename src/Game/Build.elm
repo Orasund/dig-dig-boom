@@ -85,6 +85,9 @@ parseEmoji string =
         '🐀' ->
             EntityBlock (Enemy Goblin) |> Just
 
+        '🧱' ->
+            EntityBlock Wall |> Just
+
         '⬜' ->
             Nothing
 

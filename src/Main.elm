@@ -341,7 +341,7 @@ update msg model =
 
         Received result ->
             case result of
-                Ok (SoundEnded sound) ->
+                Ok (SoundEnded _) ->
                     ( model, Cmd.none )
 
                 _ ->
@@ -353,7 +353,7 @@ updateWorldMap input model =
     case input of
         InputActivate ->
             case model.world.nodes |> Dict.get model.world.player of
-                Just (Room { sort, seed }) ->
+                Just (Room { seed }) ->
                     {--seed
                         |> Random.step (World.solveRoom model.world)
                         |> (\( w, s ) -> ( { model | world = w, seed = s }, Cmd.none ))
