@@ -5425,7 +5425,9 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var $author$project$Entity$Door = {$: 'Door'};
+var $author$project$Entity$Door = function (a) {
+	return {$: 'Door', a: a};
+};
 var $author$project$Direction$Down = {$: 'Down'};
 var $author$project$Entity$Ground = {$: 'Ground'};
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
@@ -5551,6 +5553,24 @@ var $elm$core$Dict$fromList = function (assocs) {
 		$elm$core$Dict$empty,
 		assocs);
 };
+var $author$project$Config$roomSize = 5;
+var $author$project$Game$empty = {
+	cells: $elm$core$Dict$empty,
+	floor: $elm$core$Dict$fromList(
+		A2(
+			$elm$core$List$map,
+			function (pos) {
+				return A2($elm$core$Tuple$pair, pos, $author$project$Entity$Ground);
+			},
+			$author$project$Position$asGrid(
+				{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize}))),
+	item: $elm$core$Maybe$Nothing,
+	items: $elm$core$Dict$empty,
+	nextId: 0,
+	particles: $elm$core$Dict$empty,
+	playerDirection: $author$project$Direction$Down,
+	won: false
+};
 var $author$project$Game$insert = F3(
 	function (pos, entity, game) {
 		return _Utils_update(
@@ -5563,31 +5583,6 @@ var $author$project$Game$insert = F3(
 					game.cells),
 				nextId: game.nextId + 1
 			});
-	});
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $author$project$Config$roomSize = 5;
-var $author$project$Game$empty = A3(
-	$author$project$Game$insert,
-	_Utils_Tuple2(2, -1),
-	$author$project$Entity$Door,
-	{
-		cells: $elm$core$Dict$empty,
-		floor: $elm$core$Dict$fromList(
-			A2(
-				$elm$core$List$map,
-				function (pos) {
-					return A2($elm$core$Tuple$pair, pos, $author$project$Entity$Ground);
-				},
-				$author$project$Position$asGrid(
-					{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize}))),
-		item: $elm$core$Maybe$Nothing,
-		items: $elm$core$Dict$empty,
-		nextId: 0,
-		particles: $elm$core$Dict$empty,
-		playerDirection: $author$project$Direction$Down,
-		won: false
 	});
 var $author$project$Game$placeItem = F3(
 	function (pos, item, game) {
@@ -5967,26 +5962,40 @@ var $author$project$Game$removeFloor = F2(
 				floor: A2($elm$core$Dict$remove, pos, game.floor)
 			});
 	});
-var $author$project$Game$Build$fromBlocks = function (blocks) {
-	return A3(
-		$elm$core$List$foldl,
-		function (_v0) {
-			var pos = _v0.a;
-			var block = _v0.b;
-			switch (block.$) {
-				case 'EntityBlock':
-					var entity = block.a;
-					return A2($author$project$Game$insert, pos, entity);
-				case 'ItemBlock':
-					var item = block.a;
-					return A2($author$project$Game$placeItem, pos, item);
-				default:
-					return $author$project$Game$removeFloor(pos);
-			}
-		},
-		$author$project$Game$empty,
-		blocks);
-};
+var $author$project$Game$Build$fromBlocks = F2(
+	function (args, blocks) {
+		var game = A3(
+			$elm$core$List$foldl,
+			function (_v1) {
+				var pos = _v1.a;
+				var block = _v1.b;
+				switch (block.$) {
+					case 'EntityBlock':
+						var entity = block.a;
+						return A2($author$project$Game$insert, pos, entity);
+					case 'ItemBlock':
+						var item = block.a;
+						return A2($author$project$Game$placeItem, pos, item);
+					default:
+						return $author$project$Game$removeFloor(pos);
+				}
+			},
+			$author$project$Game$empty,
+			blocks);
+		return A3(
+			$elm$core$List$foldl,
+			function (_v0) {
+				var pos = _v0.a;
+				var room = _v0.b;
+				return A2(
+					$author$project$Game$insert,
+					pos,
+					$author$project$Entity$Door(
+						{room: room.next}));
+			},
+			game,
+			args.doors);
+	});
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _v0 = f(mx);
@@ -6154,6 +6163,9 @@ var $elm$core$Dict$member = F2(
 		}
 	});
 var $elm$core$Basics$not = _Basics_not;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
@@ -6246,35 +6258,40 @@ var $author$project$Game$Build$shuffle = function (list) {
 var $author$project$Game$Build$validator = function (_v0) {
 	return true;
 };
-var $author$project$Game$Build$generator = F2(
-	function (emojis, blocks) {
-		var dict = $author$project$Game$Build$fromEmojis(emojis);
-		var rec = function (_v0) {
-			return A2(
-				$elm$random$Random$andThen,
-				function (game) {
-					return $author$project$Game$Build$validator(game.cells) ? $elm$random$Random$constant(game) : $elm$random$Random$lazy(rec);
-				},
+var $author$project$Game$Build$build = function (args) {
+	var dict = $author$project$Game$Build$fromEmojis(args.emojis);
+	var rec = function (_v0) {
+		return A2(
+			$elm$random$Random$andThen,
+			function (game) {
+				return $author$project$Game$Build$validator(game.cells) ? $elm$random$Random$constant(game) : $elm$random$Random$lazy(rec);
+			},
+			A2(
+				$elm$random$Random$map,
+				$author$project$Game$Build$fromBlocks(
+					{doors: args.doors}),
 				A2(
 					$elm$random$Random$map,
-					$author$project$Game$Build$fromBlocks,
-					A2(
-						$elm$random$Random$map,
-						function (list) {
-							return _Utils_ap(
-								A3($elm$core$List$map2, $elm$core$Tuple$pair, list, blocks),
-								$elm$core$Dict$toList(dict));
-						},
-						$author$project$Game$Build$shuffle(
-							A2(
-								$elm$core$List$filter,
-								function (pos) {
-									return !A2($elm$core$Dict$member, pos, dict);
-								},
-								$author$project$Position$asGrid(
-									{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize}))))));
-		};
-		return rec(_Utils_Tuple0);
+					function (list) {
+						return _Utils_ap(
+							A3($elm$core$List$map2, $elm$core$Tuple$pair, list, args.blocks),
+							$elm$core$Dict$toList(dict));
+					},
+					$author$project$Game$Build$shuffle(
+						A2(
+							$elm$core$List$filter,
+							function (pos) {
+								return !A2($elm$core$Dict$member, pos, dict);
+							},
+							$author$project$Position$asGrid(
+								{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize}))))));
+	};
+	return rec(_Utils_Tuple0);
+};
+var $author$project$Game$Build$generator = F2(
+	function (emojis, blocks) {
+		return $author$project$Game$Build$build(
+			{blocks: blocks, doors: _List_Nil, emojis: emojis});
 	});
 var $author$project$World$Level$empty = A2(
 	$author$project$Game$Build$generator,
@@ -7247,69 +7264,60 @@ var $author$project$Port$fromElm = function (value) {
 	return $author$project$Port$interopFromElm(
 		A3($elm$core$Basics$apR, $author$project$PortDefinition$interop.fromElm, $dillonkearns$elm_ts_json$TsJson$Encode$encoder, value));
 };
-var $author$project$World$Trial$crateTails = _List_fromArray(
-	[
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
+var $author$project$Game$Build$constant = F2(
+	function (emojis, doors) {
+		return $author$project$Game$Build$build(
+			{blocks: _List_Nil, doors: doors, emojis: emojis});
+	});
+var $author$project$World$Trial$crateTails = A2(
+	$elm$core$List$indexedMap,
+	F2(
+		function (i, list) {
+			return A2(
+				$author$project$Game$Build$constant,
+				list,
+				A2(
+					$elm$core$List$filterMap,
+					$elm$core$Basics$identity,
+					_List_fromArray(
+						[
+							$elm$core$Maybe$Just(
+							_Utils_Tuple2(
+								_Utils_Tuple2(2, -1),
+								{next: i + 1})),
+							(i > 0) ? $elm$core$Maybe$Just(
+							_Utils_Tuple2(
+								_Utils_Tuple2(2, 5),
+								{next: i - 1})) : $elm$core$Maybe$Nothing
+						])));
+		}),
+	_List_fromArray(
+		[
+			_List_fromArray(
 			['🧱📦⬜📦🧱', '🧱⬜📦⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
+			_List_fromArray(
 			['🧱📦⬜📦🧱', '🧱⬜⬜⬜🧱', '🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
+			_List_fromArray(
 			['🧱⬜📦⬜🧱', '🧱⬜⬜⬜🧱', '🧱📦⬜📦🧱', '🧱⬜📦⬜🧱', '🧱⬜😊⬜🧱']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
+			_List_fromArray(
 			['🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
+			_List_fromArray(
 			['🧱⬜📦⬜🧱', '🧱📦📦📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
+			_List_fromArray(
 			['🧱📦📦📦🧱', '🧱📦🧨📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
+			_List_fromArray(
 			['🧱🧱🧱🧱🧱', '🧱⬜⬜⬜🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
+			_List_fromArray(
 			['🧱🧱🧱🧱🧱', '🧱📦📦📦🧱', '🧱🧨🧨🧨🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
+			_List_fromArray(
 			['🧱🧱🧱🧱🧱', '🧱🧨📦🧨🧱', '🧱📦🧨📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
+			_List_fromArray(
 			['🧱⬜📦⬜🧱', '🧨⬜⬜⬜🧨', '🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
+			_List_fromArray(
 			['🧱⬜📦⬜🧱', '🧱📦⬜📦🧱', '🧨⬜📦⬜🧨', '🧨📦📦📦🧨', '🧱⬜😊⬜🧱']),
-		_List_Nil),
-		A2(
-		$author$project$Game$Build$generator,
-		_List_fromArray(
-			['🧱⬜🧱⬜🧱', '🧨🧱📦🧱🧨', '🧨📦🧨📦🧨', '🧨⬜🧨⬜🧨', '🧱⬜😊⬜🧱']),
-		_List_Nil)
-	]);
+			_List_fromArray(
+			['🧱⬜🧱⬜🧱', '🧨🧱📦🧱🧨', '🧨📦🧨📦🧨', '🧨⬜🧨⬜🧨', '🧱⬜😊⬜🧱'])
+		]));
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
 		fromListHelp:
@@ -8112,7 +8120,6 @@ var $author$project$Game$Event$Fx = function (a) {
 var $author$project$PortDefinition$PlaySound = function (a) {
 	return {$: 'PlaySound', a: a};
 };
-var $author$project$Game$Event$StageComplete = {$: 'StageComplete'};
 var $author$project$Main$WorldMap = {$: 'WorldMap'};
 var $author$project$Game$Event$andThen = F2(
 	function (fun, output) {
@@ -8133,7 +8140,9 @@ var $elm$core$Maybe$andThen = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
-var $author$project$Main$NextLevelRequested = {$: 'NextLevelRequested'};
+var $author$project$Main$RoomEntered = function (a) {
+	return {$: 'RoomEntered', a: a};
+};
 var $author$project$Entity$ActivatedBomb = function (a) {
 	return {$: 'ActivatedBomb', a: a};
 };
@@ -8289,6 +8298,7 @@ var $author$project$Main$applyEvent = F2(
 						$author$project$PortDefinition$PlaySound(
 							{looping: false, sound: sound})));
 			default:
+				var room = event.a;
 				return _Utils_Tuple2(
 					model,
 					$elm$core$Platform$Cmd$batch(
@@ -8297,7 +8307,7 @@ var $author$project$Main$applyEvent = F2(
 								A2(
 								$elm$core$Task$perform,
 								function (_v1) {
-									return $author$project$Main$NextLevelRequested;
+									return $author$project$Main$RoomEntered(room);
 								},
 								$elm$core$Process$sleep(200)),
 								$author$project$Port$fromElm(
@@ -8793,6 +8803,9 @@ var $author$project$Game$face = F2(
 var $author$project$Game$Event$Kill = function (a) {
 	return {$: 'Kill', a: a};
 };
+var $author$project$Game$Event$MoveToRoom = function (a) {
+	return {$: 'MoveToRoom', a: a};
+};
 var $author$project$Entity$Stunned = function (a) {
 	return {$: 'Stunned', a: a};
 };
@@ -9130,7 +9143,7 @@ var $author$project$Game$Update$movePlayer = F2(
 								])
 						});
 				case 'Door':
-					var _v4 = _v0.a;
+					var door = _v0.a.a;
 					return $elm$core$Maybe$Just(
 						{
 							game: _Utils_update(
@@ -9150,7 +9163,10 @@ var $author$project$Game$Update$movePlayer = F2(
 											A2($elm$core$Dict$get, position, game.cells))),
 									won: true
 								}),
-							kill: _List_Nil
+							kill: _List_fromArray(
+								[
+									$author$project$Game$Event$MoveToRoom(door.room)
+								])
 						});
 				default:
 					return $elm$core$Maybe$Nothing;
@@ -9585,17 +9601,18 @@ var $author$project$Main$nextFrameRequested = function (model) {
 			frame: A2($elm$core$Basics$modBy, 2, model.frame + 1)
 		});
 };
-var $author$project$Main$nextRoom = function (model) {
-	return _Utils_Tuple2(
-		A3(
-			$author$project$Main$generateLevel,
-			model.seed,
-			model.room + 1,
-			_Utils_update(
-				model,
-				{history: _List_Nil, room: model.room + 1})),
-		$elm$core$Platform$Cmd$none);
-};
+var $author$project$Main$nextRoom = F2(
+	function (id, model) {
+		return _Utils_Tuple2(
+			A3(
+				$author$project$Main$generateLevel,
+				model.seed,
+				id,
+				_Utils_update(
+					model,
+					{history: _List_Nil, room: id})),
+			$elm$core$Platform$Cmd$none);
+	});
 var $author$project$Game$Update$applyBomb = F2(
 	function (position, game) {
 		var newPosition = A2(
@@ -9806,10 +9823,7 @@ var $author$project$Main$update = F2(
 				}
 			case 'ApplyEvents':
 				var events = msg.a;
-				return A2(
-					$author$project$Main$applyEvents,
-					$author$project$Game$isWon(model.game) ? A2($elm$core$List$cons, $author$project$Game$Event$StageComplete, events) : events,
-					model);
+				return A2($author$project$Main$applyEvents, events, model);
 			case 'NextFrameRequested':
 				return _Utils_Tuple2(
 					$author$project$Main$nextFrameRequested(model),
@@ -9821,8 +9835,9 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'NoOps':
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-			case 'NextLevelRequested':
-				return $author$project$Main$nextRoom(model);
+			case 'RoomEntered':
+				var id = msg.a;
+				return A2($author$project$Main$nextRoom, id, model);
 			default:
 				var result = msg.a;
 				if (result.$ === 'Ok') {

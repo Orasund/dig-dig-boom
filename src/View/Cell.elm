@@ -67,7 +67,7 @@ particle attrs particleSort =
 toHtml : List (Attribute msg) -> { frame : Int, playerDirection : Direction } -> Entity -> Html msg
 toHtml attrs args cell =
     case cell of
-        Door ->
+        Door _ ->
             door attrs
 
         Player ->

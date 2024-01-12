@@ -1,4 +1,4 @@
-module Game.Build exposing (BuildingBlock(..), fromEmojis, generator)
+module Game.Build exposing (BuildingBlock(..), constant, fromEmojis, generator)
 
 import Config
 import Dict exposing (Dict)
@@ -15,11 +15,34 @@ type BuildingBlock
     | HoleBlock
 
 
+constant : List String -> List ( ( Int, Int ), { next : Int } ) -> Generator Game
+constant emojis doors =
+    build
+        { emojis = emojis
+        , blocks = []
+        , doors = doors
+        }
+
+
 generator : List String -> List BuildingBlock -> Generator Game
 generator emojis blocks =
+    build
+        { emojis = emojis
+        , blocks = blocks
+        , doors = []
+        }
+
+
+build :
+    { emojis : List String
+    , blocks : List BuildingBlock
+    , doors : List ( ( Int, Int ), { next : Int } )
+    }
+    -> Generator Game
+build args =
     let
         dict =
-            fromEmojis emojis
+            fromEmojis args.emojis
 
         rec () =
             Position.asGrid
@@ -33,10 +56,10 @@ generator emojis blocks =
                 |> shuffle
                 |> Random.map
                     (\list ->
-                        List.map2 Tuple.pair list blocks
+                        List.map2 Tuple.pair list args.blocks
                             ++ Dict.toList dict
                     )
-                |> Random.map fromBlocks
+                |> Random.map (fromBlocks { doors = args.doors })
                 |> Random.andThen
                     (\game ->
                         if validator game.cells then
@@ -98,22 +121,31 @@ parseEmoji string =
             Nothing
 
 
-fromBlocks : List ( ( Int, Int ), BuildingBlock ) -> Game
-fromBlocks blocks =
-    blocks
+fromBlocks : { doors : List ( ( Int, Int ), { next : Int } ) } -> List ( ( Int, Int ), BuildingBlock ) -> Game
+fromBlocks args blocks =
+    let
+        game =
+            blocks
+                |> List.foldl
+                    (\( pos, block ) ->
+                        case block of
+                            EntityBlock entity ->
+                                Game.insert pos entity
+
+                            ItemBlock item ->
+                                Game.placeItem pos item
+
+                            HoleBlock ->
+                                Game.removeFloor pos
+                    )
+                    Game.empty
+    in
+    args.doors
         |> List.foldl
-            (\( pos, block ) ->
-                case block of
-                    EntityBlock entity ->
-                        Game.insert pos entity
-
-                    ItemBlock item ->
-                        Game.placeItem pos item
-
-                    HoleBlock ->
-                        Game.removeFloor pos
+            (\( pos, room ) ->
+                Game.insert pos (Door { room = room.next })
             )
-            Game.empty
+            game
 
 
 neighbors4 : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)

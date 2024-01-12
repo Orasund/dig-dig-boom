@@ -33,7 +33,7 @@ type Item
 
 
 type Entity
-    = Door
+    = Door { room : Int }
     | Player
     | Crate
     | InactiveBomb Item

@@ -134,7 +134,7 @@ movePlayer position game =
             }
                 |> Just
 
-        Just Door ->
+        Just (Door door) ->
             { game =
                 { game
                     | won = True
@@ -149,7 +149,7 @@ movePlayer position game =
                                 )
                             |> Maybe.withDefault game.cells
                 }
-            , kill = []
+            , kill = [ MoveToRoom door.room ]
             }
                 |> Just
 

@@ -61,7 +61,7 @@ type Msg
     | GotSeed Seed
     | NextFrameRequested
     | NoOps
-    | NextLevelRequested
+    | RoomEntered Int
     | Received (Result Decode.Error PortDefinition.ToElm)
 
 
@@ -164,12 +164,12 @@ restartRoom model =
     )
 
 
-nextRoom : Model -> ( Model, Cmd Msg )
-nextRoom model =
+nextRoom : Int -> Model -> ( Model, Cmd Msg )
+nextRoom id model =
     ( generateLevel model.seed
-        (model.room + 1)
+        id
         { model
-            | room = model.room + 1
+            | room = id
             , history = []
         }
     , Cmd.none
@@ -220,10 +220,10 @@ applyEvent event model =
                 )
             )
 
-        StageComplete ->
+        MoveToRoom room ->
             ( model
             , Cmd.batch
-                [ Process.sleep 200 |> Task.perform (\() -> NextLevelRequested)
+                [ Process.sleep 200 |> Task.perform (\() -> RoomEntered room)
                 , PlaySound
                     { sound = Win
                     , looping = False
@@ -317,13 +317,7 @@ update msg model =
 
         ApplyEvents events ->
             model
-                |> applyEvents
-                    (if Game.isWon model.game then
-                        StageComplete :: events
-
-                     else
-                        events
-                    )
+                |> applyEvents events
 
         NextFrameRequested ->
             ( nextFrameRequested model
@@ -336,8 +330,8 @@ update msg model =
         NoOps ->
             ( model, Cmd.none )
 
-        NextLevelRequested ->
-            nextRoom model
+        RoomEntered id ->
+            nextRoom id model
 
         Received result ->
             case result of

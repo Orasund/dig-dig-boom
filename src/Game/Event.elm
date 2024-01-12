@@ -16,7 +16,7 @@ import Gen.Sound exposing (Sound)
 type Event
     = Kill ( Int, Int )
     | Fx Sound
-    | StageComplete
+    | MoveToRoom Int
 
 
 type alias GameAndEvents =
