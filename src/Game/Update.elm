@@ -134,24 +134,8 @@ movePlayer position game =
             }
                 |> Just
 
-        Just (Door door) ->
-            { game =
-                { game
-                    | won = True
-                    , cells =
-                        game.cells
-                            |> Dict.get position
-                            |> Maybe.map
-                                (\a ->
-                                    game.cells
-                                        |> Dict.insert newLocation a
-                                        |> Dict.remove position
-                                )
-                            |> Maybe.withDefault game.cells
-                }
-            , kill = [ MoveToRoom door.room ]
-            }
-                |> Just
+        Just Diamant ->
+            Just { game = game, kill = [ WinGame ] }
 
         Nothing ->
             if Math.posIsValid newLocation && Dict.member newLocation game.floor then
@@ -163,7 +147,27 @@ movePlayer position game =
                     |> Just
 
             else
-                Nothing
+                Dict.get newLocation game.doors
+                    |> Maybe.map
+                        (\door ->
+                            { game =
+                                { game
+                                    | won = True
+                                    , cells =
+                                        game.cells
+                                            |> Dict.get position
+                                            |> Maybe.map
+                                                (\a ->
+                                                    game.cells
+                                                        |> Dict.insert newLocation a
+                                                        |> Dict.remove position
+                                                )
+                                            |> Maybe.withDefault game.cells
+                                    , playerPos = Just newLocation
+                                }
+                            , kill = [ MoveToRoom door.room ]
+                            }
+                        )
 
         _ ->
             {--{ game = game |> Game.face game.playerDirection

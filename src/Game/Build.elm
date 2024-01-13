@@ -15,13 +15,11 @@ type BuildingBlock
     | HoleBlock
 
 
-constant : List String -> List ( ( Int, Int ), { next : Int } ) -> Generator Game
+constant : List String -> List ( ( Int, Int ), { room : ( Int, Int ) } ) -> Game
 constant emojis doors =
-    build
-        { emojis = emojis
-        , blocks = []
-        , doors = doors
-        }
+    fromEmojis emojis
+        |> Dict.toList
+        |> fromBlocks { doors = doors }
 
 
 generator : List String -> List BuildingBlock -> Generator Game
@@ -36,7 +34,7 @@ generator emojis blocks =
 build :
     { emojis : List String
     , blocks : List BuildingBlock
-    , doors : List ( ( Int, Int ), { next : Int } )
+    , doors : List ( ( Int, Int ), { room : ( Int, Int ) } )
     }
     -> Generator Game
 build args =
@@ -93,9 +91,8 @@ fromEmojis rows =
 parseEmoji : Char -> Maybe BuildingBlock
 parseEmoji string =
     case string of
-        '😊' ->
-            EntityBlock Player |> Just
-
+        -- '😊' ->
+        --    EntityBlock Player |> Just
         '📦' ->
             EntityBlock Crate |> Just
 
@@ -114,6 +111,9 @@ parseEmoji string =
         '🧱' ->
             EntityBlock Wall |> Just
 
+        '💎' ->
+            EntityBlock Diamant |> Just
+
         '⬜' ->
             Nothing
 
@@ -121,7 +121,7 @@ parseEmoji string =
             Nothing
 
 
-fromBlocks : { doors : List ( ( Int, Int ), { next : Int } ) } -> List ( ( Int, Int ), BuildingBlock ) -> Game
+fromBlocks : { doors : List ( ( Int, Int ), { room : ( Int, Int ) } ) } -> List ( ( Int, Int ), BuildingBlock ) -> Game
 fromBlocks args blocks =
     let
         game =
@@ -140,17 +140,11 @@ fromBlocks args blocks =
                     )
                     Game.empty
     in
-    args.doors
-        |> List.foldl
-            (\( pos, room ) ->
-                Game.insert pos (Door { room = room.next })
-            )
-            { game
-                | doors =
-                    args.doors
-                        |> List.map (Tuple.mapSecond .next)
-                        |> Dict.fromList
-            }
+    { game
+        | doors =
+            args.doors
+                |> Dict.fromList
+    }
 
 
 neighbors4 : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)

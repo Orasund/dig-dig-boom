@@ -8,7 +8,6 @@ import Game exposing (Game)
 import Html exposing (Attribute, Html)
 import Html.Style
 import Image
-import Layout
 import View.Bitmap
 
 
@@ -68,10 +67,6 @@ particle attrs particleSort =
 toHtml : List (Attribute msg) -> { frame : Int, playerDirection : Direction } -> Entity -> Html msg
 toHtml attrs args cell =
     case cell of
-        Door _ ->
-            Layout.el attrs Layout.none
-
-        --door attrs
         Player ->
             directional ( 0, 4 )
                 { direction = args.playerDirection
@@ -114,6 +109,9 @@ toHtml attrs args cell =
 
         Wall ->
             wall attrs
+
+        Diamant ->
+            diamant attrs
 
 
 directional : ( Int, Int ) -> { direction : Direction, frame : Int } -> ( Int, Int )
@@ -211,6 +209,28 @@ fromEmojis attrs =
         { color = "white"
         , pixelSize = Config.cellSize / 16
         }
+
+
+diamant : List (Attribute msg) -> Html msg
+diamant attrs =
+    fromEmojis attrs
+        [ "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        , "❌❌❌🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨❌❌❌"
+        , "❌❌🟨❌❌🟨❌❌❌❌🟨❌❌🟨❌❌"
+        , "❌🟨❌❌🟨❌❌❌❌❌❌🟨❌❌🟨❌"
+        , "❌🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨❌"
+        , "❌❌🟨❌❌🟨❌❌❌❌🟨❌❌🟨❌❌"
+        , "❌❌❌🟨❌❌🟨❌❌🟨❌❌🟨❌❌❌"
+        , "❌❌❌❌🟨❌🟨❌❌🟨❌🟨❌❌❌❌"
+        , "❌❌❌❌❌🟨❌🟨🟨❌🟨❌❌❌❌❌"
+        , "❌❌❌❌❌❌🟨🟨🟨🟨❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌🟨🟨❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        ]
 
 
 wall : List (Attribute msg) -> Html msg

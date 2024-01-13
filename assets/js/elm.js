@@ -4372,43 +4372,6 @@ function _Browser_load(url)
 }
 
 
-
-var _Bitwise_and = F2(function(a, b)
-{
-	return a & b;
-});
-
-var _Bitwise_or = F2(function(a, b)
-{
-	return a | b;
-});
-
-var _Bitwise_xor = F2(function(a, b)
-{
-	return a ^ b;
-});
-
-function _Bitwise_complement(a)
-{
-	return ~a;
-};
-
-var _Bitwise_shiftLeftBy = F2(function(offset, a)
-{
-	return a << offset;
-});
-
-var _Bitwise_shiftRightBy = F2(function(offset, a)
-{
-	return a >> offset;
-});
-
-var _Bitwise_shiftRightZfBy = F2(function(offset, a)
-{
-	return a >>> offset;
-});
-
-
 // CREATE
 
 var _Regex_never = /.^/;
@@ -4508,6 +4471,43 @@ var _Regex_splitAtMost = F3(function(n, re, str)
 });
 
 var _Regex_infinity = Infinity;
+
+
+
+var _Bitwise_and = F2(function(a, b)
+{
+	return a & b;
+});
+
+var _Bitwise_or = F2(function(a, b)
+{
+	return a | b;
+});
+
+var _Bitwise_xor = F2(function(a, b)
+{
+	return a ^ b;
+});
+
+function _Bitwise_complement(a)
+{
+	return ~a;
+};
+
+var _Bitwise_shiftLeftBy = F2(function(offset, a)
+{
+	return a << offset;
+});
+
+var _Bitwise_shiftRightBy = F2(function(offset, a)
+{
+	return a >> offset;
+});
+
+var _Bitwise_shiftRightZfBy = F2(function(offset, a)
+{
+	return a >>> offset;
+});
 
 
 
@@ -5350,93 +5350,17 @@ var $author$project$Main$Menu = {$: 'Menu'};
 var $author$project$PortDefinition$RegisterSounds = function (a) {
 	return {$: 'RegisterSounds', a: a};
 };
-var $author$project$Gen$Sound$Explosion = {$: 'Explosion'};
-var $author$project$Gen$Sound$Move = {$: 'Move'};
-var $author$project$Gen$Sound$Push = {$: 'Push'};
-var $author$project$Gen$Sound$Retry = {$: 'Retry'};
-var $author$project$Gen$Sound$Undo = {$: 'Undo'};
-var $author$project$Gen$Sound$Win = {$: 'Win'};
-var $author$project$Gen$Sound$asList = _List_fromArray(
-	[$author$project$Gen$Sound$Explosion, $author$project$Gen$Sound$Move, $author$project$Gen$Sound$Push, $author$project$Gen$Sound$Retry, $author$project$Gen$Sound$Undo, $author$project$Gen$Sound$Win]);
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$random$Random$Generator = function (a) {
-	return {$: 'Generator', a: a};
-};
-var $elm$random$Random$andThen = F2(
-	function (callback, _v0) {
-		var genA = _v0.a;
-		return $elm$random$Random$Generator(
-			function (seed) {
-				var _v1 = genA(seed);
-				var result = _v1.a;
-				var newSeed = _v1.b;
-				var _v2 = callback(result);
-				var genB = _v2.a;
-				return genB(newSeed);
-			});
-	});
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
-	});
-var $author$project$Position$asGrid = function (_v0) {
-	var rows = _v0.rows;
-	var columns = _v0.columns;
-	return A2(
-		$elm$core$List$concatMap,
-		function (x) {
-			return A2(
-				$elm$core$List$map,
-				$elm$core$Tuple$pair(x),
-				A2($elm$core$List$range, 0, columns - 1));
-		},
-		A2($elm$core$List$range, 0, rows - 1));
-};
-var $elm$random$Random$constant = function (value) {
-	return $elm$random$Random$Generator(
-		function (seed) {
-			return _Utils_Tuple2(value, seed);
-		});
-};
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $author$project$Entity$Door = function (a) {
-	return {$: 'Door', a: a};
-};
 var $author$project$Direction$Down = {$: 'Down'};
-var $author$project$Entity$Ground = {$: 'Ground'};
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $author$project$Direction$Left = {$: 'Left'};
+var $author$project$Entity$Player = {$: 'Player'};
+var $author$project$Direction$Right = {$: 'Right'};
+var $author$project$Direction$Up = {$: 'Up'};
 var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
 		return {$: 'RBNode_elm_builtin', a: a, b: b, c: c, d: d, e: e};
 	});
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$Red = {$: 'Red'};
 var $elm$core$Dict$balance = F5(
 	function (color, key, value, left, right) {
@@ -5541,37 +5465,6 @@ var $elm$core$Dict$insert = F3(
 			return x;
 		}
 	});
-var $elm$core$Dict$fromList = function (assocs) {
-	return A3(
-		$elm$core$List$foldl,
-		F2(
-			function (_v0, dict) {
-				var key = _v0.a;
-				var value = _v0.b;
-				return A3($elm$core$Dict$insert, key, value, dict);
-			}),
-		$elm$core$Dict$empty,
-		assocs);
-};
-var $author$project$Config$roomSize = 5;
-var $author$project$Game$empty = {
-	cells: $elm$core$Dict$empty,
-	doors: $elm$core$Dict$empty,
-	floor: $elm$core$Dict$fromList(
-		A2(
-			$elm$core$List$map,
-			function (pos) {
-				return A2($elm$core$Tuple$pair, pos, $author$project$Entity$Ground);
-			},
-			$author$project$Position$asGrid(
-				{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize}))),
-	item: $elm$core$Maybe$Nothing,
-	items: $elm$core$Dict$empty,
-	nextId: 0,
-	particles: $elm$core$Dict$empty,
-	playerDirection: $author$project$Direction$Down,
-	won: false
-};
 var $author$project$Game$insert = F3(
 	function (pos, entity, game) {
 		return _Utils_update(
@@ -5585,21 +5478,448 @@ var $author$project$Game$insert = F3(
 				nextId: game.nextId + 1
 			});
 	});
-var $elm$core$Tuple$mapSecond = F2(
-	function (func, _v0) {
+var $author$project$Config$roomSize = 5;
+var $author$project$Game$addPlayer = F2(
+	function (_v0, game) {
 		var x = _v0.a;
 		var y = _v0.b;
-		return _Utils_Tuple2(
-			x,
-			func(y));
+		return A3(
+			$author$project$Game$insert,
+			_Utils_Tuple2(x, y),
+			$author$project$Entity$Player,
+			_Utils_update(
+				game,
+				{
+					playerDirection: (!x) ? $author$project$Direction$Right : (_Utils_eq(x, $author$project$Config$roomSize - 1) ? $author$project$Direction$Left : ((!y) ? $author$project$Direction$Down : $author$project$Direction$Up)),
+					playerPos: $elm$core$Maybe$Just(
+						_Utils_Tuple2(x, y))
+				}));
 	});
-var $author$project$Game$placeItem = F3(
-	function (pos, item, game) {
-		return _Utils_update(
-			game,
-			{
-				items: A3($elm$core$Dict$insert, pos, item, game.items)
-			});
+var $author$project$Gen$Sound$Explosion = {$: 'Explosion'};
+var $author$project$Gen$Sound$Move = {$: 'Move'};
+var $author$project$Gen$Sound$Push = {$: 'Push'};
+var $author$project$Gen$Sound$Retry = {$: 'Retry'};
+var $author$project$Gen$Sound$Undo = {$: 'Undo'};
+var $author$project$Gen$Sound$Win = {$: 'Win'};
+var $author$project$Gen$Sound$asList = _List_fromArray(
+	[$author$project$Gen$Sound$Explosion, $author$project$Gen$Sound$Move, $author$project$Gen$Sound$Push, $author$project$Gen$Sound$Retry, $author$project$Gen$Sound$Undo, $author$project$Gen$Sound$Win]);
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $dillonkearns$elm_ts_json$TsJson$Encode$encoder = F2(
+	function (_v0, input) {
+		var encodeFn = _v0.a;
+		return encodeFn(input);
+	});
+var $dillonkearns$elm_ts_json$TsJson$Internal$Decode$Decoder = F2(
+	function (a, b) {
+		return {$: 'Decoder', a: a, b: b};
+	});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Literal = function (a) {
+	return {$: 'Literal', a: a};
+};
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$fail = _Json_fail;
+var $elm$json$Json$Decode$value = _Json_decodeValue;
+var $dillonkearns$elm_ts_json$TsJson$Decode$literal = F2(
+	function (value_, literalValue) {
+		return A2(
+			$dillonkearns$elm_ts_json$TsJson$Internal$Decode$Decoder,
+			A2(
+				$elm$json$Json$Decode$andThen,
+				function (decodeValue) {
+					return _Utils_eq(literalValue, decodeValue) ? $elm$json$Json$Decode$succeed(value_) : $elm$json$Json$Decode$fail(
+						'Expected the following literal value: ' + A2($elm$json$Json$Encode$encode, 0, literalValue));
+				},
+				$elm$json$Json$Decode$value),
+			$dillonkearns$elm_ts_json$Internal$TsJsonType$Literal(literalValue));
+	});
+var $elm$json$Json$Encode$null = _Json_encodeNull;
+var $dillonkearns$elm_ts_json$TsJson$Decode$null = function (value_) {
+	return A2($dillonkearns$elm_ts_json$TsJson$Decode$literal, value_, $elm$json$Json$Encode$null);
+};
+var $author$project$PortDefinition$flags = $dillonkearns$elm_ts_json$TsJson$Decode$null(
+	{});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Boolean = {$: 'Boolean'};
+var $dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder = F2(
+	function (a, b) {
+		return {$: 'Encoder', a: a, b: b};
+	});
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $dillonkearns$elm_ts_json$TsJson$Encode$bool = A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder, $elm$json$Json$Encode$bool, $dillonkearns$elm_ts_json$Internal$TsJsonType$Boolean);
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$TsNever = {$: 'TsNever'};
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Union = function (a) {
+	return {$: 'Union', a: a};
+};
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Unknown = {$: 'Unknown'};
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $dillonkearns$elm_ts_json$Internal$TypeReducer$union = function (tsTypes) {
+	var withoutNevers = A2(
+		$elm$core$List$filter,
+		$elm$core$Basics$neq($dillonkearns$elm_ts_json$Internal$TsJsonType$TsNever),
+		tsTypes);
+	var hadNevers = !_Utils_eq(
+		$elm$core$List$length(tsTypes),
+		$elm$core$List$length(withoutNevers));
+	if (!withoutNevers.b) {
+		return hadNevers ? $dillonkearns$elm_ts_json$Internal$TsJsonType$TsNever : $dillonkearns$elm_ts_json$Internal$TsJsonType$Unknown;
+	} else {
+		if (!withoutNevers.b.b) {
+			var singleType = withoutNevers.a;
+			return singleType;
+		} else {
+			var first = withoutNevers.a;
+			var rest = withoutNevers.b;
+			return $dillonkearns$elm_ts_json$Internal$TsJsonType$Union(
+				_Utils_Tuple2(first, rest));
+		}
+	}
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$unwrapUnion = function (_v0) {
+	var rawValue = _v0.a;
+	return rawValue;
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$buildUnion = function (_v0) {
+	var toValue = _v0.a;
+	var tsTypes_ = _v0.b;
+	return A2(
+		$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
+		A2($elm$core$Basics$composeR, toValue, $dillonkearns$elm_ts_json$TsJson$Encode$unwrapUnion),
+		$dillonkearns$elm_ts_json$Internal$TypeReducer$union(tsTypes_));
+};
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$List = function (a) {
+	return {$: 'List', a: a};
+};
+var $elm$json$Json$Encode$list = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$List$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(_Utils_Tuple0),
+				entries));
+	});
+var $dillonkearns$elm_ts_json$TsJson$Encode$list = function (_v0) {
+	var encodeFn = _v0.a;
+	var tsType_ = _v0.b;
+	return A2(
+		$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
+		function (input) {
+			return A2($elm$json$Json$Encode$list, encodeFn, input);
+		},
+		$dillonkearns$elm_ts_json$Internal$TsJsonType$List(tsType_));
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$map = F2(
+	function (mapFunction, _v0) {
+		var encodeFn = _v0.a;
+		var tsType_ = _v0.b;
+		return A2(
+			$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
+			function (input) {
+				return encodeFn(
+					mapFunction(input));
+			},
+			tsType_);
+	});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$TypeObject = function (a) {
+	return {$: 'TypeObject', a: a};
+};
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$object = function (propertyEncoders) {
+	var propertyTypes = $dillonkearns$elm_ts_json$Internal$TsJsonType$TypeObject(
+		A2(
+			$elm$core$List$map,
+			function (_v1) {
+				var optionality = _v1.a;
+				var propertyName = _v1.b;
+				var tsType_ = _v1.d;
+				return _Utils_Tuple3(optionality, propertyName, tsType_);
+			},
+			propertyEncoders));
+	var encodeObject = function (input) {
+		return $elm$json$Json$Encode$object(
+			A2(
+				$elm$core$List$filterMap,
+				function (_v0) {
+					var propertyName = _v0.b;
+					var encodeFn = _v0.c;
+					return A2(
+						$elm$core$Maybe$map,
+						function (encoded) {
+							return _Utils_Tuple2(propertyName, encoded);
+						},
+						encodeFn(input));
+				},
+				propertyEncoders));
+	};
+	return A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder, encodeObject, propertyTypes);
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$Property = F4(
+	function (a, b, c, d) {
+		return {$: 'Property', a: a, b: b, c: c, d: d};
+	});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Required = {$: 'Required'};
+var $dillonkearns$elm_ts_json$TsJson$Encode$required = F3(
+	function (name, getter, _v0) {
+		var encodeFn = _v0.a;
+		var tsType_ = _v0.b;
+		return A4(
+			$dillonkearns$elm_ts_json$TsJson$Encode$Property,
+			$dillonkearns$elm_ts_json$Internal$TsJsonType$Required,
+			name,
+			function (input) {
+				return $elm$core$Maybe$Just(
+					encodeFn(
+						getter(input)));
+			},
+			tsType_);
+	});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$String = {$: 'String'};
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $dillonkearns$elm_ts_json$TsJson$Encode$string = A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder, $elm$json$Json$Encode$string, $dillonkearns$elm_ts_json$Internal$TsJsonType$String);
+var $author$project$Gen$Sound$toString = function (sound) {
+	switch (sound.$) {
+		case 'Explosion':
+			return 'explosion.wav';
+		case 'Move':
+			return 'move.wav';
+		case 'Push':
+			return 'push.wav';
+		case 'Retry':
+			return 'retry.wav';
+		case 'Undo':
+			return 'undo.wav';
+		default:
+			return 'win.wav';
+	}
+};
+var $dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionBuilder = F2(
+	function (a, b) {
+		return {$: 'UnionBuilder', a: a, b: b};
+	});
+var $dillonkearns$elm_ts_json$TsJson$Encode$union = function (constructor) {
+	return A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionBuilder, constructor, _List_Nil);
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$literal = function (literalValue) {
+	return A2(
+		$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
+		function (_v0) {
+			return literalValue;
+		},
+		$dillonkearns$elm_ts_json$Internal$TsJsonType$Literal(literalValue));
+};
+var $dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionEncodeValue = function (a) {
+	return {$: 'UnionEncodeValue', a: a};
+};
+var $dillonkearns$elm_ts_json$TsJson$Encode$variant = F2(
+	function (_v0, _v1) {
+		var encoder_ = _v0.a;
+		var tsType_ = _v0.b;
+		var builder = _v1.a;
+		var tsTypes_ = _v1.b;
+		return A2(
+			$dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionBuilder,
+			builder(
+				A2($elm$core$Basics$composeR, encoder_, $dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionEncodeValue)),
+			A2($elm$core$List$cons, tsType_, tsTypes_));
+	});
+var $dillonkearns$elm_ts_json$TsJson$Encode$variantObject = F3(
+	function (variantName, objectFields, unionBuilder) {
+		return A2(
+			$dillonkearns$elm_ts_json$TsJson$Encode$variant,
+			$dillonkearns$elm_ts_json$TsJson$Encode$object(
+				A2(
+					$elm$core$List$cons,
+					A3(
+						$dillonkearns$elm_ts_json$TsJson$Encode$required,
+						'tag',
+						$elm$core$Basics$identity,
+						$dillonkearns$elm_ts_json$TsJson$Encode$literal(
+							$elm$json$Json$Encode$string(variantName))),
+					objectFields)),
+			unionBuilder);
+	});
+var $dillonkearns$elm_ts_json$TsJson$Encode$variantTagged = F3(
+	function (tagName, dataEncoder, builder) {
+		return A3(
+			$dillonkearns$elm_ts_json$TsJson$Encode$variantObject,
+			tagName,
+			_List_fromArray(
+				[
+					A3($dillonkearns$elm_ts_json$TsJson$Encode$required, 'data', $elm$core$Basics$identity, dataEncoder)
+				]),
+			builder);
+	});
+var $author$project$PortDefinition$fromElm = function () {
+	var soundEncoder = A2($dillonkearns$elm_ts_json$TsJson$Encode$map, $author$project$Gen$Sound$toString, $dillonkearns$elm_ts_json$TsJson$Encode$string);
+	return $dillonkearns$elm_ts_json$TsJson$Encode$buildUnion(
+		A3(
+			$dillonkearns$elm_ts_json$TsJson$Encode$variantTagged,
+			'registerSounds',
+			$dillonkearns$elm_ts_json$TsJson$Encode$list(soundEncoder),
+			A3(
+				$dillonkearns$elm_ts_json$TsJson$Encode$variantTagged,
+				'stopSound',
+				soundEncoder,
+				A3(
+					$dillonkearns$elm_ts_json$TsJson$Encode$variantTagged,
+					'playSound',
+					$dillonkearns$elm_ts_json$TsJson$Encode$object(
+						_List_fromArray(
+							[
+								A3(
+								$dillonkearns$elm_ts_json$TsJson$Encode$required,
+								'sound',
+								function (obj) {
+									return $author$project$Gen$Sound$toString(obj.sound);
+								},
+								$dillonkearns$elm_ts_json$TsJson$Encode$string),
+								A3(
+								$dillonkearns$elm_ts_json$TsJson$Encode$required,
+								'looping',
+								function ($) {
+									return $.looping;
+								},
+								$dillonkearns$elm_ts_json$TsJson$Encode$bool)
+							])),
+					$dillonkearns$elm_ts_json$TsJson$Encode$union(
+						F4(
+							function (playSound, stopSound, registerSounds, value) {
+								switch (value.$) {
+									case 'RegisterSounds':
+										var list = value.a;
+										return registerSounds(list);
+									case 'PlaySound':
+										var args = value.a;
+										return playSound(args);
+									default:
+										var args = value.a;
+										return stopSound(args);
+								}
+							}))))));
+}();
+var $author$project$PortDefinition$SoundEnded = function (a) {
+	return {$: 'SoundEnded', a: a};
+};
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$ArrayIndex = F2(
+	function (a, b) {
+		return {$: 'ArrayIndex', a: a, b: b};
+	});
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Intersection = function (a) {
+	return {$: 'Intersection', a: a};
+};
+var $dillonkearns$elm_ts_json$Internal$TsJsonType$Optional = {$: 'Optional'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm$core$Dict$values = function (dict) {
+	return A3(
+		$elm$core$Dict$foldr,
+		F3(
+			function (key, value, valueList) {
+				return A2($elm$core$List$cons, value, valueList);
+			}),
+		_List_Nil,
+		dict);
+};
+var $dillonkearns$elm_ts_json$Internal$TypeReducer$deduplicateBy = F2(
+	function (toComparable, list) {
+		return $elm$core$Dict$values(
+			A3(
+				$elm$core$List$foldl,
+				F2(
+					function (value, accum) {
+						return A3(
+							$elm$core$Dict$insert,
+							toComparable(value),
+							value,
+							accum);
+					}),
+				$elm$core$Dict$empty,
+				list));
+	});
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
 	});
 var $elm$core$Dict$getMin = function (dict) {
 	getMin:
@@ -5963,707 +6283,6 @@ var $elm$core$Dict$remove = F2(
 			return x;
 		}
 	});
-var $author$project$Game$removeFloor = F2(
-	function (pos, game) {
-		return _Utils_update(
-			game,
-			{
-				floor: A2($elm$core$Dict$remove, pos, game.floor)
-			});
-	});
-var $author$project$Game$Build$fromBlocks = F2(
-	function (args, blocks) {
-		var game = A3(
-			$elm$core$List$foldl,
-			function (_v1) {
-				var pos = _v1.a;
-				var block = _v1.b;
-				switch (block.$) {
-					case 'EntityBlock':
-						var entity = block.a;
-						return A2($author$project$Game$insert, pos, entity);
-					case 'ItemBlock':
-						var item = block.a;
-						return A2($author$project$Game$placeItem, pos, item);
-					default:
-						return $author$project$Game$removeFloor(pos);
-				}
-			},
-			$author$project$Game$empty,
-			blocks);
-		return A3(
-			$elm$core$List$foldl,
-			function (_v0) {
-				var pos = _v0.a;
-				var room = _v0.b;
-				return A2(
-					$author$project$Game$insert,
-					pos,
-					$author$project$Entity$Door(
-						{room: room.next}));
-			},
-			_Utils_update(
-				game,
-				{
-					doors: $elm$core$Dict$fromList(
-						A2(
-							$elm$core$List$map,
-							$elm$core$Tuple$mapSecond(
-								function ($) {
-									return $.next;
-								}),
-							args.doors))
-				}),
-			args.doors);
-	});
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $author$project$Entity$ActiveSmallBomb = {$: 'ActiveSmallBomb'};
-var $author$project$Entity$Bomb = {$: 'Bomb'};
-var $author$project$Entity$Crate = {$: 'Crate'};
-var $author$project$Entity$Enemy = function (a) {
-	return {$: 'Enemy', a: a};
-};
-var $author$project$Game$Build$EntityBlock = function (a) {
-	return {$: 'EntityBlock', a: a};
-};
-var $author$project$Entity$Goblin = {$: 'Goblin'};
-var $author$project$Game$Build$HoleBlock = {$: 'HoleBlock'};
-var $author$project$Entity$InactiveBomb = function (a) {
-	return {$: 'InactiveBomb', a: a};
-};
-var $author$project$Entity$Player = {$: 'Player'};
-var $author$project$Entity$Wall = {$: 'Wall'};
-var $author$project$Game$Build$parseEmoji = function (string) {
-	switch (string.valueOf()) {
-		case '😊':
-			return $elm$core$Maybe$Just(
-				$author$project$Game$Build$EntityBlock($author$project$Entity$Player));
-		case '📦':
-			return $elm$core$Maybe$Just(
-				$author$project$Game$Build$EntityBlock($author$project$Entity$Crate));
-		case '💣':
-			return $elm$core$Maybe$Just(
-				$author$project$Game$Build$EntityBlock(
-					$author$project$Entity$InactiveBomb($author$project$Entity$Bomb)));
-		case '🧨':
-			return $elm$core$Maybe$Just(
-				$author$project$Game$Build$EntityBlock($author$project$Entity$ActiveSmallBomb));
-		case '❌':
-			return $elm$core$Maybe$Just($author$project$Game$Build$HoleBlock);
-		case '🐀':
-			return $elm$core$Maybe$Just(
-				$author$project$Game$Build$EntityBlock(
-					$author$project$Entity$Enemy($author$project$Entity$Goblin)));
-		case '🧱':
-			return $elm$core$Maybe$Just(
-				$author$project$Game$Build$EntityBlock($author$project$Entity$Wall));
-		case '⬜':
-			return $elm$core$Maybe$Nothing;
-		default:
-			return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$String$foldr = _String_foldr;
-var $elm$core$String$toList = function (string) {
-	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
-};
-var $author$project$Game$Build$fromEmojis = function (rows) {
-	return $elm$core$Dict$fromList(
-		$elm$core$List$concat(
-			A2(
-				$elm$core$List$indexedMap,
-				F2(
-					function (y, strings) {
-						return A2(
-							$elm$core$List$filterMap,
-							$elm$core$Basics$identity,
-							A2(
-								$elm$core$List$indexedMap,
-								F2(
-									function (x, string) {
-										return A2(
-											$elm$core$Maybe$map,
-											function (block) {
-												return _Utils_Tuple2(
-													_Utils_Tuple2(x, y),
-													block);
-											},
-											$author$project$Game$Build$parseEmoji(string));
-									}),
-								$elm$core$String$toList(strings)));
-					}),
-				rows)));
-};
-var $elm$random$Random$lazy = function (callback) {
-	return $elm$random$Random$Generator(
-		function (seed) {
-			var _v0 = callback(_Utils_Tuple0);
-			var gen = _v0.a;
-			return gen(seed);
-		});
-};
-var $elm$random$Random$map = F2(
-	function (func, _v0) {
-		var genA = _v0.a;
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v1 = genA(seed0);
-				var a = _v1.a;
-				var seed1 = _v1.b;
-				return _Utils_Tuple2(
-					func(a),
-					seed1);
-			});
-	});
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1.$) {
-					case 'LT':
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 'EQ':
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
-	});
-var $elm$core$Dict$member = F2(
-	function (key, dict) {
-		var _v0 = A2($elm$core$Dict$get, key, dict);
-		if (_v0.$ === 'Just') {
-			return true;
-		} else {
-			return false;
-		}
-	});
-var $elm$core$Basics$not = _Basics_not;
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $elm$core$Basics$abs = function (n) {
-	return (n < 0) ? (-n) : n;
-};
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$random$Random$Seed = F2(
-	function (a, b) {
-		return {$: 'Seed', a: a, b: b};
-	});
-var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
-var $elm$random$Random$next = function (_v0) {
-	var state0 = _v0.a;
-	var incr = _v0.b;
-	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
-};
-var $elm$core$Bitwise$xor = _Bitwise_xor;
-var $elm$random$Random$peel = function (_v0) {
-	var state = _v0.a;
-	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
-	return ((word >>> 22) ^ word) >>> 0;
-};
-var $elm$random$Random$float = F2(
-	function (a, b) {
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var seed1 = $elm$random$Random$next(seed0);
-				var range = $elm$core$Basics$abs(b - a);
-				var n1 = $elm$random$Random$peel(seed1);
-				var n0 = $elm$random$Random$peel(seed0);
-				var lo = (134217727 & n1) * 1.0;
-				var hi = (67108863 & n0) * 1.0;
-				var val = ((hi * 134217728.0) + lo) / 9007199254740992.0;
-				var scaled = (val * range) + a;
-				return _Utils_Tuple2(
-					scaled,
-					$elm$random$Random$next(seed1));
-			});
-	});
-var $elm$random$Random$listHelp = F4(
-	function (revList, n, gen, seed) {
-		listHelp:
-		while (true) {
-			if (n < 1) {
-				return _Utils_Tuple2(revList, seed);
-			} else {
-				var _v0 = gen(seed);
-				var value = _v0.a;
-				var newSeed = _v0.b;
-				var $temp$revList = A2($elm$core$List$cons, value, revList),
-					$temp$n = n - 1,
-					$temp$gen = gen,
-					$temp$seed = newSeed;
-				revList = $temp$revList;
-				n = $temp$n;
-				gen = $temp$gen;
-				seed = $temp$seed;
-				continue listHelp;
-			}
-		}
-	});
-var $elm$random$Random$list = F2(
-	function (n, _v0) {
-		var gen = _v0.a;
-		return $elm$random$Random$Generator(
-			function (seed) {
-				return A4($elm$random$Random$listHelp, _List_Nil, n, gen, seed);
-			});
-	});
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
-var $elm$core$List$sortBy = _List_sortBy;
-var $author$project$Game$Build$shuffle = function (list) {
-	return A2(
-		$elm$random$Random$map,
-		function (rand) {
-			return A2(
-				$elm$core$List$map,
-				$elm$core$Tuple$second,
-				A2(
-					$elm$core$List$sortBy,
-					$elm$core$Tuple$first,
-					A3($elm$core$List$map2, $elm$core$Tuple$pair, rand, list)));
-		},
-		A2(
-			$elm$random$Random$list,
-			$elm$core$List$length(list),
-			A2($elm$random$Random$float, 0, 1)));
-};
-var $author$project$Game$Build$validator = function (_v0) {
-	return true;
-};
-var $author$project$Game$Build$build = function (args) {
-	var dict = $author$project$Game$Build$fromEmojis(args.emojis);
-	var rec = function (_v0) {
-		return A2(
-			$elm$random$Random$andThen,
-			function (game) {
-				return $author$project$Game$Build$validator(game.cells) ? $elm$random$Random$constant(game) : $elm$random$Random$lazy(rec);
-			},
-			A2(
-				$elm$random$Random$map,
-				$author$project$Game$Build$fromBlocks(
-					{doors: args.doors}),
-				A2(
-					$elm$random$Random$map,
-					function (list) {
-						return _Utils_ap(
-							A3($elm$core$List$map2, $elm$core$Tuple$pair, list, args.blocks),
-							$elm$core$Dict$toList(dict));
-					},
-					$author$project$Game$Build$shuffle(
-						A2(
-							$elm$core$List$filter,
-							function (pos) {
-								return !A2($elm$core$Dict$member, pos, dict);
-							},
-							$author$project$Position$asGrid(
-								{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize}))))));
-	};
-	return rec(_Utils_Tuple0);
-};
-var $author$project$Game$Build$generator = F2(
-	function (emojis, blocks) {
-		return $author$project$Game$Build$build(
-			{blocks: blocks, doors: _List_Nil, emojis: emojis});
-	});
-var $author$project$World$Level$empty = A2(
-	$author$project$Game$Build$generator,
-	_List_fromArray(
-		['⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜😊⬜⬜']),
-	_List_Nil);
-var $dillonkearns$elm_ts_json$TsJson$Encode$encoder = F2(
-	function (_v0, input) {
-		var encodeFn = _v0.a;
-		return encodeFn(input);
-	});
-var $dillonkearns$elm_ts_json$TsJson$Internal$Decode$Decoder = F2(
-	function (a, b) {
-		return {$: 'Decoder', a: a, b: b};
-	});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Literal = function (a) {
-	return {$: 'Literal', a: a};
-};
-var $elm$json$Json$Decode$andThen = _Json_andThen;
-var $elm$json$Json$Decode$fail = _Json_fail;
-var $elm$json$Json$Decode$value = _Json_decodeValue;
-var $dillonkearns$elm_ts_json$TsJson$Decode$literal = F2(
-	function (value_, literalValue) {
-		return A2(
-			$dillonkearns$elm_ts_json$TsJson$Internal$Decode$Decoder,
-			A2(
-				$elm$json$Json$Decode$andThen,
-				function (decodeValue) {
-					return _Utils_eq(literalValue, decodeValue) ? $elm$json$Json$Decode$succeed(value_) : $elm$json$Json$Decode$fail(
-						'Expected the following literal value: ' + A2($elm$json$Json$Encode$encode, 0, literalValue));
-				},
-				$elm$json$Json$Decode$value),
-			$dillonkearns$elm_ts_json$Internal$TsJsonType$Literal(literalValue));
-	});
-var $elm$json$Json$Encode$null = _Json_encodeNull;
-var $dillonkearns$elm_ts_json$TsJson$Decode$null = function (value_) {
-	return A2($dillonkearns$elm_ts_json$TsJson$Decode$literal, value_, $elm$json$Json$Encode$null);
-};
-var $author$project$PortDefinition$flags = $dillonkearns$elm_ts_json$TsJson$Decode$null(
-	{});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Boolean = {$: 'Boolean'};
-var $dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder = F2(
-	function (a, b) {
-		return {$: 'Encoder', a: a, b: b};
-	});
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $dillonkearns$elm_ts_json$TsJson$Encode$bool = A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder, $elm$json$Json$Encode$bool, $dillonkearns$elm_ts_json$Internal$TsJsonType$Boolean);
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$TsNever = {$: 'TsNever'};
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Union = function (a) {
-	return {$: 'Union', a: a};
-};
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Unknown = {$: 'Unknown'};
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $dillonkearns$elm_ts_json$Internal$TypeReducer$union = function (tsTypes) {
-	var withoutNevers = A2(
-		$elm$core$List$filter,
-		$elm$core$Basics$neq($dillonkearns$elm_ts_json$Internal$TsJsonType$TsNever),
-		tsTypes);
-	var hadNevers = !_Utils_eq(
-		$elm$core$List$length(tsTypes),
-		$elm$core$List$length(withoutNevers));
-	if (!withoutNevers.b) {
-		return hadNevers ? $dillonkearns$elm_ts_json$Internal$TsJsonType$TsNever : $dillonkearns$elm_ts_json$Internal$TsJsonType$Unknown;
-	} else {
-		if (!withoutNevers.b.b) {
-			var singleType = withoutNevers.a;
-			return singleType;
-		} else {
-			var first = withoutNevers.a;
-			var rest = withoutNevers.b;
-			return $dillonkearns$elm_ts_json$Internal$TsJsonType$Union(
-				_Utils_Tuple2(first, rest));
-		}
-	}
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$unwrapUnion = function (_v0) {
-	var rawValue = _v0.a;
-	return rawValue;
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$buildUnion = function (_v0) {
-	var toValue = _v0.a;
-	var tsTypes_ = _v0.b;
-	return A2(
-		$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
-		A2($elm$core$Basics$composeR, toValue, $dillonkearns$elm_ts_json$TsJson$Encode$unwrapUnion),
-		$dillonkearns$elm_ts_json$Internal$TypeReducer$union(tsTypes_));
-};
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$List = function (a) {
-	return {$: 'List', a: a};
-};
-var $elm$json$Json$Encode$list = F2(
-	function (func, entries) {
-		return _Json_wrap(
-			A3(
-				$elm$core$List$foldl,
-				_Json_addEntry(func),
-				_Json_emptyArray(_Utils_Tuple0),
-				entries));
-	});
-var $dillonkearns$elm_ts_json$TsJson$Encode$list = function (_v0) {
-	var encodeFn = _v0.a;
-	var tsType_ = _v0.b;
-	return A2(
-		$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
-		function (input) {
-			return A2($elm$json$Json$Encode$list, encodeFn, input);
-		},
-		$dillonkearns$elm_ts_json$Internal$TsJsonType$List(tsType_));
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$map = F2(
-	function (mapFunction, _v0) {
-		var encodeFn = _v0.a;
-		var tsType_ = _v0.b;
-		return A2(
-			$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
-			function (input) {
-				return encodeFn(
-					mapFunction(input));
-			},
-			tsType_);
-	});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$TypeObject = function (a) {
-	return {$: 'TypeObject', a: a};
-};
-var $elm$json$Json$Encode$object = function (pairs) {
-	return _Json_wrap(
-		A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v0, obj) {
-					var k = _v0.a;
-					var v = _v0.b;
-					return A3(_Json_addField, k, v, obj);
-				}),
-			_Json_emptyObject(_Utils_Tuple0),
-			pairs));
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$object = function (propertyEncoders) {
-	var propertyTypes = $dillonkearns$elm_ts_json$Internal$TsJsonType$TypeObject(
-		A2(
-			$elm$core$List$map,
-			function (_v1) {
-				var optionality = _v1.a;
-				var propertyName = _v1.b;
-				var tsType_ = _v1.d;
-				return _Utils_Tuple3(optionality, propertyName, tsType_);
-			},
-			propertyEncoders));
-	var encodeObject = function (input) {
-		return $elm$json$Json$Encode$object(
-			A2(
-				$elm$core$List$filterMap,
-				function (_v0) {
-					var propertyName = _v0.b;
-					var encodeFn = _v0.c;
-					return A2(
-						$elm$core$Maybe$map,
-						function (encoded) {
-							return _Utils_Tuple2(propertyName, encoded);
-						},
-						encodeFn(input));
-				},
-				propertyEncoders));
-	};
-	return A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder, encodeObject, propertyTypes);
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$Property = F4(
-	function (a, b, c, d) {
-		return {$: 'Property', a: a, b: b, c: c, d: d};
-	});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Required = {$: 'Required'};
-var $dillonkearns$elm_ts_json$TsJson$Encode$required = F3(
-	function (name, getter, _v0) {
-		var encodeFn = _v0.a;
-		var tsType_ = _v0.b;
-		return A4(
-			$dillonkearns$elm_ts_json$TsJson$Encode$Property,
-			$dillonkearns$elm_ts_json$Internal$TsJsonType$Required,
-			name,
-			function (input) {
-				return $elm$core$Maybe$Just(
-					encodeFn(
-						getter(input)));
-			},
-			tsType_);
-	});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$String = {$: 'String'};
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $dillonkearns$elm_ts_json$TsJson$Encode$string = A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder, $elm$json$Json$Encode$string, $dillonkearns$elm_ts_json$Internal$TsJsonType$String);
-var $author$project$Gen$Sound$toString = function (sound) {
-	switch (sound.$) {
-		case 'Explosion':
-			return 'explosion.wav';
-		case 'Move':
-			return 'move.wav';
-		case 'Push':
-			return 'push.wav';
-		case 'Retry':
-			return 'retry.wav';
-		case 'Undo':
-			return 'undo.wav';
-		default:
-			return 'win.wav';
-	}
-};
-var $dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionBuilder = F2(
-	function (a, b) {
-		return {$: 'UnionBuilder', a: a, b: b};
-	});
-var $dillonkearns$elm_ts_json$TsJson$Encode$union = function (constructor) {
-	return A2($dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionBuilder, constructor, _List_Nil);
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$literal = function (literalValue) {
-	return A2(
-		$dillonkearns$elm_ts_json$TsJson$Internal$Encode$Encoder,
-		function (_v0) {
-			return literalValue;
-		},
-		$dillonkearns$elm_ts_json$Internal$TsJsonType$Literal(literalValue));
-};
-var $dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionEncodeValue = function (a) {
-	return {$: 'UnionEncodeValue', a: a};
-};
-var $dillonkearns$elm_ts_json$TsJson$Encode$variant = F2(
-	function (_v0, _v1) {
-		var encoder_ = _v0.a;
-		var tsType_ = _v0.b;
-		var builder = _v1.a;
-		var tsTypes_ = _v1.b;
-		return A2(
-			$dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionBuilder,
-			builder(
-				A2($elm$core$Basics$composeR, encoder_, $dillonkearns$elm_ts_json$TsJson$Internal$Encode$UnionEncodeValue)),
-			A2($elm$core$List$cons, tsType_, tsTypes_));
-	});
-var $dillonkearns$elm_ts_json$TsJson$Encode$variantObject = F3(
-	function (variantName, objectFields, unionBuilder) {
-		return A2(
-			$dillonkearns$elm_ts_json$TsJson$Encode$variant,
-			$dillonkearns$elm_ts_json$TsJson$Encode$object(
-				A2(
-					$elm$core$List$cons,
-					A3(
-						$dillonkearns$elm_ts_json$TsJson$Encode$required,
-						'tag',
-						$elm$core$Basics$identity,
-						$dillonkearns$elm_ts_json$TsJson$Encode$literal(
-							$elm$json$Json$Encode$string(variantName))),
-					objectFields)),
-			unionBuilder);
-	});
-var $dillonkearns$elm_ts_json$TsJson$Encode$variantTagged = F3(
-	function (tagName, dataEncoder, builder) {
-		return A3(
-			$dillonkearns$elm_ts_json$TsJson$Encode$variantObject,
-			tagName,
-			_List_fromArray(
-				[
-					A3($dillonkearns$elm_ts_json$TsJson$Encode$required, 'data', $elm$core$Basics$identity, dataEncoder)
-				]),
-			builder);
-	});
-var $author$project$PortDefinition$fromElm = function () {
-	var soundEncoder = A2($dillonkearns$elm_ts_json$TsJson$Encode$map, $author$project$Gen$Sound$toString, $dillonkearns$elm_ts_json$TsJson$Encode$string);
-	return $dillonkearns$elm_ts_json$TsJson$Encode$buildUnion(
-		A3(
-			$dillonkearns$elm_ts_json$TsJson$Encode$variantTagged,
-			'registerSounds',
-			$dillonkearns$elm_ts_json$TsJson$Encode$list(soundEncoder),
-			A3(
-				$dillonkearns$elm_ts_json$TsJson$Encode$variantTagged,
-				'stopSound',
-				soundEncoder,
-				A3(
-					$dillonkearns$elm_ts_json$TsJson$Encode$variantTagged,
-					'playSound',
-					$dillonkearns$elm_ts_json$TsJson$Encode$object(
-						_List_fromArray(
-							[
-								A3(
-								$dillonkearns$elm_ts_json$TsJson$Encode$required,
-								'sound',
-								function (obj) {
-									return $author$project$Gen$Sound$toString(obj.sound);
-								},
-								$dillonkearns$elm_ts_json$TsJson$Encode$string),
-								A3(
-								$dillonkearns$elm_ts_json$TsJson$Encode$required,
-								'looping',
-								function ($) {
-									return $.looping;
-								},
-								$dillonkearns$elm_ts_json$TsJson$Encode$bool)
-							])),
-					$dillonkearns$elm_ts_json$TsJson$Encode$union(
-						F4(
-							function (playSound, stopSound, registerSounds, value) {
-								switch (value.$) {
-									case 'RegisterSounds':
-										var list = value.a;
-										return registerSounds(list);
-									case 'PlaySound':
-										var args = value.a;
-										return playSound(args);
-									default:
-										var args = value.a;
-										return stopSound(args);
-								}
-							}))))));
-}();
-var $author$project$PortDefinition$SoundEnded = function (a) {
-	return {$: 'SoundEnded', a: a};
-};
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$ArrayIndex = F2(
-	function (a, b) {
-		return {$: 'ArrayIndex', a: a, b: b};
-	});
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Intersection = function (a) {
-	return {$: 'Intersection', a: a};
-};
-var $dillonkearns$elm_ts_json$Internal$TsJsonType$Optional = {$: 'Optional'};
-var $elm$core$Dict$values = function (dict) {
-	return A3(
-		$elm$core$Dict$foldr,
-		F3(
-			function (key, value, valueList) {
-				return A2($elm$core$List$cons, value, valueList);
-			}),
-		_List_Nil,
-		dict);
-};
-var $dillonkearns$elm_ts_json$Internal$TypeReducer$deduplicateBy = F2(
-	function (toComparable, list) {
-		return $elm$core$Dict$values(
-			A3(
-				$elm$core$List$foldl,
-				F2(
-					function (value, accum) {
-						return A3(
-							$elm$core$Dict$insert,
-							toComparable(value),
-							value,
-							accum);
-					}),
-				$elm$core$Dict$empty,
-				list));
-	});
 var $elm$core$Dict$update = F3(
 	function (targetKey, alter, dictionary) {
 		var _v0 = alter(
@@ -6737,6 +6356,18 @@ var $dillonkearns$elm_ts_json$Internal$TypeReducer$isPrimitive = function (tsTyp
 var $dillonkearns$elm_ts_json$Internal$TypeReducer$isContradictory = function (types) {
 	return A2($dillonkearns$elm_ts_json$Internal$TypeReducer$either, $dillonkearns$elm_ts_json$Internal$TypeReducer$isNonEmptyObject, types) && A2($dillonkearns$elm_ts_json$Internal$TypeReducer$either, $dillonkearns$elm_ts_json$Internal$TypeReducer$isPrimitive, types);
 };
+var $elm$core$Dict$fromList = function (assocs) {
+	return A3(
+		$elm$core$List$foldl,
+		F2(
+			function (_v0, dict) {
+				var key = _v0.a;
+				var value = _v0.b;
+				return A3($elm$core$Dict$insert, key, value, dict);
+			}),
+		$elm$core$Dict$empty,
+		assocs);
+};
 var $elm$core$List$maximum = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -6794,6 +6425,7 @@ var $dillonkearns$elm_ts_json$Internal$TypeToString$quoteObjectKey = function (k
 	var needsQuotes = $dillonkearns$elm_ts_json$Internal$TypeToString$isIdentifier(key);
 	return needsQuotes ? $dillonkearns$elm_ts_json$Internal$TypeToString$doubleQuote(key) : key;
 };
+var $elm$core$List$sortBy = _List_sortBy;
 var $dillonkearns$elm_ts_json$Internal$TypeToString$parenthesizeToString = function (type_) {
 	var needsParens = function () {
 		if (type_.$ === 'Union') {
@@ -7284,149 +6916,18 @@ var $author$project$Port$fromElm = function (value) {
 	return $author$project$Port$interopFromElm(
 		A3($elm$core$Basics$apR, $author$project$PortDefinition$interop.fromElm, $dillonkearns$elm_ts_json$TsJson$Encode$encoder, value));
 };
-var $author$project$Game$Build$constant = F2(
-	function (emojis, doors) {
-		return $author$project$Game$Build$build(
-			{blocks: _List_Nil, doors: doors, emojis: emojis});
-	});
-var $author$project$World$Trial$crateTails = A2(
-	$elm$core$List$indexedMap,
-	F2(
-		function (i, list) {
-			return A2(
-				$author$project$Game$Build$constant,
-				list,
-				A2(
-					$elm$core$List$filterMap,
-					$elm$core$Basics$identity,
-					_List_fromArray(
-						[
-							$elm$core$Maybe$Just(
-							_Utils_Tuple2(
-								_Utils_Tuple2(2, -1),
-								{next: i + 1})),
-							$elm$core$Maybe$Just(
-							_Utils_Tuple2(
-								_Utils_Tuple2(-1, 2),
-								{next: i - 1})),
-							$elm$core$Maybe$Just(
-							_Utils_Tuple2(
-								_Utils_Tuple2(5, 2),
-								{next: i - 1})),
-							(i > 0) ? $elm$core$Maybe$Just(
-							_Utils_Tuple2(
-								_Utils_Tuple2(2, 5),
-								{next: i - 1})) : $elm$core$Maybe$Nothing
-						])));
-		}),
-	_List_fromArray(
-		[
-			_List_fromArray(
-			['🧱📦⬜📦🧱', '🧱⬜📦⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-			_List_fromArray(
-			['🧱📦⬜📦🧱', '🧱⬜⬜⬜🧱', '🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-			_List_fromArray(
-			['🧱⬜📦⬜🧱', '🧱⬜⬜⬜🧱', '🧱📦⬜📦🧱', '🧱⬜📦⬜🧱', '🧱⬜😊⬜🧱']),
-			_List_fromArray(
-			['🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-			_List_fromArray(
-			['🧱⬜📦⬜🧱', '🧱📦📦📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-			_List_fromArray(
-			['🧱📦📦📦🧱', '🧱📦🧨📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-			_List_fromArray(
-			['🧱🧱🧱🧱🧱', '🧱⬜⬜⬜🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-			_List_fromArray(
-			['🧱🧱🧱🧱🧱', '🧱📦📦📦🧱', '🧱🧨🧨🧨🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-			_List_fromArray(
-			['🧱🧱🧱🧱🧱', '🧱🧨📦🧨🧱', '🧱📦🧨📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-			_List_fromArray(
-			['🧱⬜📦⬜🧱', '🧨⬜⬜⬜🧨', '🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']),
-			_List_fromArray(
-			['🧱⬜📦⬜🧱', '🧱📦⬜📦🧱', '🧨⬜📦⬜🧨', '🧨📦📦📦🧨', '🧱⬜😊⬜🧱']),
-			_List_fromArray(
-			['🧱⬜🧱⬜🧱', '🧨🧱📦🧱🧨', '🧨📦🧨📦🧨', '🧨⬜🧨⬜🧨', '🧱⬜😊⬜🧱'])
-		]));
-var $elm$core$Array$fromListHelp = F3(
-	function (list, nodeList, nodeListSize) {
-		fromListHelp:
-		while (true) {
-			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
-			var jsArray = _v0.a;
-			var remainingItems = _v0.b;
-			if (_Utils_cmp(
-				$elm$core$Elm$JsArray$length(jsArray),
-				$elm$core$Array$branchFactor) < 0) {
-				return A2(
-					$elm$core$Array$builderToArray,
-					true,
-					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
-			} else {
-				var $temp$list = remainingItems,
-					$temp$nodeList = A2(
-					$elm$core$List$cons,
-					$elm$core$Array$Leaf(jsArray),
-					nodeList),
-					$temp$nodeListSize = nodeListSize + 1;
-				list = $temp$list;
-				nodeList = $temp$nodeList;
-				nodeListSize = $temp$nodeListSize;
-				continue fromListHelp;
-			}
-		}
-	});
-var $elm$core$Array$fromList = function (list) {
-	if (!list.b) {
-		return $elm$core$Array$empty;
-	} else {
-		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
-	}
-};
-var $author$project$World$Trial$asArray = $elm$core$Array$fromList($author$project$World$Trial$crateTails);
-var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
-var $elm$core$Basics$ge = _Utils_ge;
-var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
-var $elm$core$Array$getHelp = F3(
-	function (shift, index, tree) {
-		getHelp:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (index >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (_v0.$ === 'SubTree') {
-				var subTree = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$index = index,
-					$temp$tree = subTree;
-				shift = $temp$shift;
-				index = $temp$index;
-				tree = $temp$tree;
-				continue getHelp;
-			} else {
-				var values = _v0.a;
-				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
-			}
-		}
-	});
-var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
-var $elm$core$Array$tailIndex = function (len) {
-	return (len >>> 5) << 5;
-};
-var $elm$core$Array$get = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
-			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
-			A3($elm$core$Array$getHelp, startShift, index, tree)));
-	});
-var $author$project$World$Trial$fromInt = function (i) {
-	return A2($elm$core$Array$get, i, $author$project$World$Trial$asArray);
-};
 var $elm$random$Random$Generate = function (a) {
 	return {$: 'Generate', a: a};
+};
+var $elm$random$Random$Seed = F2(
+	function (a, b) {
+		return {$: 'Seed', a: a, b: b};
+	});
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$random$Random$next = function (_v0) {
+	var state0 = _v0.a;
+	var incr = _v0.b;
+	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
 };
 var $elm$random$Random$initialSeed = function (x) {
 	var _v0 = $elm$random$Random$next(
@@ -7492,6 +6993,22 @@ var $elm$random$Random$onSelfMsg = F3(
 	function (_v0, _v1, seed) {
 		return $elm$core$Task$succeed(seed);
 	});
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var $elm$random$Random$map = F2(
+	function (func, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v1 = genA(seed0);
+				var a = _v1.a;
+				var seed1 = _v1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
+	});
 var $elm$random$Random$cmdMap = F2(
 	function (func, _v0) {
 		var generator = _v0.a;
@@ -7506,6 +7023,307 @@ var $elm$random$Random$generate = F2(
 			$elm$random$Random$Generate(
 				A2($elm$random$Random$map, tagger, generator)));
 	});
+var $author$project$Entity$Ground = {$: 'Ground'};
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $author$project$Position$asGrid = function (_v0) {
+	var rows = _v0.rows;
+	var columns = _v0.columns;
+	return A2(
+		$elm$core$List$concatMap,
+		function (x) {
+			return A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$pair(x),
+				A2($elm$core$List$range, 0, columns - 1));
+		},
+		A2($elm$core$List$range, 0, rows - 1));
+};
+var $author$project$Game$empty = {
+	cells: $elm$core$Dict$empty,
+	doors: $elm$core$Dict$empty,
+	floor: $elm$core$Dict$fromList(
+		A2(
+			$elm$core$List$map,
+			function (pos) {
+				return A2($elm$core$Tuple$pair, pos, $author$project$Entity$Ground);
+			},
+			$author$project$Position$asGrid(
+				{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize}))),
+	item: $elm$core$Maybe$Nothing,
+	items: $elm$core$Dict$empty,
+	nextId: 0,
+	particles: $elm$core$Dict$empty,
+	playerDirection: $author$project$Direction$Down,
+	playerPos: $elm$core$Maybe$Nothing,
+	won: false
+};
+var $author$project$Game$placeItem = F3(
+	function (pos, item, game) {
+		return _Utils_update(
+			game,
+			{
+				items: A3($elm$core$Dict$insert, pos, item, game.items)
+			});
+	});
+var $author$project$Game$removeFloor = F2(
+	function (pos, game) {
+		return _Utils_update(
+			game,
+			{
+				floor: A2($elm$core$Dict$remove, pos, game.floor)
+			});
+	});
+var $author$project$Game$Build$fromBlocks = F2(
+	function (args, blocks) {
+		var game = A3(
+			$elm$core$List$foldl,
+			function (_v0) {
+				var pos = _v0.a;
+				var block = _v0.b;
+				switch (block.$) {
+					case 'EntityBlock':
+						var entity = block.a;
+						return A2($author$project$Game$insert, pos, entity);
+					case 'ItemBlock':
+						var item = block.a;
+						return A2($author$project$Game$placeItem, pos, item);
+					default:
+						return $author$project$Game$removeFloor(pos);
+				}
+			},
+			$author$project$Game$empty,
+			blocks);
+		return _Utils_update(
+			game,
+			{
+				doors: $elm$core$Dict$fromList(args.doors)
+			});
+	});
+var $author$project$Entity$ActiveSmallBomb = {$: 'ActiveSmallBomb'};
+var $author$project$Entity$Bomb = {$: 'Bomb'};
+var $author$project$Entity$Crate = {$: 'Crate'};
+var $author$project$Entity$Diamant = {$: 'Diamant'};
+var $author$project$Entity$Enemy = function (a) {
+	return {$: 'Enemy', a: a};
+};
+var $author$project$Game$Build$EntityBlock = function (a) {
+	return {$: 'EntityBlock', a: a};
+};
+var $author$project$Entity$Goblin = {$: 'Goblin'};
+var $author$project$Game$Build$HoleBlock = {$: 'HoleBlock'};
+var $author$project$Entity$InactiveBomb = function (a) {
+	return {$: 'InactiveBomb', a: a};
+};
+var $author$project$Entity$Wall = {$: 'Wall'};
+var $author$project$Game$Build$parseEmoji = function (string) {
+	switch (string.valueOf()) {
+		case '📦':
+			return $elm$core$Maybe$Just(
+				$author$project$Game$Build$EntityBlock($author$project$Entity$Crate));
+		case '💣':
+			return $elm$core$Maybe$Just(
+				$author$project$Game$Build$EntityBlock(
+					$author$project$Entity$InactiveBomb($author$project$Entity$Bomb)));
+		case '🧨':
+			return $elm$core$Maybe$Just(
+				$author$project$Game$Build$EntityBlock($author$project$Entity$ActiveSmallBomb));
+		case '❌':
+			return $elm$core$Maybe$Just($author$project$Game$Build$HoleBlock);
+		case '🐀':
+			return $elm$core$Maybe$Just(
+				$author$project$Game$Build$EntityBlock(
+					$author$project$Entity$Enemy($author$project$Entity$Goblin)));
+		case '🧱':
+			return $elm$core$Maybe$Just(
+				$author$project$Game$Build$EntityBlock($author$project$Entity$Wall));
+		case '💎':
+			return $elm$core$Maybe$Just(
+				$author$project$Game$Build$EntityBlock($author$project$Entity$Diamant));
+		case '⬜':
+			return $elm$core$Maybe$Nothing;
+		default:
+			return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Game$Build$fromEmojis = function (rows) {
+	return $elm$core$Dict$fromList(
+		$elm$core$List$concat(
+			A2(
+				$elm$core$List$indexedMap,
+				F2(
+					function (y, strings) {
+						return A2(
+							$elm$core$List$filterMap,
+							$elm$core$Basics$identity,
+							A2(
+								$elm$core$List$indexedMap,
+								F2(
+									function (x, string) {
+										return A2(
+											$elm$core$Maybe$map,
+											function (block) {
+												return _Utils_Tuple2(
+													_Utils_Tuple2(x, y),
+													block);
+											},
+											$author$project$Game$Build$parseEmoji(string));
+									}),
+								$elm$core$String$toList(strings)));
+					}),
+				rows)));
+};
+var $author$project$Game$Build$constant = F2(
+	function (emojis, doors) {
+		return A2(
+			$author$project$Game$Build$fromBlocks,
+			{doors: doors},
+			$elm$core$Dict$toList(
+				$author$project$Game$Build$fromEmojis(emojis)));
+	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$World$Map$dict = $elm$core$Dict$fromList(
+	_List_fromArray(
+		[
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, 0),
+			_List_fromArray(
+				['🧱📦⬜📦🧱', '🧱⬜📦⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -1),
+			_List_fromArray(
+				['🧱📦⬜📦🧱', '🧱⬜⬜⬜🧱', '🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -2),
+			_List_fromArray(
+				['🧱⬜📦⬜🧱', '🧱⬜⬜⬜🧱', '🧱📦⬜📦🧱', '🧱⬜📦⬜🧱', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -3),
+			_List_fromArray(
+				['🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -4),
+			_List_fromArray(
+				['🧱⬜📦⬜🧱', '🧱📦📦📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -5),
+			_List_fromArray(
+				['🧱📦📦📦🧱', '🧱📦🧨📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -6),
+			_List_fromArray(
+				['🧱🧱🧱🧱🧱', '🧱⬜⬜⬜🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -7),
+			_List_fromArray(
+				['🧱🧱🧱🧱🧱', '🧱📦📦📦🧱', '🧱🧨🧨🧨🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -8),
+			_List_fromArray(
+				['🧱🧱🧱🧱🧱', '🧱🧨📦🧨🧱', '🧱📦🧨📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -9),
+			_List_fromArray(
+				['🧱⬜📦⬜🧱', '🧨⬜⬜⬜🧨', '🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -10),
+			_List_fromArray(
+				['🧱⬜📦⬜🧱', '🧱📦⬜📦🧱', '🧨⬜📦⬜🧨', '🧨📦📦📦🧨', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -11),
+			_List_fromArray(
+				['🧱⬜🧱⬜🧱', '🧨🧱📦🧱🧨', '🧨📦🧨📦🧨', '🧨⬜🧨⬜🧨', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -12),
+			_List_fromArray(
+				['🧱🧱🧱🧱🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(0, -13),
+			_List_fromArray(
+				['🧱🧱🧱🧱🧱', '🧱🧱🧱🧱🧱', '🧱⬜💎⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
+			_Utils_Tuple2(
+			_Utils_Tuple2(-1, -12),
+			_List_fromArray(
+				['🧱🧱🧱🧱🧱', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '🧱🧱🧱🧱🧱']))
+		]));
+var $elm$core$Dict$member = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$get, key, dict);
+		if (_v0.$ === 'Just') {
+			return true;
+		} else {
+			return false;
+		}
+	});
+var $author$project$World$Map$getDoors = function (_v0) {
+	var x = _v0.a;
+	var y = _v0.b;
+	return A2(
+		$elm$core$List$filterMap,
+		function (_v1) {
+			var room = _v1.a;
+			var pos = _v1.b;
+			return A2($elm$core$Dict$member, room, $author$project$World$Map$dict) ? $elm$core$Maybe$Just(
+				_Utils_Tuple2(
+					pos,
+					{room: room})) : $elm$core$Maybe$Nothing;
+		},
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				_Utils_Tuple2(x - 1, y),
+				_Utils_Tuple2(-1, 2)),
+				_Utils_Tuple2(
+				_Utils_Tuple2(x, y - 1),
+				_Utils_Tuple2(2, -1)),
+				_Utils_Tuple2(
+				_Utils_Tuple2(x + 1, y),
+				_Utils_Tuple2($author$project$Config$roomSize, 2)),
+				_Utils_Tuple2(
+				_Utils_Tuple2(x, y + 1),
+				_Utils_Tuple2(2, $author$project$Config$roomSize))
+			]));
+};
+var $author$project$World$Map$get = function (pos) {
+	return A2(
+		$author$project$Game$Build$constant,
+		A2(
+			$elm$core$Maybe$withDefault,
+			_List_Nil,
+			A2($elm$core$Dict$get, pos, $author$project$World$Map$dict)),
+		$author$project$World$Map$getDoors(pos));
+};
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$xor = _Bitwise_xor;
+var $elm$random$Random$peel = function (_v0) {
+	var state = _v0.a;
+	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
+	return ((word >>> 22) ^ word) >>> 0;
+};
 var $elm$random$Random$int = F2(
 	function (a, b) {
 		return $elm$random$Random$Generator(
@@ -7600,23 +7418,17 @@ var $author$project$World$new = function (seed) {
 	};
 };
 var $author$project$Main$init = function (_v0) {
-	var room = 0;
-	var level = A2(
-		$elm$core$Maybe$withDefault,
-		$author$project$World$Level$empty,
-		$author$project$World$Trial$fromInt(0));
-	var _v1 = A2(
-		$elm$random$Random$step,
-		level,
-		$elm$random$Random$initialSeed(42));
-	var game = _v1.a;
-	var seed = _v1.b;
+	var seed = $elm$random$Random$initialSeed(42);
+	var room = _Utils_Tuple2(0, 0);
+	var initialPlayerPos = _Utils_Tuple2(2, 4);
+	var game = $author$project$World$Map$get(room);
 	return _Utils_Tuple2(
 		{
 			frame: 0,
-			game: game,
+			game: A2($author$project$Game$addPlayer, initialPlayerPos, game),
 			history: _List_Nil,
 			initialItem: $elm$core$Maybe$Nothing,
+			initialPlayerPos: initialPlayerPos,
 			levelSeed: seed,
 			overlay: $elm$core$Maybe$Just($author$project$Main$Menu),
 			room: room,
@@ -7902,10 +7714,7 @@ var $author$project$Input$InputDir = function (a) {
 };
 var $author$project$Input$InputReset = {$: 'InputReset'};
 var $author$project$Input$InputUndo = {$: 'InputUndo'};
-var $author$project$Direction$Left = {$: 'Left'};
 var $author$project$Main$NoOps = {$: 'NoOps'};
-var $author$project$Direction$Right = {$: 'Right'};
-var $author$project$Direction$Up = {$: 'Up'};
 var $author$project$Main$toDirection = function (string) {
 	switch (string) {
 		case 'a':
@@ -8168,6 +7977,7 @@ var $elm$core$Maybe$andThen = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
+var $author$project$Main$GameWon = {$: 'GameWon'};
 var $author$project$Main$RoomEntered = function (a) {
 	return {$: 'RoomEntered', a: a};
 };
@@ -8210,7 +8020,10 @@ var $author$project$Game$remove = F2(
 		return _Utils_update(
 			game,
 			{
-				cells: A2($elm$core$Dict$remove, pos, game.cells)
+				cells: A2($elm$core$Dict$remove, pos, game.cells),
+				playerPos: _Utils_eq(
+					game.playerPos,
+					$elm$core$Maybe$Just(pos)) ? $elm$core$Maybe$Nothing : game.playerPos
 			});
 	});
 var $author$project$Game$update = F3(
@@ -8325,7 +8138,7 @@ var $author$project$Main$applyEvent = F2(
 					$author$project$Port$fromElm(
 						$author$project$PortDefinition$PlaySound(
 							{looping: false, sound: sound})));
-			default:
+			case 'MoveToRoom':
 				var room = event.a;
 				return _Utils_Tuple2(
 					model,
@@ -8342,7 +8155,23 @@ var $author$project$Main$applyEvent = F2(
 								$author$project$PortDefinition$PlaySound(
 									{looping: false, sound: $author$project$Gen$Sound$Win}))
 							])));
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							overlay: $elm$core$Maybe$Just($author$project$Main$GameWon)
+						}),
+					$elm$core$Platform$Cmd$none);
 		}
+	});
+var $elm$core$Tuple$mapSecond = F2(
+	function (func, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return _Utils_Tuple2(
+			x,
+			func(y));
 	});
 var $author$project$Main$applyEvents = F2(
 	function (events, model) {
@@ -8387,423 +8216,8 @@ var $author$project$Main$applyGameAndKill = F2(
 				},
 				$elm$core$Process$sleep(100)));
 	});
-var $author$project$Main$GameWon = {$: 'GameWon'};
-var $elm$random$Random$addOne = function (value) {
-	return _Utils_Tuple2(1, value);
-};
-var $elm$random$Random$getByWeight = F3(
-	function (_v0, others, countdown) {
-		getByWeight:
-		while (true) {
-			var weight = _v0.a;
-			var value = _v0.b;
-			if (!others.b) {
-				return value;
-			} else {
-				var second = others.a;
-				var otherOthers = others.b;
-				if (_Utils_cmp(
-					countdown,
-					$elm$core$Basics$abs(weight)) < 1) {
-					return value;
-				} else {
-					var $temp$_v0 = second,
-						$temp$others = otherOthers,
-						$temp$countdown = countdown - $elm$core$Basics$abs(weight);
-					_v0 = $temp$_v0;
-					others = $temp$others;
-					countdown = $temp$countdown;
-					continue getByWeight;
-				}
-			}
-		}
-	});
-var $elm$core$List$sum = function (numbers) {
-	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
-};
-var $elm$random$Random$weighted = F2(
-	function (first, others) {
-		var normalize = function (_v0) {
-			var weight = _v0.a;
-			return $elm$core$Basics$abs(weight);
-		};
-		var total = normalize(first) + $elm$core$List$sum(
-			A2($elm$core$List$map, normalize, others));
-		return A2(
-			$elm$random$Random$map,
-			A2($elm$random$Random$getByWeight, first, others),
-			A2($elm$random$Random$float, 0, total));
-	});
-var $elm$random$Random$uniform = F2(
-	function (value, valueList) {
-		return A2(
-			$elm$random$Random$weighted,
-			$elm$random$Random$addOne(value),
-			A2($elm$core$List$map, $elm$random$Random$addOne, valueList));
-	});
-var $author$project$World$Level$crateDungeonNoBombs = A2(
-	$elm$random$Random$andThen,
-	function (layout) {
-		return A2($author$project$Game$Build$generator, layout, _List_Nil);
-	},
-	A2(
-		$elm$random$Random$uniform,
-		_List_fromArray(
-			['❌❌📦❌❌', '❌⬜⬜📦❌', '❌⬜📦⬜❌', '❌📦⬜⬜❌', '❌⬜😊⬜❌']),
-		_List_fromArray(
-			[
-				_List_fromArray(
-				['📦⬜📦⬜⬜', '⬜📦⬜📦⬜', '❌❌❌❌❌', '⬜⬜📦⬜⬜', '⬜⬜😊⬜⬜']),
-				_List_fromArray(
-				['📦⬜⬜📦⬜', '⬜📦❌⬜📦', '❌❌❌❌❌', '⬜⬜📦⬜📦', '⬜⬜😊⬜⬜']),
-				_List_fromArray(
-				['❌📦⬜⬜❌', '📦⬜⬜⬜📦', '⬜⬜❌📦⬜', '📦⬜📦⬜📦', '❌⬜😊⬜❌'])
-			])));
-var $author$project$World$Level$crateDungeonNoLava = A2(
-	$elm$random$Random$andThen,
-	$elm$core$Basics$identity,
-	A2(
-		$elm$random$Random$uniform,
-		A2(
-			$author$project$Game$Build$generator,
-			_List_fromArray(
-				['⬜⬜📦⬜⬜', '⬜📦⬜📦⬜', '📦📦📦📦📦', '📦⬜💣📦⬜', '⬜⬜😊⬜⬜']),
-			_List_Nil),
-		_List_fromArray(
-			[
-				A2(
-				$author$project$Game$Build$generator,
-				_List_fromArray(
-					['⬜⬜📦⬜⬜', '📦⬜⬜📦⬜', '📦📦📦📦📦', '📦⬜💣⬜📦', '⬜⬜😊⬜⬜']),
-				_List_Nil),
-				A2(
-				$author$project$Game$Build$generator,
-				_List_fromArray(
-					['⬜⬜📦⬜⬜', '⬜📦📦📦📦', '📦⬜💣📦⬜', '⬜📦📦⬜⬜', '⬜⬜😊⬜⬜']),
-				_List_Nil),
-				A2(
-				$author$project$Game$Build$generator,
-				_List_fromArray(
-					['⬜📦📦📦⬜', '⬜⬜📦⬜⬜', '📦📦📦📦📦', '⬜⬜💣⬜⬜', '⬜⬜😊⬜⬜']),
-				_List_Nil)
-			])));
-var $author$project$World$Level$crateDungeonNoLavaNoBombs = A2(
-	$elm$random$Random$andThen,
-	$elm$core$Basics$identity,
-	A2(
-		$elm$random$Random$uniform,
-		A2(
-			$author$project$Game$Build$generator,
-			_List_fromArray(
-				['⬜⬜⬜⬜⬜', '⬜📦⬜📦⬜', '📦📦📦📦📦', '📦⬜⬜📦⬜', '⬜⬜😊⬜⬜']),
-			_List_Nil),
-		_List_fromArray(
-			[
-				A2(
-				$author$project$Game$Build$generator,
-				_List_fromArray(
-					['⬜⬜⬜⬜⬜', '📦⬜⬜📦⬜', '📦📦📦📦📦', '📦⬜⬜⬜📦', '⬜⬜😊⬜⬜']),
-				_List_Nil),
-				A2(
-				$author$project$Game$Build$generator,
-				_List_fromArray(
-					['⬜⬜⬜⬜⬜', '⬜📦📦📦📦', '📦⬜⬜📦⬜', '⬜📦📦⬜⬜', '⬜⬜😊⬜⬜']),
-				_List_Nil),
-				A2(
-				$author$project$Game$Build$generator,
-				_List_fromArray(
-					['⬜📦⬜📦⬜', '⬜⬜📦⬜⬜', '📦📦📦📦📦', '⬜⬜⬜⬜⬜', '⬜⬜😊⬜⬜']),
-				_List_Nil)
-			])));
-var $author$project$Game$Build$ItemBlock = function (a) {
-	return {$: 'ItemBlock', a: a};
-};
-var $author$project$Entity$Orc = function (a) {
-	return {$: 'Orc', a: a};
-};
-var $author$project$Entity$Rat = {$: 'Rat'};
-var $elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
-	});
-var $elm$core$List$repeatHelp = F3(
-	function (result, n, value) {
-		repeatHelp:
-		while (true) {
-			if (n <= 0) {
-				return result;
-			} else {
-				var $temp$result = A2($elm$core$List$cons, value, result),
-					$temp$n = n - 1,
-					$temp$value = value;
-				result = $temp$result;
-				n = $temp$n;
-				value = $temp$value;
-				continue repeatHelp;
-			}
-		}
-	});
-var $elm$core$List$repeat = F2(
-	function (n, value) {
-		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
-	});
-var $author$project$World$Level$ratDungeon = function (difficulty) {
-	var maxEnemies = A2(
-		$elm$core$Basics$max,
-		1,
-		A2($elm$core$Basics$min, 3, difficulty));
-	var maxCrates = difficulty + 1;
-	var maxBombs = A2($elm$core$Basics$max, 1, maxEnemies - 1);
-	return A2(
-		$elm$random$Random$andThen,
-		function (layout) {
-			return A2(
-				$elm$random$Random$andThen,
-				$author$project$Game$Build$generator(layout),
-				A2(
-					$elm$random$Random$uniform,
-					$elm$core$List$concat(
-						_List_fromArray(
-							[
-								A2(
-								$elm$core$List$repeat,
-								maxEnemies,
-								$author$project$Game$Build$EntityBlock(
-									$author$project$Entity$Enemy($author$project$Entity$Rat))),
-								A2(
-								$elm$core$List$repeat,
-								maxBombs + 1,
-								$author$project$Game$Build$ItemBlock($author$project$Entity$Bomb)),
-								A2(
-								$elm$core$List$repeat,
-								maxCrates - 1,
-								$author$project$Game$Build$EntityBlock($author$project$Entity$Crate))
-							])),
-					_List_fromArray(
-						[
-							$elm$core$List$concat(
-							_List_fromArray(
-								[
-									A2(
-									$elm$core$List$repeat,
-									maxEnemies,
-									$author$project$Game$Build$EntityBlock(
-										$author$project$Entity$Enemy($author$project$Entity$Rat))),
-									A2(
-									$elm$core$List$repeat,
-									maxBombs,
-									$author$project$Game$Build$ItemBlock($author$project$Entity$Bomb)),
-									A2(
-									$elm$core$List$repeat,
-									maxCrates,
-									$author$project$Game$Build$EntityBlock($author$project$Entity$Crate))
-								])),
-							$elm$core$List$concat(
-							_List_fromArray(
-								[
-									A2(
-									$elm$core$List$repeat,
-									maxEnemies - 1,
-									$author$project$Game$Build$EntityBlock(
-										$author$project$Entity$Enemy($author$project$Entity$Rat))),
-									A2(
-									$elm$core$List$repeat,
-									1,
-									$author$project$Game$Build$EntityBlock(
-										$author$project$Entity$Enemy(
-											$author$project$Entity$Orc($author$project$Direction$Down)))),
-									A2(
-									$elm$core$List$repeat,
-									maxBombs,
-									$author$project$Game$Build$ItemBlock($author$project$Entity$Bomb)),
-									A2(
-									$elm$core$List$repeat,
-									maxCrates,
-									$author$project$Game$Build$EntityBlock($author$project$Entity$Crate))
-								]))
-						])));
-		},
-		A2(
-			$elm$random$Random$uniform,
-			_List_fromArray(
-				['💣⬜⬜⬜💣', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '💣⬜😊⬜💣']),
-			_List_fromArray(
-				[
-					_List_fromArray(
-					['⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜❌⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜😊⬜⬜']),
-					_List_fromArray(
-					['📦⬜⬜⬜💣', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '💣⬜😊⬜📦'])
-				])));
-};
-var $author$project$World$Level$dungeons = $elm$core$Array$fromList(
-	_List_fromArray(
-		[
-			$author$project$World$Level$crateDungeonNoLavaNoBombs,
-			$author$project$World$Level$crateDungeonNoBombs,
-			$author$project$World$Level$crateDungeonNoLava,
-			$author$project$World$Level$ratDungeon(1)
-		]));
-var $author$project$World$Level$goblinDungeon = A2(
-	$elm$random$Random$andThen,
-	function (layout) {
-		return A2(
-			$elm$random$Random$andThen,
-			$author$project$Game$Build$generator(layout),
-			A2(
-				$elm$random$Random$uniform,
-				$elm$core$List$concat(
-					_List_fromArray(
-						[
-							A2(
-							$elm$core$List$repeat,
-							1,
-							$author$project$Game$Build$EntityBlock(
-								$author$project$Entity$Enemy($author$project$Entity$Goblin))),
-							A2(
-							$elm$core$List$repeat,
-							1,
-							$author$project$Game$Build$EntityBlock(
-								$author$project$Entity$Enemy($author$project$Entity$Goblin))),
-							A2(
-							$elm$core$List$repeat,
-							1,
-							$author$project$Game$Build$EntityBlock(
-								$author$project$Entity$Enemy($author$project$Entity$Goblin))),
-							A2(
-							$elm$core$List$repeat,
-							3,
-							$author$project$Game$Build$ItemBlock($author$project$Entity$Bomb)),
-							A2(
-							$elm$core$List$repeat,
-							2,
-							$author$project$Game$Build$EntityBlock($author$project$Entity$Crate))
-						])),
-				_List_fromArray(
-					[
-						$elm$core$List$concat(
-						_List_fromArray(
-							[
-								A2(
-								$elm$core$List$repeat,
-								1,
-								$author$project$Game$Build$EntityBlock(
-									$author$project$Entity$Enemy($author$project$Entity$Goblin))),
-								A2(
-								$elm$core$List$repeat,
-								1,
-								$author$project$Game$Build$EntityBlock(
-									$author$project$Entity$Enemy($author$project$Entity$Goblin))),
-								A2(
-								$elm$core$List$repeat,
-								3,
-								$author$project$Game$Build$ItemBlock($author$project$Entity$Bomb)),
-								A2(
-								$elm$core$List$repeat,
-								3,
-								$author$project$Game$Build$EntityBlock($author$project$Entity$Crate))
-							])),
-						$elm$core$List$concat(
-						_List_fromArray(
-							[
-								A2(
-								$elm$core$List$repeat,
-								1,
-								$author$project$Game$Build$EntityBlock(
-									$author$project$Entity$Enemy($author$project$Entity$Goblin))),
-								A2(
-								$elm$core$List$repeat,
-								1,
-								$author$project$Game$Build$EntityBlock(
-									$author$project$Entity$Enemy($author$project$Entity$Rat))),
-								A2(
-								$elm$core$List$repeat,
-								3,
-								$author$project$Game$Build$ItemBlock($author$project$Entity$Bomb)),
-								A2(
-								$elm$core$List$repeat,
-								3,
-								$author$project$Game$Build$EntityBlock($author$project$Entity$Crate))
-							]))
-					])));
-	},
-	A2(
-		$elm$random$Random$uniform,
-		_List_fromArray(
-			['❌⬜⬜⬜❌', '❌⬜⬜⬜❌', '❌⬜⬜⬜❌', '❌⬜⬜⬜❌', '❌⬜😊⬜❌']),
-		_List_fromArray(
-			[
-				_List_fromArray(
-				['⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '❌❌❌❌❌', '⬜⬜📦⬜⬜', '⬜⬜😊⬜⬜']),
-				_List_fromArray(
-				['❌⬜⬜⬜❌', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '❌⬜😊⬜❌'])
-			])));
-var $author$project$World$Level$generate = function (difficulty) {
-	return A2(
-		$elm$core$Maybe$withDefault,
-		$author$project$World$Level$goblinDungeon,
-		A2($elm$core$Array$get, difficulty, $author$project$World$Level$dungeons));
-};
-var $author$project$Main$generateLevel = F3(
-	function (seed, trial, model) {
-		var maybeGenerator = function () {
-			var _v1 = $author$project$World$Trial(trial);
-			if (_v1.$ === 'Stage') {
-				var level = _v1.a;
-				return $elm$core$Maybe$Just(
-					$author$project$World$Level$generate(level.difficulty));
-			} else {
-				var i = _v1.a;
-				return $author$project$World$Trial$fromInt(i);
-			}
-		}();
-		return A2(
-			$elm$core$Maybe$withDefault,
-			_Utils_update(
-				model,
-				{
-					overlay: $elm$core$Maybe$Just($author$project$Main$GameWon)
-				}),
-			A2(
-				$elm$core$Maybe$map,
-				function (_v0) {
-					var game = _v0.a;
-					return _Utils_update(
-						model,
-						{
-							game: _Utils_update(
-								game,
-								{item: model.game.item}),
-							levelSeed: seed,
-							overlay: $elm$core$Maybe$Nothing,
-							room: trial
-						});
-				},
-				A2(
-					$elm$core$Maybe$map,
-					function (generator) {
-						return A2($elm$random$Random$step, generator, seed);
-					},
-					maybeGenerator)));
-	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $author$project$Game$getPlayerPosition = function (game) {
-	return $elm$core$List$head(
-		A2(
-			$elm$core$List$filterMap,
-			function (_v0) {
-				var key = _v0.a;
-				var cell = _v0.b;
-				return _Utils_eq(cell.entity, $author$project$Entity$Player) ? $elm$core$Maybe$Just(key) : $elm$core$Maybe$Nothing;
-			},
-			$elm$core$Dict$toList(game.cells)));
+	return game.playerPos;
 };
 var $author$project$Main$gotSeed = F2(
 	function (seed, model) {
@@ -8829,6 +8243,7 @@ var $author$project$Game$Event$MoveToRoom = function (a) {
 var $author$project$Entity$Stunned = function (a) {
 	return {$: 'Stunned', a: a};
 };
+var $author$project$Game$Event$WinGame = {$: 'WinGame'};
 var $author$project$Position$addToVector = F2(
 	function (_v0, _v1) {
 		var x2 = _v0.a;
@@ -8888,6 +8303,7 @@ var $author$project$Game$Event$map = F2(
 				game: fun(output.game)
 			});
 	});
+var $elm$core$Basics$not = _Basics_not;
 var $author$project$Game$move = F2(
 	function (args, game) {
 		return ($author$project$Math$posIsValid(args.to) && (!A2($elm$core$Dict$member, args.to, game.cells))) ? A2(
@@ -8896,7 +8312,12 @@ var $author$project$Game$move = F2(
 				return function (cells) {
 					return _Utils_update(
 						game,
-						{cells: cells});
+						{
+							cells: cells,
+							playerPos: _Utils_eq(
+								$elm$core$Maybe$Just(args.from),
+								game.playerPos) ? $elm$core$Maybe$Just(args.to) : game.playerPos
+						});
 				}(
 					A2(
 						$elm$core$Dict$remove,
@@ -9005,6 +8426,9 @@ var $author$project$Game$Update$pushSmallBomb = F3(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
+var $author$project$Entity$Orc = function (a) {
+	return {$: 'Orc', a: a};
+};
 var $author$project$Direction$mirror = function (direction) {
 	switch (direction.$) {
 		case 'Up':
@@ -9162,31 +8586,13 @@ var $author$project$Game$Update$movePlayer = F2(
 									$author$project$Game$Event$Fx($author$project$Gen$Sound$Push)
 								])
 						});
-				case 'Door':
-					var door = _v0.a.a;
+				case 'Diamant':
+					var _v4 = _v0.a;
 					return $elm$core$Maybe$Just(
 						{
-							game: _Utils_update(
-								game,
-								{
-									cells: A2(
-										$elm$core$Maybe$withDefault,
-										game.cells,
-										A2(
-											$elm$core$Maybe$map,
-											function (a) {
-												return A2(
-													$elm$core$Dict$remove,
-													position,
-													A3($elm$core$Dict$insert, newLocation, a, game.cells));
-											},
-											A2($elm$core$Dict$get, position, game.cells))),
-									won: true
-								}),
+							game: game,
 							kill: _List_fromArray(
-								[
-									$author$project$Game$Event$MoveToRoom(door.room)
-								])
+								[$author$project$Game$Event$WinGame])
 						});
 				default:
 					return $elm$core$Maybe$Nothing;
@@ -9203,7 +8609,35 @@ var $author$project$Game$Update$movePlayer = F2(
 							A2(
 								$author$project$Game$move,
 								{from: position, to: newLocation},
-								game))))) : $elm$core$Maybe$Nothing;
+								game))))) : A2(
+				$elm$core$Maybe$map,
+				function (door) {
+					return {
+						game: _Utils_update(
+							game,
+							{
+								cells: A2(
+									$elm$core$Maybe$withDefault,
+									game.cells,
+									A2(
+										$elm$core$Maybe$map,
+										function (a) {
+											return A2(
+												$elm$core$Dict$remove,
+												position,
+												A3($elm$core$Dict$insert, newLocation, a, game.cells));
+										},
+										A2($elm$core$Dict$get, position, game.cells))),
+								playerPos: $elm$core$Maybe$Just(newLocation),
+								won: true
+							}),
+						kill: _List_fromArray(
+							[
+								$author$project$Game$Event$MoveToRoom(door.room)
+							])
+					};
+				},
+				A2($elm$core$Dict$get, newLocation, game.doors));
 		}
 	});
 var $author$project$Game$clearParticles = function (game) {
@@ -9621,17 +9055,45 @@ var $author$project$Main$nextFrameRequested = function (model) {
 			frame: A2($elm$core$Basics$modBy, 2, model.frame + 1)
 		});
 };
+var $author$project$Main$startRoom = F2(
+	function (game, model) {
+		return _Utils_update(
+			model,
+			{
+				game: A2(
+					$author$project$Game$addPlayer,
+					model.initialPlayerPos,
+					_Utils_update(
+						game,
+						{item: model.game.item})),
+				overlay: $elm$core$Maybe$Nothing
+			});
+	});
 var $author$project$Main$nextRoom = F2(
-	function (id, model) {
-		return _Utils_Tuple2(
-			A3(
-				$author$project$Main$generateLevel,
-				model.seed,
-				id,
-				_Utils_update(
-					model,
-					{history: _List_Nil, room: id})),
-			$elm$core$Platform$Cmd$none);
+	function (room, model) {
+		var game = $author$project$World$Map$get(room);
+		return A2(
+			$author$project$Main$startRoom,
+			game,
+			_Utils_update(
+				model,
+				{
+					history: _List_Nil,
+					initialPlayerPos: A2(
+						$elm$core$Maybe$withDefault,
+						model.initialPlayerPos,
+						A2(
+							$elm$core$Maybe$map,
+							function (_v0) {
+								var x = _v0.a;
+								var y = _v0.b;
+								return _Utils_Tuple2(
+									A2($elm$core$Basics$modBy, $author$project$Config$roomSize, x),
+									A2($elm$core$Basics$modBy, $author$project$Config$roomSize, y));
+							},
+							model.game.playerPos)),
+					room: room
+				}));
 	});
 var $author$project$Game$Update$applyBomb = F2(
 	function (position, game) {
@@ -9683,9 +9145,8 @@ var $author$project$Game$Update$placeBombeAndUpdateGame = F2(
 	});
 var $author$project$Main$restartRoom = function (model) {
 	return _Utils_Tuple2(
-		A3(
-			$author$project$Main$generateLevel,
-			model.levelSeed,
+		A2(
+			$author$project$Main$nextRoom,
 			model.room,
 			_Utils_update(
 				model,
@@ -9693,7 +9154,10 @@ var $author$project$Main$restartRoom = function (model) {
 					game: function (game) {
 						return _Utils_update(
 							game,
-							{item: model.initialItem});
+							{
+								item: model.initialItem,
+								playerPos: $elm$core$Maybe$Just(model.initialPlayerPos)
+							});
 					}(model.game),
 					history: _List_Nil
 				})),
@@ -9724,9 +9188,7 @@ var $author$project$Main$updateWorldMap = F2(
 				var _v1 = A2($elm$core$Dict$get, model.world.player, model.world.nodes);
 				if ((_v1.$ === 'Just') && (_v1.a.$ === 'Room')) {
 					var seed = _v1.a.a.seed;
-					return _Utils_Tuple2(
-						A3($author$project$Main$generateLevel, seed, model.room, model),
-						$elm$core$Platform$Cmd$none);
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
@@ -9766,7 +9228,9 @@ var $author$project$Main$update = F2(
 						default:
 							var _v4 = _v1.a;
 							return _Utils_Tuple2(
-								A3($author$project$Main$generateLevel, model.seed, model.room, model),
+								_Utils_update(
+									model,
+									{overlay: $elm$core$Maybe$Nothing}),
 								$elm$core$Platform$Cmd$none);
 					}
 				} else {
@@ -9857,7 +9321,9 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'RoomEntered':
 				var id = msg.a;
-				return A2($author$project$Main$nextRoom, id, model);
+				return _Utils_Tuple2(
+					A2($author$project$Main$nextRoom, id, model),
+					$elm$core$Platform$Cmd$none);
 			default:
 				var result = msg.a;
 				if (result.$ === 'Ok') {
@@ -10074,6 +9540,15 @@ var $author$project$View$Screen$menu = F2(
 						]))
 				]));
 	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $author$project$Image$bitmap = F3(
 	function (attrs, args, list) {
 		var zero = $elm$core$List$head(
@@ -10712,6 +10187,13 @@ var $author$project$View$Screen$viewDoors = F2(
 			},
 			$elm$core$Dict$keys(game.doors));
 	});
+var $author$project$View$Cell$diamant = function (attrs) {
+	return A2(
+		$author$project$View$Cell$fromEmojis,
+		attrs,
+		_List_fromArray(
+			['❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨❌❌❌', '❌❌🟨❌❌🟨❌❌❌❌🟨❌❌🟨❌❌', '❌🟨❌❌🟨❌❌❌❌❌❌🟨❌❌🟨❌', '❌🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨❌', '❌❌🟨❌❌🟨❌❌❌❌🟨❌❌🟨❌❌', '❌❌❌🟨❌❌🟨❌❌🟨❌❌🟨❌❌❌', '❌❌❌❌🟨❌🟨❌❌🟨❌🟨❌❌❌❌', '❌❌❌❌❌🟨❌🟨🟨❌🟨❌❌❌❌❌', '❌❌❌❌❌❌🟨🟨🟨🟨❌❌❌❌❌❌', '❌❌❌❌❌❌❌🟨🟨❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌']));
+};
 var $author$project$View$Cell$directional = F2(
 	function (_v0, args) {
 		var x = _v0.a;
@@ -10773,8 +10255,6 @@ var $author$project$View$Cell$wall = function (attrs) {
 var $author$project$View$Cell$toHtml = F3(
 	function (attrs, args, cell) {
 		switch (cell.$) {
-			case 'Door':
-				return A2($Orasund$elm_layout$Layout$el, attrs, $Orasund$elm_layout$Layout$none);
 			case 'Player':
 				return A2(
 					$author$project$View$Cell$sprite,
@@ -10824,8 +10304,10 @@ var $author$project$View$Cell$toHtml = F3(
 						$author$project$View$Cell$fromEnemy,
 						{frame: args.frame, playerDirection: args.playerDirection},
 						enemy));
-			default:
+			case 'Wall':
 				return $author$project$View$Cell$wall(attrs);
+			default:
+				return $author$project$View$Cell$diamant(attrs);
 		}
 	});
 var $author$project$View$Screen$viewEntity = F3(

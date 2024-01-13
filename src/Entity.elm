@@ -33,8 +33,7 @@ type Item
 
 
 type Entity
-    = Door { room : Int }
-    | Player
+    = Player
     | Crate
     | InactiveBomb Item
     | ActiveSmallBomb
@@ -42,3 +41,4 @@ type Entity
     | Enemy Enemy
     | Stunned Enemy
     | Wall
+    | Diamant

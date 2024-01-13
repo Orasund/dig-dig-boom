@@ -26,8 +26,7 @@ import View.Controls
 import View.Screen as Screen
 import View.World
 import World exposing (Node(..), RoomSort(..), World)
-import World.Level
-import World.Trial
+import World.Map
 
 
 
@@ -49,9 +48,10 @@ type alias Model =
     , overlay : Maybe Overlay
     , frame : Int
     , history : List Game
-    , room : Int
+    , room : ( Int, Int )
     , world : World
     , initialItem : Maybe Item
+    , initialPlayerPos : ( Int, Int )
     }
 
 
@@ -61,7 +61,7 @@ type Msg
     | GotSeed Seed
     | NextFrameRequested
     | NoOps
-    | RoomEntered Int
+    | RoomEntered ( Int, Int )
     | Received (Result Decode.Error PortDefinition.ToElm)
 
 
@@ -75,18 +75,22 @@ init : flag -> ( Model, Cmd Msg )
 init _ =
     let
         room =
-            0
+            ( 0, 0 )
 
-        level =
-            World.Trial.fromInt 0 |> Maybe.withDefault World.Level.empty
+        initialPlayerPos =
+            ( 2, 4 )
 
-        ( game, seed ) =
-            Random.step level (Random.initialSeed 42)
+        seed =
+            Random.initialSeed 42
+
+        game =
+            World.Map.get room
     in
     ( { levelSeed = seed
       , seed = seed
-      , game = game
+      , game = game |> Game.addPlayer initialPlayerPos
       , initialItem = Nothing
+      , initialPlayerPos = initialPlayerPos
       , overlay = Just Menu
       , frame = 0
       , history = []
@@ -106,29 +110,14 @@ init _ =
 -------------------------------
 
 
-generateLevel : Seed -> Int -> Model -> Model
-generateLevel seed trial model =
-    let
-        maybeGenerator =
-            case Trial trial of
-                Stage level ->
-                    World.Level.generate level.difficulty |> Just
-
-                Trial i ->
-                    World.Trial.fromInt i
-    in
-    maybeGenerator
-        |> Maybe.map (\generator -> Random.step generator seed)
-        |> Maybe.map
-            (\( game, _ ) ->
-                { model
-                    | levelSeed = seed
-                    , game = { game | item = model.game.item }
-                    , room = trial
-                    , overlay = Nothing
-                }
-            )
-        |> Maybe.withDefault { model | overlay = Just GameWon }
+startRoom : Game -> Model -> Model
+startRoom game model =
+    { model
+        | game =
+            { game | item = model.game.item }
+                |> Game.addPlayer model.initialPlayerPos
+        , overlay = Nothing
+    }
 
 
 solvedRoom : Model -> ( Model, Cmd Msg )
@@ -155,25 +144,31 @@ restartRoom model =
                 |> (\game ->
                         { game
                             | item = model.initialItem
+                            , playerPos = Just model.initialPlayerPos
                         }
                    )
         , history = []
       }
-        |> generateLevel model.levelSeed model.room
+        |> nextRoom model.room
     , PlaySound { sound = Retry, looping = False } |> Port.fromElm
     )
 
 
-nextRoom : Int -> Model -> ( Model, Cmd Msg )
-nextRoom id model =
-    ( generateLevel model.seed
-        id
-        { model
-            | room = id
-            , history = []
-        }
-    , Cmd.none
-    )
+nextRoom : ( Int, Int ) -> Model -> Model
+nextRoom room model =
+    let
+        game =
+            World.Map.get room
+    in
+    { model
+        | room = room
+        , history = []
+        , initialPlayerPos =
+            model.game.playerPos
+                |> Maybe.map (\( x, y ) -> ( modBy Config.roomSize x, modBy Config.roomSize y ))
+                |> Maybe.withDefault model.initialPlayerPos
+    }
+        |> startRoom game
 
 
 setGame : Model -> Game -> Model
@@ -232,6 +227,9 @@ applyEvent event model =
                 ]
             )
 
+        WinGame ->
+            ( { model | overlay = Just GameWon }, Cmd.none )
+
 
 applyEvents : List Event -> Model -> ( Model, Cmd Msg )
 applyEvents events model =
@@ -259,7 +257,7 @@ update msg model =
                     updateWorldMap input model
 
                 Just Menu ->
-                    ( generateLevel model.seed model.room model
+                    ( { model | overlay = Nothing }
                     , Cmd.none
                     )
 
@@ -331,7 +329,7 @@ update msg model =
             ( model, Cmd.none )
 
         RoomEntered id ->
-            nextRoom id model
+            ( nextRoom id model, Cmd.none )
 
         Received result ->
             case result of
@@ -352,7 +350,8 @@ updateWorldMap input model =
                         |> Random.step (World.solveRoom model.world)
                         |> (\( w, s ) -> ( { model | world = w, seed = s }, Cmd.none ))
                     --}
-                    ( generateLevel seed model.room model, Cmd.none )
+                    -- ( generateLevel seed model.room model, Cmd.none )
+                    ( model, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )

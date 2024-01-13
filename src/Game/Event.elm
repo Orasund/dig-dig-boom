@@ -16,7 +16,8 @@ import Gen.Sound exposing (Sound)
 type Event
     = Kill ( Int, Int )
     | Fx Sound
-    | MoveToRoom Int
+    | MoveToRoom ( Int, Int )
+    | WinGame
 
 
 type alias GameAndEvents =
@@ -26,10 +27,6 @@ type alias GameAndEvents =
 none : Game -> GameAndEvents
 none game =
     { game = game, kill = [] }
-
-
-
--- |> checkIfWon
 
 
 map : (Game -> Game) -> GameAndEvents -> GameAndEvents

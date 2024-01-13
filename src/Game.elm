@@ -1,4 +1,4 @@
-module Game exposing (Cell, Game, addFloor, addItem, clearParticles, empty, face, findFirstEmptyCellInDirection, findFirstInDirection, fromCells, get, getPlayerPosition, insert, isLost, isWon, move, placeItem, remove, removeFloor, removeItem, update)
+module Game exposing (Cell, Game, addFloor, addItem, addPlayer, clearParticles, empty, face, findFirstEmptyCellInDirection, findFirstInDirection, fromCells, get, getPlayerPosition, insert, isLost, isWon, move, placeItem, remove, removeFloor, removeItem, update)
 
 import Config
 import Dict exposing (Dict)
@@ -29,9 +29,30 @@ type alias Game =
     , nextId : Int
     , item : Maybe Item
     , playerDirection : Direction
-    , doors : Dict ( Int, Int ) Int
+    , playerPos : Maybe ( Int, Int )
+    , doors : Dict ( Int, Int ) { room : ( Int, Int ) }
     , won : Bool
     }
+
+
+addPlayer : ( Int, Int ) -> Game -> Game
+addPlayer ( x, y ) game =
+    { game
+        | playerPos = Just ( x, y )
+        , playerDirection =
+            if x == 0 then
+                Right
+
+            else if x == Config.roomSize - 1 then
+                Left
+
+            else if y == 0 then
+                Down
+
+            else
+                Up
+    }
+        |> insert ( x, y ) Player
 
 
 clearParticles : Game -> Game
@@ -74,6 +95,7 @@ empty =
     , item = Nothing
     , nextId = 0
     , playerDirection = Down
+    , playerPos = Nothing
     , won = False
     , doors = Dict.empty
     }
@@ -96,7 +118,15 @@ get pos game =
 
 remove : ( Int, Int ) -> Game -> Game
 remove pos game =
-    { game | cells = game.cells |> Dict.remove pos }
+    { game
+        | cells = game.cells |> Dict.remove pos
+        , playerPos =
+            if game.playerPos == Just pos then
+                Nothing
+
+            else
+                game.playerPos
+    }
 
 
 insert : ( Int, Int ) -> Entity -> Game -> Game
@@ -150,6 +180,12 @@ move args game =
                         |> (\cells ->
                                 { game
                                     | cells = cells
+                                    , playerPos =
+                                        if Just args.from == game.playerPos then
+                                            Just args.to
+
+                                        else
+                                            game.playerPos
                                 }
                            )
                 )
@@ -181,17 +217,7 @@ findFirstInDirection position direction game =
 
 getPlayerPosition : Game -> Maybe ( Int, Int )
 getPlayerPosition game =
-    game.cells
-        |> Dict.toList
-        |> List.filterMap
-            (\( key, cell ) ->
-                if cell.entity == Player then
-                    Just key
-
-                else
-                    Nothing
-            )
-        |> List.head
+    game.playerPos
 
 
 findFirstEmptyCellInDirection : ( Int, Int ) -> Direction -> Game -> ( Int, Int )
