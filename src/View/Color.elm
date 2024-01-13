@@ -13,7 +13,7 @@ yellow =
 
 black : String
 black =
-    "black"
+    "#140c1c"
 
 
 red : String

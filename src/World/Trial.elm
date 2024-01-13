@@ -101,6 +101,8 @@ crateTails =
         |> List.indexedMap
             (\i list ->
                 [ Just ( ( 2, -1 ), { next = i + 1 } )
+                , Just ( ( -1, 2 ), { next = i - 1 } )
+                , Just ( ( 5, 2 ), { next = i - 1 } )
                 , if i > 0 then
                     Just ( ( 2, 5 ), { next = i - 1 } )
 

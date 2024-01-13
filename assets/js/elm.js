@@ -5556,6 +5556,7 @@ var $elm$core$Dict$fromList = function (assocs) {
 var $author$project$Config$roomSize = 5;
 var $author$project$Game$empty = {
 	cells: $elm$core$Dict$empty,
+	doors: $elm$core$Dict$empty,
 	floor: $elm$core$Dict$fromList(
 		A2(
 			$elm$core$List$map,
@@ -5583,6 +5584,14 @@ var $author$project$Game$insert = F3(
 					game.cells),
 				nextId: game.nextId + 1
 			});
+	});
+var $elm$core$Tuple$mapSecond = F2(
+	function (func, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return _Utils_Tuple2(
+			x,
+			func(y));
 	});
 var $author$project$Game$placeItem = F3(
 	function (pos, item, game) {
@@ -5993,7 +6002,18 @@ var $author$project$Game$Build$fromBlocks = F2(
 					$author$project$Entity$Door(
 						{room: room.next}));
 			},
-			game,
+			_Utils_update(
+				game,
+				{
+					doors: $elm$core$Dict$fromList(
+						A2(
+							$elm$core$List$map,
+							$elm$core$Tuple$mapSecond(
+								function ($) {
+									return $.next;
+								}),
+							args.doors))
+				}),
 			args.doors);
 	});
 var $elm$core$List$maybeCons = F3(
@@ -7285,6 +7305,14 @@ var $author$project$World$Trial$crateTails = A2(
 							_Utils_Tuple2(
 								_Utils_Tuple2(2, -1),
 								{next: i + 1})),
+							$elm$core$Maybe$Just(
+							_Utils_Tuple2(
+								_Utils_Tuple2(-1, 2),
+								{next: i - 1})),
+							$elm$core$Maybe$Just(
+							_Utils_Tuple2(
+								_Utils_Tuple2(5, 2),
+								{next: i - 1})),
 							(i > 0) ? $elm$core$Maybe$Just(
 							_Utils_Tuple2(
 								_Utils_Tuple2(2, 5),
@@ -8315,14 +8343,6 @@ var $author$project$Main$applyEvent = F2(
 									{looping: false, sound: $author$project$Gen$Sound$Win}))
 							])));
 		}
-	});
-var $elm$core$Tuple$mapSecond = F2(
-	function (func, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		return _Utils_Tuple2(
-			x,
-			func(y));
 	});
 var $author$project$Main$applyEvents = F2(
 	function (events, model) {
@@ -10124,7 +10144,7 @@ var $author$project$Image$bitmap = F3(
 					_List_Nil)
 				]));
 	});
-var $author$project$View$Color$black = 'black';
+var $author$project$View$Color$black = '#140c1c';
 var $author$project$View$Color$red = '#d04648';
 var $author$project$View$Color$white = 'white';
 var $author$project$View$Color$yellow = '#dad45e';
@@ -10598,6 +10618,247 @@ var $author$project$View$World$toHtml = F2(
 						},
 						A2($elm$core$List$range, centerY - scale, centerY + scale)))));
 	});
+var $author$project$View$Cell$fromEmojis = function (attrs) {
+	return A2(
+		$author$project$View$Bitmap$fromEmojis,
+		attrs,
+		{color: 'white', pixelSize: $author$project$Config$cellSize / 16});
+};
+var $author$project$View$Door$floor = function (attrs) {
+	return A2(
+		$author$project$View$Cell$fromEmojis,
+		attrs,
+		_List_fromArray(
+			['⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛']));
+};
+var $author$project$View$Screen$viewDoorFloors = F2(
+	function (prefix, game) {
+		var attrs = F2(
+			function (x, y) {
+				return _List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'left',
+						$elm$core$String$fromFloat($author$project$Config$cellSize * x) + 'px'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'top',
+						$elm$core$String$fromFloat($author$project$Config$cellSize * y) + 'px')
+					]);
+			});
+		return A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var x = _v0.a;
+				var y = _v0.b;
+				return _Utils_Tuple2(
+					prefix + ('_' + ($elm$core$String$fromInt(x) + $elm$core$String$fromInt(y))),
+					$author$project$View$Door$floor(
+						A2(attrs, x, y)));
+			},
+			$elm$core$Dict$keys(game.doors));
+	});
+var $author$project$View$Door$bottom = function (attrs) {
+	return A2(
+		$author$project$View$Cell$fromEmojis,
+		attrs,
+		_List_fromArray(
+			['⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬛⬜❌❌❌❌❌❌❌❌❌❌❌❌⬜⬛', '⬛⬛⬜⬜❌❌❌❌❌❌❌❌⬜⬜⬛⬛', '⬛⬛⬛⬛⬜⬜⬜⬜⬜⬜⬜⬜⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛']));
+};
+var $author$project$View$Door$top = function (attrs) {
+	return A2(
+		$author$project$View$Cell$fromEmojis,
+		attrs,
+		_List_fromArray(
+			['⬛⬛⬛⬛⬜⬜⬜⬜⬜⬜⬜⬜⬛⬛⬛⬛', '⬛⬛⬜⬜❌❌❌❌❌❌❌❌⬜⬜⬛⬛', '⬛⬜❌❌❌❌❌❌❌❌❌❌❌❌⬜⬛', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜']));
+};
+var $author$project$View$Screen$viewDoors = F2(
+	function (prefix, game) {
+		var attrs = F2(
+			function (x, y) {
+				return _List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'left',
+						$elm$core$String$fromFloat($author$project$Config$cellSize * x) + 'px'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'top',
+						$elm$core$String$fromFloat($author$project$Config$cellSize * y) + 'px')
+					]);
+			});
+		return A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var x = _v0.a;
+				var y = _v0.b;
+				return _Utils_Tuple2(
+					prefix + ('_' + ($elm$core$String$fromInt(x) + $elm$core$String$fromInt(y))),
+					_Utils_eq(y, -1) ? $author$project$View$Door$top(
+						A2(attrs, x, y)) : (_Utils_eq(x, $author$project$Config$roomSize) ? $author$project$View$Door$bottom(
+						A2(
+							$elm$core$List$cons,
+							A2($elm$html$Html$Attributes$style, 'transform', 'rotate(-90deg)'),
+							A2(attrs, x, y))) : (_Utils_eq(x, -1) ? $author$project$View$Door$bottom(
+						A2(
+							$elm$core$List$cons,
+							A2($elm$html$Html$Attributes$style, 'transform', 'rotate(90deg)'),
+							A2(attrs, x, y))) : $author$project$View$Door$bottom(
+						A2(attrs, x, y)))));
+			},
+			$elm$core$Dict$keys(game.doors));
+	});
+var $author$project$View$Cell$directional = F2(
+	function (_v0, args) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var _v1 = args.direction;
+		switch (_v1.$) {
+			case 'Down':
+				return _Utils_Tuple2(x + args.frame, y);
+			case 'Up':
+				return _Utils_Tuple2(x + args.frame, y + 1);
+			case 'Left':
+				return _Utils_Tuple2((x + 2) + args.frame, y);
+			default:
+				return _Utils_Tuple2((x + 2) + args.frame, y + 1);
+		}
+	});
+var $author$project$View$Cell$fromEnemy = F2(
+	function (args, enemy) {
+		switch (enemy.$) {
+			case 'ActivatedBomb':
+				return _Utils_Tuple2(2 + args.frame, 1);
+			case 'Orc':
+				var dir = enemy.a;
+				return A2(
+					$author$project$View$Cell$directional,
+					_Utils_Tuple2(4, 2),
+					{direction: dir, frame: args.frame});
+			case 'Goblin':
+				return A2(
+					$author$project$View$Cell$directional,
+					_Utils_Tuple2(4, 0),
+					{direction: $author$project$Direction$Down, frame: args.frame});
+			case 'Doppelganger':
+				return A2(
+					$author$project$View$Cell$directional,
+					_Utils_Tuple2(4, 2),
+					{
+						direction: $author$project$Direction$mirror(args.playerDirection),
+						frame: args.frame
+					});
+			default:
+				return _Utils_Tuple2(0 + args.frame, 1);
+		}
+	});
+var $author$project$View$Cell$sprite = F2(
+	function (attrs, pos) {
+		return A2(
+			$author$project$Image$sprite,
+			A2($elm$core$List$cons, $author$project$Image$pixelated, attrs),
+			{height: $author$project$Config$cellSize, pos: pos, sheetColumns: 8, sheetRows: 8, url: 'assets/tileset.png', width: $author$project$Config$cellSize});
+	});
+var $author$project$View$Cell$wall = function (attrs) {
+	return A2(
+		$author$project$View$Cell$fromEmojis,
+		attrs,
+		_List_fromArray(
+			['⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜']));
+};
+var $author$project$View$Cell$toHtml = F3(
+	function (attrs, args, cell) {
+		switch (cell.$) {
+			case 'Door':
+				return A2($Orasund$elm_layout$Layout$el, attrs, $Orasund$elm_layout$Layout$none);
+			case 'Player':
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					A2(
+						$author$project$View$Cell$directional,
+						_Utils_Tuple2(0, 4),
+						{direction: args.playerDirection, frame: args.frame}));
+			case 'Sign':
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					_Utils_Tuple2(3, 2));
+			case 'Crate':
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					_Utils_Tuple2(1, 3));
+			case 'InactiveBomb':
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					_Utils_Tuple2(1, 6));
+			case 'ActiveSmallBomb':
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					A2(
+						$author$project$View$Cell$fromEnemy,
+						{frame: args.frame, playerDirection: args.playerDirection},
+						$author$project$Entity$ActivatedBomb($author$project$Entity$Bomb)));
+			case 'Enemy':
+				var enemy = cell.a;
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					A2(
+						$author$project$View$Cell$fromEnemy,
+						{frame: args.frame, playerDirection: args.playerDirection},
+						enemy));
+			case 'Stunned':
+				var enemy = cell.a;
+				return A2(
+					$author$project$View$Cell$sprite,
+					attrs,
+					A2(
+						$author$project$View$Cell$fromEnemy,
+						{frame: args.frame, playerDirection: args.playerDirection},
+						enemy));
+			default:
+				return $author$project$View$Cell$wall(attrs);
+		}
+	});
+var $author$project$View$Screen$viewEntity = F3(
+	function (prefix, args, game) {
+		return A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var _v1 = _v0.a;
+				var x = _v1.a;
+				var y = _v1.b;
+				var cell = _v0.b;
+				return _Utils_Tuple2(
+					prefix + ('_' + $elm$core$String$fromInt(cell.id)),
+					A3(
+						$author$project$View$Cell$toHtml,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+								A2(
+								$elm$html$Html$Attributes$style,
+								'left',
+								$elm$core$String$fromFloat($author$project$Config$cellSize * x) + 'px'),
+								A2(
+								$elm$html$Html$Attributes$style,
+								'top',
+								$elm$core$String$fromFloat($author$project$Config$cellSize * y) + 'px'),
+								A2($elm$html$Html$Attributes$style, 'transition', 'left 0.2s,top 0.2s')
+							]),
+						{frame: args.frame, playerDirection: game.playerDirection},
+						cell.entity));
+			},
+			$elm$core$Dict$toList(game.cells));
+	});
 var $author$project$View$Cell$border = F2(
 	function (attrs, pos) {
 		return A2(
@@ -10653,13 +10914,6 @@ var $author$project$View$Cell$borders = F2(
 						_Utils_Tuple2(1, 1))) : $elm$core$Maybe$Nothing
 				]));
 	});
-var $author$project$View$Cell$sprite = F2(
-	function (attrs, pos) {
-		return A2(
-			$author$project$Image$sprite,
-			A2($elm$core$List$cons, $author$project$Image$pixelated, attrs),
-			{height: $author$project$Config$cellSize, pos: pos, sheetColumns: 8, sheetRows: 8, url: 'assets/tileset.png', width: $author$project$Config$cellSize});
-	});
 var $author$project$View$Cell$floor = function (attrs) {
 	return A2(
 		$author$project$View$Cell$sprite,
@@ -10704,127 +10958,103 @@ var $author$project$View$Cell$particle = F2(
 				}
 			}());
 	});
-var $author$project$View$Cell$directional = F2(
-	function (_v0, args) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var _v1 = args.direction;
-		switch (_v1.$) {
-			case 'Down':
-				return _Utils_Tuple2(x + args.frame, y);
-			case 'Up':
-				return _Utils_Tuple2(x + args.frame, y + 1);
-			case 'Left':
-				return _Utils_Tuple2((x + 2) + args.frame, y);
-			default:
-				return _Utils_Tuple2((x + 2) + args.frame, y + 1);
-		}
-	});
-var $author$project$View$Cell$fromEmojis = function (attrs) {
-	return A2(
-		$author$project$View$Bitmap$fromEmojis,
-		attrs,
-		{color: 'white', pixelSize: $author$project$Config$cellSize / 16});
-};
-var $author$project$View$Cell$door = function (attrs) {
-	return A2(
-		$author$project$View$Cell$fromEmojis,
-		attrs,
-		_List_fromArray(
-			['❌❌❌❌⬜⬜⬜⬜⬜⬜⬜⬜❌❌❌❌', '❌❌⬜⬜❌❌❌❌❌❌❌❌⬜⬜❌❌', '❌⬜❌❌❌❌❌❌❌❌❌❌❌❌⬜❌', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌🟨🟨❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌🟨🟨🟨🟨❌❌❌❌❌⬜', '⬜❌❌❌❌🟨🟨🟨🟨🟨🟨❌❌❌❌⬜', '⬜❌❌❌🟨🟨🟨🟨🟨🟨🟨🟨❌❌❌⬜', '⬜❌❌🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨❌❌⬜', '⬜❌❌❌❌🟨🟨🟨🟨🟨🟨❌❌❌❌⬜', '⬜❌❌🟨❌🟨🟨🟨🟨🟨🟨❌🟨❌❌⬜', '⬜❌❌❌❌🟨🟨🟨🟨🟨🟨❌❌❌❌⬜', '⬜❌❌❌❌🟨🟨🟨🟨🟨🟨❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌🟨🟨🟨🟨🟨🟨❌❌❌❌⬜', '⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬜']));
-};
-var $author$project$View$Cell$fromEnemy = F2(
-	function (args, enemy) {
-		switch (enemy.$) {
-			case 'ActivatedBomb':
-				return _Utils_Tuple2(2 + args.frame, 1);
-			case 'Orc':
-				var dir = enemy.a;
-				return A2(
-					$author$project$View$Cell$directional,
-					_Utils_Tuple2(4, 2),
-					{direction: dir, frame: args.frame});
-			case 'Goblin':
-				return A2(
-					$author$project$View$Cell$directional,
-					_Utils_Tuple2(4, 0),
-					{direction: $author$project$Direction$Down, frame: args.frame});
-			case 'Doppelganger':
-				return A2(
-					$author$project$View$Cell$directional,
-					_Utils_Tuple2(4, 2),
-					{
-						direction: $author$project$Direction$mirror(args.playerDirection),
-						frame: args.frame
-					});
-			default:
-				return _Utils_Tuple2(0 + args.frame, 1);
-		}
-	});
-var $author$project$View$Cell$wall = function (attrs) {
-	return A2(
-		$author$project$View$Cell$fromEmojis,
-		attrs,
-		_List_fromArray(
-			['⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜']));
-};
-var $author$project$View$Cell$toHtml = F3(
-	function (attrs, args, cell) {
-		switch (cell.$) {
-			case 'Door':
-				return $author$project$View$Cell$door(attrs);
-			case 'Player':
-				return A2(
-					$author$project$View$Cell$sprite,
-					attrs,
+var $author$project$View$Screen$viewFloorAndItems = F2(
+	function (prefix, game) {
+		return A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var x = _v0.a;
+				var y = _v0.b;
+				return _Utils_Tuple2(
+					prefix + ('_' + ($elm$core$String$fromInt(x) + ('_' + $elm$core$String$fromInt(y)))),
 					A2(
-						$author$project$View$Cell$directional,
-						_Utils_Tuple2(0, 4),
-						{direction: args.playerDirection, frame: args.frame}));
-			case 'Sign':
-				return A2(
-					$author$project$View$Cell$sprite,
-					attrs,
-					_Utils_Tuple2(3, 2));
-			case 'Crate':
-				return A2(
-					$author$project$View$Cell$sprite,
-					attrs,
-					_Utils_Tuple2(1, 3));
-			case 'InactiveBomb':
-				return A2(
-					$author$project$View$Cell$sprite,
-					attrs,
-					_Utils_Tuple2(1, 6));
-			case 'ActiveSmallBomb':
-				return A2(
-					$author$project$View$Cell$sprite,
-					attrs,
-					A2(
-						$author$project$View$Cell$fromEnemy,
-						{frame: args.frame, playerDirection: args.playerDirection},
-						$author$project$Entity$ActivatedBomb($author$project$Entity$Bomb)));
-			case 'Enemy':
-				var enemy = cell.a;
-				return A2(
-					$author$project$View$Cell$sprite,
-					attrs,
-					A2(
-						$author$project$View$Cell$fromEnemy,
-						{frame: args.frame, playerDirection: args.playerDirection},
-						enemy));
-			case 'Stunned':
-				var enemy = cell.a;
-				return A2(
-					$author$project$View$Cell$sprite,
-					attrs,
-					A2(
-						$author$project$View$Cell$fromEnemy,
-						{frame: args.frame, playerDirection: args.playerDirection},
-						enemy));
-			default:
-				return $author$project$View$Cell$wall(attrs);
-		}
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$Orasund$elm_layout$Html$Style$positionAbsolute,
+								A2(
+								$elm$html$Html$Attributes$style,
+								'left',
+								$elm$core$String$fromFloat($author$project$Config$cellSize * x) + 'px'),
+								A2(
+								$elm$html$Html$Attributes$style,
+								'top',
+								$elm$core$String$fromFloat($author$project$Config$cellSize * y) + 'px')
+							]),
+						_Utils_ap(
+							_List_fromArray(
+								[
+									A2(
+									$elm$core$Dict$member,
+									_Utils_Tuple2(x, y),
+									game.floor) ? $author$project$View$Cell$floor(
+									_List_fromArray(
+										[
+											$Orasund$elm_layout$Html$Style$positionAbsolute,
+											$Orasund$elm_layout$Html$Style$top('0')
+										])) : (A2(
+									$elm$core$Dict$member,
+									_Utils_Tuple2(x, y - 1),
+									game.floor) ? $author$project$View$Cell$holeTop(
+									_List_fromArray(
+										[
+											$Orasund$elm_layout$Html$Style$positionAbsolute,
+											$Orasund$elm_layout$Html$Style$top('0')
+										])) : $author$project$View$Cell$hole(
+									_List_fromArray(
+										[
+											$Orasund$elm_layout$Html$Style$positionAbsolute,
+											$Orasund$elm_layout$Html$Style$top('0')
+										]))),
+									A2(
+									$elm$core$Maybe$withDefault,
+									$Orasund$elm_layout$Layout$none,
+									A2(
+										$elm$core$Maybe$map,
+										function (item) {
+											return A2(
+												$author$project$View$Cell$item,
+												_List_fromArray(
+													[
+														$Orasund$elm_layout$Html$Style$positionAbsolute,
+														$Orasund$elm_layout$Html$Style$top('0')
+													]),
+												item);
+										},
+										A2(
+											$elm$core$Dict$get,
+											_Utils_Tuple2(x, y),
+											game.items))),
+									A2(
+									$elm$core$Maybe$withDefault,
+									$Orasund$elm_layout$Layout$none,
+									A2(
+										$elm$core$Maybe$map,
+										function (particle) {
+											return A2(
+												$author$project$View$Cell$particle,
+												_List_fromArray(
+													[
+														$Orasund$elm_layout$Html$Style$positionAbsolute,
+														$Orasund$elm_layout$Html$Style$top('0')
+													]),
+												particle);
+										},
+										A2(
+											$elm$core$Dict$get,
+											_Utils_Tuple2(x, y),
+											game.particles)))
+								]),
+							(!A2(
+								$elm$core$Dict$member,
+								_Utils_Tuple2(x, y),
+								game.floor)) ? A2(
+								$author$project$View$Cell$borders,
+								_Utils_Tuple2(x, y),
+								game) : _List_Nil)));
+			},
+			$author$project$Position$asGrid(
+				{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize}));
 	});
 var $author$project$View$Screen$world = F2(
 	function (args, game) {
@@ -10848,129 +11078,12 @@ var $author$project$View$Screen$world = F2(
 				$elm$core$List$sortBy,
 				$elm$core$Tuple$first,
 				_Utils_ap(
-					A2(
-						$elm$core$List$map,
-						function (_v0) {
-							var x = _v0.a;
-							var y = _v0.b;
-							return _Utils_Tuple2(
-								'0_' + ($elm$core$String$fromInt(x) + ('_' + $elm$core$String$fromInt(y))),
-								A2(
-									$elm$html$Html$div,
-									_List_fromArray(
-										[
-											$Orasund$elm_layout$Html$Style$positionAbsolute,
-											A2(
-											$elm$html$Html$Attributes$style,
-											'left',
-											$elm$core$String$fromFloat($author$project$Config$cellSize * x) + 'px'),
-											A2(
-											$elm$html$Html$Attributes$style,
-											'top',
-											$elm$core$String$fromFloat($author$project$Config$cellSize * y) + 'px')
-										]),
-									_Utils_ap(
-										_List_fromArray(
-											[
-												A2(
-												$elm$core$Dict$member,
-												_Utils_Tuple2(x, y),
-												game.floor) ? $author$project$View$Cell$floor(
-												_List_fromArray(
-													[
-														$Orasund$elm_layout$Html$Style$positionAbsolute,
-														$Orasund$elm_layout$Html$Style$top('0')
-													])) : (A2(
-												$elm$core$Dict$member,
-												_Utils_Tuple2(x, y - 1),
-												game.floor) ? $author$project$View$Cell$holeTop(
-												_List_fromArray(
-													[
-														$Orasund$elm_layout$Html$Style$positionAbsolute,
-														$Orasund$elm_layout$Html$Style$top('0')
-													])) : $author$project$View$Cell$hole(
-												_List_fromArray(
-													[
-														$Orasund$elm_layout$Html$Style$positionAbsolute,
-														$Orasund$elm_layout$Html$Style$top('0')
-													]))),
-												A2(
-												$elm$core$Maybe$withDefault,
-												$Orasund$elm_layout$Layout$none,
-												A2(
-													$elm$core$Maybe$map,
-													function (item) {
-														return A2(
-															$author$project$View$Cell$item,
-															_List_fromArray(
-																[
-																	$Orasund$elm_layout$Html$Style$positionAbsolute,
-																	$Orasund$elm_layout$Html$Style$top('0')
-																]),
-															item);
-													},
-													A2(
-														$elm$core$Dict$get,
-														_Utils_Tuple2(x, y),
-														game.items))),
-												A2(
-												$elm$core$Maybe$withDefault,
-												$Orasund$elm_layout$Layout$none,
-												A2(
-													$elm$core$Maybe$map,
-													function (particle) {
-														return A2(
-															$author$project$View$Cell$particle,
-															_List_fromArray(
-																[
-																	$Orasund$elm_layout$Html$Style$positionAbsolute,
-																	$Orasund$elm_layout$Html$Style$top('0')
-																]),
-															particle);
-													},
-													A2(
-														$elm$core$Dict$get,
-														_Utils_Tuple2(x, y),
-														game.particles)))
-											]),
-										(!A2(
-											$elm$core$Dict$member,
-											_Utils_Tuple2(x, y),
-											game.floor)) ? A2(
-											$author$project$View$Cell$borders,
-											_Utils_Tuple2(x, y),
-											game) : _List_Nil)));
-						},
-						$author$project$Position$asGrid(
-							{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize})),
-					A2(
-						$elm$core$List$map,
-						function (_v1) {
-							var _v2 = _v1.a;
-							var x = _v2.a;
-							var y = _v2.b;
-							var cell = _v1.b;
-							return _Utils_Tuple2(
-								'1_' + $elm$core$String$fromInt(cell.id),
-								A3(
-									$author$project$View$Cell$toHtml,
-									_List_fromArray(
-										[
-											A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-											A2(
-											$elm$html$Html$Attributes$style,
-											'left',
-											$elm$core$String$fromFloat($author$project$Config$cellSize * x) + 'px'),
-											A2(
-											$elm$html$Html$Attributes$style,
-											'top',
-											$elm$core$String$fromFloat($author$project$Config$cellSize * y) + 'px'),
-											A2($elm$html$Html$Attributes$style, 'transition', 'left 0.2s,top 0.2s')
-										]),
-									{frame: args.frame, playerDirection: game.playerDirection},
-									cell.entity));
-						},
-						$elm$core$Dict$toList(game.cells)))));
+					A2($author$project$View$Screen$viewDoorFloors, '0', game),
+					_Utils_ap(
+						A2($author$project$View$Screen$viewFloorAndItems, '1', game),
+						_Utils_ap(
+							A3($author$project$View$Screen$viewEntity, '2', args, game),
+							A2($author$project$View$Screen$viewDoors, '3', game))))));
 	});
 var $author$project$Main$view = function (model) {
 	return A2(

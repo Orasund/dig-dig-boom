@@ -29,6 +29,7 @@ type alias Game =
     , nextId : Int
     , item : Maybe Item
     , playerDirection : Direction
+    , doors : Dict ( Int, Int ) Int
     , won : Bool
     }
 
@@ -74,6 +75,7 @@ empty =
     , nextId = 0
     , playerDirection = Down
     , won = False
+    , doors = Dict.empty
     }
 
 

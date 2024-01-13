@@ -12,6 +12,7 @@ import Image
 import Layout
 import Position
 import View.Cell
+import View.Door
 
 
 gameWon : Html msg
@@ -73,19 +74,73 @@ menu attrs args =
             )
 
 
-world :
-    { frame : Int
-    }
-    -> Game
-    -> Html msg
-world args game =
-    (Position.asGrid
+viewDoorFloors : String -> Game -> List ( String, Html msg )
+viewDoorFloors prefix game =
+    let
+        attrs x y =
+            [ Html.Attributes.style "position" "absolute"
+            , Html.Attributes.style "left"
+                (String.fromFloat (Config.cellSize * toFloat x) ++ "px")
+            , Html.Attributes.style "top"
+                (String.fromFloat (Config.cellSize * toFloat y) ++ "px")
+            ]
+    in
+    game.doors
+        |> Dict.keys
+        |> List.map
+            (\( x, y ) ->
+                ( prefix ++ "_" ++ String.fromInt x ++ String.fromInt y
+                , View.Door.floor (attrs x y)
+                )
+            )
+
+
+viewDoors : String -> Game -> List ( String, Html msg )
+viewDoors prefix game =
+    let
+        attrs x y =
+            [ Html.Attributes.style "position" "absolute"
+            , Html.Attributes.style "left"
+                (String.fromFloat (Config.cellSize * toFloat x) ++ "px")
+            , Html.Attributes.style "top"
+                (String.fromFloat (Config.cellSize * toFloat y) ++ "px")
+            ]
+    in
+    game.doors
+        |> Dict.keys
+        |> List.map
+            (\( x, y ) ->
+                ( prefix ++ "_" ++ String.fromInt x ++ String.fromInt y
+                , if y == -1 then
+                    View.Door.top (attrs x y)
+
+                  else if x == Config.roomSize then
+                    View.Door.bottom
+                        (Html.Attributes.style "transform" "rotate(-90deg)"
+                            :: attrs x y
+                        )
+
+                  else if x == -1 then
+                    View.Door.bottom
+                        (Html.Attributes.style "transform" "rotate(90deg)"
+                            :: attrs x y
+                        )
+
+                  else
+                    View.Door.bottom (attrs x y)
+                )
+            )
+
+
+viewFloorAndItems : String -> Game -> List ( String, Html msg )
+viewFloorAndItems prefix game =
+    Position.asGrid
         { rows = Config.roomSize
         , columns = Config.roomSize
         }
         |> List.map
             (\( x, y ) ->
-                ( "0_" ++ String.fromInt x ++ "_" ++ String.fromInt y
+                ( prefix ++ "_" ++ String.fromInt x ++ "_" ++ String.fromInt y
                 , [ if game.floor |> Dict.member ( x, y ) then
                         View.Cell.floor
                             [ Html.Style.positionAbsolute
@@ -141,27 +196,41 @@ world args game =
                         ]
                 )
             )
-    )
-        ++ (game.cells
-                |> Dict.toList
-                |> List.map
-                    (\( ( x, y ), cell ) ->
-                        ( "1_" ++ String.fromInt cell.id
-                        , View.Cell.toHtml
-                            [ Html.Attributes.style "position" "absolute"
-                            , Html.Attributes.style "left"
-                                (String.fromFloat (Config.cellSize * toFloat x) ++ "px")
-                            , Html.Attributes.style "top"
-                                (String.fromFloat (Config.cellSize * toFloat y) ++ "px")
-                            , Html.Attributes.style "transition" "left 0.2s,top 0.2s"
-                            ]
-                            { frame = args.frame
-                            , playerDirection = game.playerDirection
-                            }
-                            cell.entity
-                        )
-                    )
-           )
+
+
+viewEntity : String -> { frame : Int } -> Game -> List ( String, Html msg )
+viewEntity prefix args game =
+    game.cells
+        |> Dict.toList
+        |> List.map
+            (\( ( x, y ), cell ) ->
+                ( prefix ++ "_" ++ String.fromInt cell.id
+                , View.Cell.toHtml
+                    [ Html.Attributes.style "position" "absolute"
+                    , Html.Attributes.style "left"
+                        (String.fromFloat (Config.cellSize * toFloat x) ++ "px")
+                    , Html.Attributes.style "top"
+                        (String.fromFloat (Config.cellSize * toFloat y) ++ "px")
+                    , Html.Attributes.style "transition" "left 0.2s,top 0.2s"
+                    ]
+                    { frame = args.frame
+                    , playerDirection = game.playerDirection
+                    }
+                    cell.entity
+                )
+            )
+
+
+world :
+    { frame : Int
+    }
+    -> Game
+    -> Html msg
+world args game =
+    viewDoorFloors "0" game
+        ++ viewFloorAndItems "1" game
+        ++ viewEntity "2" args game
+        ++ viewDoors "3" game
         |> List.sortBy Tuple.first
         |> Html.Keyed.node "div"
             [ Html.Attributes.style "position" "relative"

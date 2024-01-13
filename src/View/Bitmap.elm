@@ -49,9 +49,9 @@ fromEmojis attrs args rows =
             }
 
 
-empty : Html msg
-empty =
-    fromEmojis []
+empty : List (Attribute msg) -> Html msg
+empty attrs =
+    fromEmojis attrs
         { color = "white"
         , pixelSize = 72
         }

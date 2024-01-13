@@ -145,7 +145,12 @@ fromBlocks args blocks =
             (\( pos, room ) ->
                 Game.insert pos (Door { room = room.next })
             )
-            game
+            { game
+                | doors =
+                    args.doors
+                        |> List.map (Tuple.mapSecond .next)
+                        |> Dict.fromList
+            }
 
 
 neighbors4 : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)

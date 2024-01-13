@@ -8,6 +8,7 @@ import Game exposing (Game)
 import Html exposing (Attribute, Html)
 import Html.Style
 import Image
+import Layout
 import View.Bitmap
 
 
@@ -68,8 +69,9 @@ toHtml : List (Attribute msg) -> { frame : Int, playerDirection : Direction } ->
 toHtml attrs args cell =
     case cell of
         Door _ ->
-            door attrs
+            Layout.el attrs Layout.none
 
+        --door attrs
         Player ->
             directional ( 0, 4 )
                 { direction = args.playerDirection
@@ -209,28 +211,6 @@ fromEmojis attrs =
         { color = "white"
         , pixelSize = Config.cellSize / 16
         }
-
-
-door : List (Attribute msg) -> Html msg
-door attrs =
-    fromEmojis attrs
-        [ "❌❌❌❌⬜⬜⬜⬜⬜⬜⬜⬜❌❌❌❌"
-        , "❌❌⬜⬜❌❌❌❌❌❌❌❌⬜⬜❌❌"
-        , "❌⬜❌❌❌❌❌❌❌❌❌❌❌❌⬜❌"
-        , "⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜"
-        , "⬜❌❌❌❌❌❌🟨🟨❌❌❌❌❌❌⬜"
-        , "⬜❌❌❌❌❌🟨🟨🟨🟨❌❌❌❌❌⬜"
-        , "⬜❌❌❌❌🟨🟨🟨🟨🟨🟨❌❌❌❌⬜"
-        , "⬜❌❌❌🟨🟨🟨🟨🟨🟨🟨🟨❌❌❌⬜"
-        , "⬜❌❌🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨❌❌⬜"
-        , "⬜❌❌❌❌🟨🟨🟨🟨🟨🟨❌❌❌❌⬜"
-        , "⬜❌❌🟨❌🟨🟨🟨🟨🟨🟨❌🟨❌❌⬜"
-        , "⬜❌❌❌❌🟨🟨🟨🟨🟨🟨❌❌❌❌⬜"
-        , "⬜❌❌❌❌🟨🟨🟨🟨🟨🟨❌❌❌❌⬜"
-        , "⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜"
-        , "⬜❌❌❌❌🟨🟨🟨🟨🟨🟨❌❌❌❌⬜"
-        , "⬜⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬜"
-        ]
 
 
 wall : List (Attribute msg) -> Html msg
