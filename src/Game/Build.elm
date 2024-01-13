@@ -3,8 +3,7 @@ module Game.Build exposing (BuildingBlock(..), constant, fromEmojis, generator)
 import Config
 import Dict exposing (Dict)
 import Entity exposing (Enemy(..), Entity(..), Item(..))
-import Game exposing (Cell, Game)
-import Math
+import Game exposing (Game)
 import Position
 import Random exposing (Generator)
 
@@ -147,34 +146,6 @@ fromBlocks args blocks =
     }
 
 
-neighbors4 : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)
-neighbors4 ( x, y ) dict =
-    [ ( x + 1, y )
-    , ( x - 1, y )
-    , ( x, y + 1 )
-    , ( x, y - 1 )
-    ]
-        |> List.filter Math.posIsValid
-        |> List.map
-            (\pos ->
-                dict |> Dict.get pos |> Maybe.map .entity
-            )
-
-
-diagNeighbors : ( Int, Int ) -> Dict ( Int, Int ) Cell -> List (Maybe Entity)
-diagNeighbors ( x, y ) dict =
-    [ ( x + 1, y + 1 )
-    , ( x + 1, y - 1 )
-    , ( x - 1, y + 1 )
-    , ( x - 1, y - 1 )
-    ]
-        |> List.filter Math.posIsValid
-        |> List.map
-            (\pos ->
-                dict |> Dict.get pos |> Maybe.map .entity
-            )
-
-
 validator =
     \_ -> True
 
@@ -222,11 +193,6 @@ validator =
                         _ ->
                             True
                 )--}
-
-
-count : (a -> Bool) -> List a -> Int
-count fun list =
-    list |> List.filter fun |> List.length
 
 
 shuffle : List a -> Generator (List a)

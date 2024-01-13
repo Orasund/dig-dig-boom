@@ -1,6 +1,5 @@
 module World exposing (..)
 
-import Config
 import Dict exposing (Dict)
 import Direction exposing (Direction)
 import Position

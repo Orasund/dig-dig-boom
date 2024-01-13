@@ -7206,70 +7206,104 @@ var $author$project$Game$Build$constant = F2(
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
-var $author$project$World$Map$dict = $elm$core$Dict$fromList(
-	_List_fromArray(
+var $author$project$World$Map$sokoBombLevels = function (_v0) {
+	var x = _v0.a;
+	var y = _v0.b;
+	return _List_fromArray(
 		[
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, 0),
+			_Utils_Tuple2(x, y),
 			_List_fromArray(
 				['🧱📦⬜📦🧱', '🧱⬜📦⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -1),
+			_Utils_Tuple2(x, y - 1),
 			_List_fromArray(
 				['🧱📦⬜📦🧱', '🧱⬜⬜⬜🧱', '🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -2),
+			_Utils_Tuple2(x, y - 2),
 			_List_fromArray(
 				['🧱⬜📦⬜🧱', '🧱⬜⬜⬜🧱', '🧱📦⬜📦🧱', '🧱⬜📦⬜🧱', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -3),
+			_Utils_Tuple2(x, y - 3),
 			_List_fromArray(
 				['🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -4),
+			_Utils_Tuple2(x, y - 4),
 			_List_fromArray(
 				['🧱⬜📦⬜🧱', '🧱📦📦📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -5),
+			_Utils_Tuple2(x, y - 5),
 			_List_fromArray(
 				['🧱📦📦📦🧱', '🧱📦🧨📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -6),
+			_Utils_Tuple2(x, y - 6),
 			_List_fromArray(
 				['🧱🧱🧱🧱🧱', '🧱⬜⬜⬜🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -7),
+			_Utils_Tuple2(x, y - 7),
 			_List_fromArray(
 				['🧱🧱🧱🧱🧱', '🧱📦📦📦🧱', '🧱🧨🧨🧨🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -8),
+			_Utils_Tuple2(x, y - 8),
 			_List_fromArray(
 				['🧱🧱🧱🧱🧱', '🧱🧨📦🧨🧱', '🧱📦🧨📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -9),
+			_Utils_Tuple2(x, y - 9),
 			_List_fromArray(
 				['🧱⬜📦⬜🧱', '🧨⬜⬜⬜🧨', '🧱📦📦📦🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -10),
+			_Utils_Tuple2(x, y - 10),
 			_List_fromArray(
 				['🧱⬜📦⬜🧱', '🧱📦⬜📦🧱', '🧨⬜📦⬜🧨', '🧨📦📦📦🧨', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -11),
+			_Utils_Tuple2(x, y - 11),
 			_List_fromArray(
 				['🧱⬜🧱⬜🧱', '🧨🧱📦🧱🧨', '🧨📦🧨📦🧨', '🧨⬜🧨⬜🧨', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -12),
+			_Utils_Tuple2(x, y - 12),
 			_List_fromArray(
 				['🧱🧱🧱🧱🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
 			_Utils_Tuple2(
-			_Utils_Tuple2(0, -13),
+			_Utils_Tuple2(x, y - 13),
 			_List_fromArray(
-				['🧱🧱🧱🧱🧱', '🧱🧱🧱🧱🧱', '🧱⬜💎⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])),
-			_Utils_Tuple2(
-			_Utils_Tuple2(-1, -12),
-			_List_fromArray(
-				['🧱🧱🧱🧱🧱', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '🧱🧱🧱🧱🧱']))
-		]));
+				['🧱🧱🧱🧱🧱', '🧱🧱🧱🧱🧱', '🧱⬜💎⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']))
+		]);
+};
+var $author$project$World$Map$dict = $elm$core$Dict$fromList(
+	_Utils_ap(
+		$author$project$World$Map$sokoBombLevels(
+			_Utils_Tuple2(0, 0)),
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				_Utils_Tuple2(-1, -12),
+				_List_fromArray(
+					['❌❌⬜⬜⬜', '❌❌⬜❌⬜', '⬜❌⬜❌⬜', '⬜❌⬜❌❌', '⬜⬜⬜❌❌'])),
+				_Utils_Tuple2(
+				_Utils_Tuple2(-2, -12),
+				_List_fromArray(
+					['❌❌❌❌❌', '❌⬜⬜⬜⬜', '❌⬜📦⬜⬜', '❌❌❌❌❌', '❌⬜⬜⬜❌'])),
+				_Utils_Tuple2(
+				_Utils_Tuple2(-2, -11),
+				_List_fromArray(
+					['⬜⬜⬜⬜⬜', '⬜⬜📦⬜⬜', '⬜⬜⬜⬜⬜', '❌❌❌❌❌', '⬜⬜📦⬜⬜'])),
+				_Utils_Tuple2(
+				_Utils_Tuple2(-2, -10),
+				_List_fromArray(
+					['⬜⬜⬜⬜⬜', '⬜📦📦📦⬜', '❌❌📦❌❌', '❌❌❌❌❌', '❌❌📦❌❌'])),
+				_Utils_Tuple2(
+				_Utils_Tuple2(-2, -9),
+				_List_fromArray(
+					['⬜⬜⬜⬜⬜', '📦📦📦📦📦', '⬜📦⬜📦⬜', '❌❌🧱❌❌', '❌❌❌❌❌'])),
+				_Utils_Tuple2(
+				_Utils_Tuple2(-2, -8),
+				_List_fromArray(
+					['⬜⬜⬜⬜⬜', '⬜⬜📦⬜⬜', '⬜📦🧨📦⬜', '❌❌❌❌❌', '🧱🧱🧱🧱🧱'])),
+				_Utils_Tuple2(
+				_Utils_Tuple2(-1, -8),
+				_List_fromArray(
+					['🧱🧱🧱🧱🧱', '⬜⬜❌⬜⬜', '⬜📦❌⬜⬜', '⬜⬜❌⬜⬜', '🧱🧱🧱🧱🧱']))
+			])));
 var $elm$core$Dict$member = F2(
 	function (key, dict) {
 		var _v0 = A2($elm$core$Dict$get, key, dict);
@@ -8329,12 +8363,13 @@ var $author$project$Game$move = F2(
 var $author$project$Game$Event$none = function (game) {
 	return {game: game, kill: _List_Nil};
 };
-var $author$project$Game$addFloor = F2(
-	function (pos, game) {
+var $author$project$Entity$CrateInLava = {$: 'CrateInLava'};
+var $author$project$Game$addFloor = F3(
+	function (pos, floor, game) {
 		return _Utils_update(
 			game,
 			{
-				floor: A3($elm$core$Dict$insert, pos, $author$project$Entity$Ground, game.floor)
+				floor: A3($elm$core$Dict$insert, pos, floor, game.floor)
 			});
 	});
 var $author$project$Game$Update$pushCrate = F3(
@@ -8357,7 +8392,7 @@ var $author$project$Game$Update$pushCrate = F3(
 						A2(
 							$author$project$Game$remove,
 							pos,
-							A2($author$project$Game$addFloor, newPos, game))));
+							A3($author$project$Game$addFloor, newPos, $author$project$Entity$CrateInLava, game))));
 			} else {
 				if (_v0.a.$ === 'ActiveSmallBomb') {
 					var _v1 = _v0.a;
@@ -8401,10 +8436,7 @@ var $author$project$Game$Update$pushSmallBomb = F3(
 						{from: pos, to: newPos},
 						game)) : $elm$core$Maybe$Just(
 					$author$project$Game$Event$none(
-						A2(
-							$author$project$Game$remove,
-							pos,
-							A2($author$project$Game$addFloor, newPos, game))));
+						A2($author$project$Game$remove, pos, game)));
 			} else {
 				return A2(
 					$elm$core$Maybe$map,
@@ -10362,40 +10394,54 @@ var $author$project$View$Cell$borders = F2(
 			$elm$core$Basics$identity,
 			_List_fromArray(
 				[
+					_Utils_eq(
 					A2(
-					$elm$core$Dict$member,
-					_Utils_Tuple2(x - 1, y),
-					game.floor) ? $elm$core$Maybe$Just(
+						$elm$core$Dict$get,
+						_Utils_Tuple2(x - 1, y),
+						game.floor),
+					$elm$core$Maybe$Just($author$project$Entity$Ground)) ? $elm$core$Maybe$Just(
 					A2(
 						$author$project$View$Cell$border,
 						attrs,
 						_Utils_Tuple2(0, 1))) : $elm$core$Maybe$Nothing,
+					_Utils_eq(
 					A2(
-					$elm$core$Dict$member,
-					_Utils_Tuple2(x + 1, y),
-					game.floor) ? $elm$core$Maybe$Just(
+						$elm$core$Dict$get,
+						_Utils_Tuple2(x + 1, y),
+						game.floor),
+					$elm$core$Maybe$Just($author$project$Entity$Ground)) ? $elm$core$Maybe$Just(
 					A2(
 						$author$project$View$Cell$border,
 						attrs,
 						_Utils_Tuple2(1, 0))) : $elm$core$Maybe$Nothing,
+					_Utils_eq(
 					A2(
-					$elm$core$Dict$member,
-					_Utils_Tuple2(x, y - 1),
-					game.floor) ? $elm$core$Maybe$Just(
+						$elm$core$Dict$get,
+						_Utils_Tuple2(x, y - 1),
+						game.floor),
+					$elm$core$Maybe$Just($author$project$Entity$Ground)) ? $elm$core$Maybe$Just(
 					A2(
 						$author$project$View$Cell$border,
 						attrs,
 						_Utils_Tuple2(0, 0))) : $elm$core$Maybe$Nothing,
+					_Utils_eq(
 					A2(
-					$elm$core$Dict$member,
-					_Utils_Tuple2(x, y + 1),
-					game.floor) ? $elm$core$Maybe$Just(
+						$elm$core$Dict$get,
+						_Utils_Tuple2(x, y + 1),
+						game.floor),
+					$elm$core$Maybe$Just($author$project$Entity$Ground)) ? $elm$core$Maybe$Just(
 					A2(
 						$author$project$View$Cell$border,
 						attrs,
 						_Utils_Tuple2(1, 1))) : $elm$core$Maybe$Nothing
 				]));
 	});
+var $author$project$View$Cell$crateInLava = function (attrs) {
+	return A2(
+		$author$project$View$Cell$sprite,
+		attrs,
+		_Utils_Tuple2(3, 3));
+};
 var $author$project$View$Cell$floor = function (attrs) {
 	return A2(
 		$author$project$View$Cell$sprite,
@@ -10466,18 +10512,22 @@ var $author$project$View$Screen$viewFloorAndItems = F2(
 						_Utils_ap(
 							_List_fromArray(
 								[
+									_Utils_eq(
 									A2(
-									$elm$core$Dict$member,
-									_Utils_Tuple2(x, y),
-									game.floor) ? $author$project$View$Cell$floor(
+										$elm$core$Dict$get,
+										_Utils_Tuple2(x, y),
+										game.floor),
+									$elm$core$Maybe$Just($author$project$Entity$Ground)) ? $author$project$View$Cell$floor(
 									_List_fromArray(
 										[
 											$Orasund$elm_layout$Html$Style$positionAbsolute,
 											$Orasund$elm_layout$Html$Style$top('0')
-										])) : (A2(
-									$elm$core$Dict$member,
-									_Utils_Tuple2(x, y - 1),
-									game.floor) ? $author$project$View$Cell$holeTop(
+										])) : (_Utils_eq(
+									A2(
+										$elm$core$Dict$get,
+										_Utils_Tuple2(x, y - 1),
+										game.floor),
+									$elm$core$Maybe$Just($author$project$Entity$Ground)) ? $author$project$View$Cell$holeTop(
 									_List_fromArray(
 										[
 											$Orasund$elm_layout$Html$Style$positionAbsolute,
@@ -10488,6 +10538,23 @@ var $author$project$View$Screen$viewFloorAndItems = F2(
 											$Orasund$elm_layout$Html$Style$positionAbsolute,
 											$Orasund$elm_layout$Html$Style$top('0')
 										]))),
+									function () {
+									var _v1 = A2(
+										$elm$core$Dict$get,
+										_Utils_Tuple2(x, y),
+										game.floor);
+									if ((_v1.$ === 'Just') && (_v1.a.$ === 'CrateInLava')) {
+										var _v2 = _v1.a;
+										return $author$project$View$Cell$crateInLava(
+											_List_fromArray(
+												[
+													$Orasund$elm_layout$Html$Style$positionAbsolute,
+													$Orasund$elm_layout$Html$Style$top('0')
+												]));
+									} else {
+										return $Orasund$elm_layout$Layout$none;
+									}
+								}(),
 									A2(
 									$elm$core$Maybe$withDefault,
 									$Orasund$elm_layout$Layout$none,
@@ -10527,10 +10594,12 @@ var $author$project$View$Screen$viewFloorAndItems = F2(
 											_Utils_Tuple2(x, y),
 											game.particles)))
 								]),
-							(!A2(
-								$elm$core$Dict$member,
-								_Utils_Tuple2(x, y),
-								game.floor)) ? A2(
+							(!_Utils_eq(
+								A2(
+									$elm$core$Dict$get,
+									_Utils_Tuple2(x, y),
+									game.floor),
+								$elm$core$Maybe$Just($author$project$Entity$Ground))) ? A2(
 								$author$project$View$Cell$borders,
 								_Utils_Tuple2(x, y),
 								game) : _List_Nil)));

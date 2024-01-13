@@ -2,7 +2,7 @@ module Game.Update exposing (movePlayerInDirectionAndUpdateGame, placeBombeAndUp
 
 import Dict
 import Direction exposing (Direction(..))
-import Entity exposing (Enemy(..), Entity(..), Item(..), ParticleSort(..))
+import Entity exposing (Enemy(..), Entity(..), Floor(..), Item(..), ParticleSort(..))
 import Game exposing (Cell, Game)
 import Game.Enemy
 import Game.Event exposing (Event(..), GameAndEvents)
@@ -240,7 +240,7 @@ pushCrate pos dir game =
 
                 else
                     game
-                        |> Game.addFloor newPos
+                        |> Game.addFloor newPos CrateInLava
                         |> Game.remove pos
                         |> Game.Event.none
                         |> Just
@@ -276,7 +276,6 @@ pushSmallBomb pos dir game =
 
                 else
                     game
-                        |> Game.addFloor newPos
                         |> Game.remove pos
                         |> Game.Event.none
                         |> Just

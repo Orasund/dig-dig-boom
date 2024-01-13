@@ -3,7 +3,7 @@ module View.Cell exposing (..)
 import Config
 import Dict
 import Direction exposing (Direction(..))
-import Entity exposing (Enemy(..), Entity(..), Item(..), ParticleSort(..))
+import Entity exposing (Enemy(..), Entity(..), Floor(..), Item(..), ParticleSort(..))
 import Game exposing (Game)
 import Html exposing (Attribute, Html)
 import Html.Style
@@ -166,23 +166,23 @@ borders ( x, y ) game =
             , Html.Style.top "0"
             ]
     in
-    [ if Dict.member ( x - 1, y ) game.floor then
+    [ if Dict.get ( x - 1, y ) game.floor == Just Ground then
         border attrs ( 0, 1 ) |> Just
 
       else
         Nothing
-    , if Dict.member ( x + 1, y ) game.floor then
+    , if Dict.get ( x + 1, y ) game.floor == Just Ground then
         border attrs ( 1, 0 ) |> Just
 
       else
         Nothing
-    , if Dict.member ( x, y - 1 ) game.floor then
+    , if Dict.get ( x, y - 1 ) game.floor == Just Ground then
         border attrs ( 0, 0 )
             |> Just
 
       else
         Nothing
-    , if Dict.member ( x, y + 1 ) game.floor then
+    , if Dict.get ( x, y + 1 ) game.floor == Just Ground then
         border attrs ( 1, 1 ) |> Just
 
       else
@@ -209,6 +209,11 @@ fromEmojis attrs =
         { color = "white"
         , pixelSize = Config.cellSize / 16
         }
+
+
+crateInLava : List (Attribute msg) -> Html msg
+crateInLava attrs =
+    sprite attrs ( 3, 3 )
 
 
 diamant : List (Attribute msg) -> Html msg

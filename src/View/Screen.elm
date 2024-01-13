@@ -2,7 +2,7 @@ module View.Screen exposing (gameWon, menu, world)
 
 import Config
 import Dict
-import Entity exposing (Enemy(..), Entity(..))
+import Entity exposing (Enemy(..), Entity(..), Floor(..))
 import Game exposing (Game)
 import Html exposing (Attribute, Html)
 import Html.Attributes
@@ -141,13 +141,13 @@ viewFloorAndItems prefix game =
         |> List.map
             (\( x, y ) ->
                 ( prefix ++ "_" ++ String.fromInt x ++ "_" ++ String.fromInt y
-                , [ if game.floor |> Dict.member ( x, y ) then
+                , [ if Dict.get ( x, y ) game.floor == Just Ground then
                         View.Cell.floor
                             [ Html.Style.positionAbsolute
                             , Html.Style.top "0"
                             ]
 
-                    else if game.floor |> Dict.member ( x, y - 1 ) then
+                    else if Dict.get ( x, y - 1 ) game.floor == Just Ground then
                         View.Cell.holeTop
                             [ Html.Style.positionAbsolute
                             , Html.Style.top "0"
@@ -158,6 +158,15 @@ viewFloorAndItems prefix game =
                             [ Html.Style.positionAbsolute
                             , Html.Style.top "0"
                             ]
+                  , case game.floor |> Dict.get ( x, y ) of
+                        Just CrateInLava ->
+                            View.Cell.crateInLava
+                                [ Html.Style.positionAbsolute
+                                , Html.Style.top "0"
+                                ]
+
+                        _ ->
+                            Layout.none
                   , game.items
                         |> Dict.get ( x, y )
                         |> Maybe.map
@@ -181,7 +190,7 @@ viewFloorAndItems prefix game =
                             )
                         |> Maybe.withDefault Layout.none
                   ]
-                    ++ (if game.floor |> Dict.member ( x, y ) |> not then
+                    ++ (if Dict.get ( x, y ) game.floor /= Just Ground then
                             View.Cell.borders ( x, y ) game
 
                         else

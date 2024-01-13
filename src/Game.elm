@@ -147,9 +147,9 @@ placeItem pos item game =
     { game | items = game.items |> Dict.insert pos item }
 
 
-addFloor : ( Int, Int ) -> Game -> Game
-addFloor pos game =
-    { game | floor = game.floor |> Dict.insert pos Ground }
+addFloor : ( Int, Int ) -> Floor -> Game -> Game
+addFloor pos floor game =
+    { game | floor = game.floor |> Dict.insert pos floor }
 
 
 removeFloor : ( Int, Int ) -> Game -> Game
