@@ -40,5 +40,7 @@ type Entity
     | Sign String
     | Enemy Enemy
     | Stunned Enemy
+    | Key
+    | LockedDoor
     | Wall
     | Diamant

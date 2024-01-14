@@ -20,6 +20,7 @@ import Port
 import PortDefinition exposing (FromElm(..), ToElm(..))
 import Process
 import Random exposing (Seed)
+import Set exposing (Set)
 import Task
 import Time
 import View.Controls
@@ -52,6 +53,8 @@ type alias Model =
     , world : World
     , initialItem : Maybe Item
     , initialPlayerPos : ( Int, Int )
+    , hasKey : Bool
+    , unlockedRooms : Set ( Int, Int )
     }
 
 
@@ -75,8 +78,9 @@ init : flag -> ( Model, Cmd Msg )
 init _ =
     let
         room =
-            ( -2, -8 )
+            ( 0, -12 )
 
+        --( -2, -8 )
         initialPlayerPos =
             ( 2, 4 )
 
@@ -96,6 +100,8 @@ init _ =
       , history = []
       , room = room
       , world = World.new seed
+      , hasKey = False
+      , unlockedRooms = Set.empty
       }
     , Cmd.batch
         [ Port.fromElm (RegisterSounds Sound.asList)
@@ -230,6 +236,17 @@ applyEvent event model =
         WinGame ->
             ( { model | overlay = Just GameWon }, Cmd.none )
 
+        AddKey ->
+            ( { model | hasKey = True }, Cmd.none )
+
+        UnlockDoor ->
+            ( { model
+                | hasKey = False
+                , unlockedRooms = model.unlockedRooms |> Set.insert model.room
+              }
+            , Cmd.none
+            )
+
 
 applyEvents : List Event -> Model -> ( Model, Cmd Msg )
 applyEvents events model =
@@ -274,7 +291,9 @@ update msg model =
                                     |> Maybe.andThen
                                         (\playerPosition ->
                                             model.game
-                                                |> Game.Update.placeBombeAndUpdateGame playerPosition
+                                                |> Game.Update.placeBombeAndUpdateGame
+                                                    { roomUnlocked = Set.member model.room model.unlockedRooms }
+                                                    playerPosition
                                                 |> Maybe.map (applyGameAndKill model)
                                         )
                                     |> Maybe.withDefault ( model, Cmd.none )
@@ -286,7 +305,10 @@ update msg model =
                                         (\playerPosition ->
                                             model.game
                                                 |> Game.Update.movePlayerInDirectionAndUpdateGame
-                                                    dir
+                                                    { direction = dir
+                                                    , hasKey = model.hasKey
+                                                    , roomUnlocked = Set.member model.room model.unlockedRooms
+                                                    }
                                                     playerPosition
                                                 |> Maybe.map
                                                     (Game.Event.andThen
@@ -345,7 +367,7 @@ updateWorldMap input model =
     case input of
         InputActivate ->
             case model.world.nodes |> Dict.get model.world.player of
-                Just (Room { seed }) ->
+                Just (Room _) ->
                     {--seed
                         |> Random.step (World.solveRoom model.world)
                         |> (\( w, s ) -> ( { model | world = w, seed = s }, Cmd.none ))

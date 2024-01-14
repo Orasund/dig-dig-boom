@@ -18,6 +18,8 @@ type Event
     | Fx Sound
     | MoveToRoom ( Int, Int )
     | WinGame
+    | AddKey
+    | UnlockDoor
 
 
 type alias GameAndEvents =

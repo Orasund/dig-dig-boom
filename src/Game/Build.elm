@@ -1,4 +1,4 @@
-module Game.Build exposing (BuildingBlock(..), constant, fromEmojis, generator)
+module Game.Build exposing (BuildingBlock(..), constant, fromBlocks, fromEmojis, generator)
 
 import Config
 import Dict exposing (Dict)
@@ -112,6 +112,9 @@ parseEmoji string =
 
         '💎' ->
             EntityBlock Diamant |> Just
+
+        '🗝' ->
+            EntityBlock Key |> Just
 
         '⬜' ->
             Nothing

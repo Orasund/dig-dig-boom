@@ -11,17 +11,17 @@ import Math
 import Position
 
 
-updateGame : Game -> GameAndEvents
-updateGame game =
+updateGame : { roomUnlocked : Bool } -> Game -> GameAndEvents
+updateGame args game =
     game.cells
         |> Dict.toList
         |> List.foldl
-            (\tuple -> Game.Event.andThen (updateCell tuple))
+            (\tuple -> Game.Event.andThen (updateCell args tuple))
             (game |> Game.clearParticles |> Game.Event.none)
 
 
-updateCell : ( ( Int, Int ), Cell ) -> Game -> GameAndEvents
-updateCell ( position, cell ) game =
+updateCell : { roomUnlocked : Bool } -> ( ( Int, Int ), Cell ) -> Game -> GameAndEvents
+updateCell args ( position, cell ) game =
     case cell.entity of
         Enemy enemy ->
             game
@@ -35,20 +35,37 @@ updateCell ( position, cell ) game =
                 |> Game.update position (\_ -> Enemy enemy)
                 |> Game.Event.none
 
+        LockedDoor ->
+            if args.roomUnlocked then
+                game
+                    |> Game.remove position
+                    |> Game.Event.none
+
+            else
+                game
+                    |> Game.Event.none
+
         _ ->
             game |> Game.Event.none
 
 
-movePlayerInDirectionAndUpdateGame : Direction -> ( Int, Int ) -> Game -> Maybe GameAndEvents
-movePlayerInDirectionAndUpdateGame dir location game =
+movePlayerInDirectionAndUpdateGame :
+    { hasKey : Bool
+    , direction : Direction
+    , roomUnlocked : Bool
+    }
+    -> ( Int, Int )
+    -> Game
+    -> Maybe GameAndEvents
+movePlayerInDirectionAndUpdateGame args location game =
     game
-        |> Game.face dir
-        |> movePlayer location
-        |> Maybe.map (Game.Event.andThen updateGame)
+        |> Game.face args.direction
+        |> movePlayer { hasKey = args.hasKey } location
+        |> Maybe.map (Game.Event.andThen (updateGame { roomUnlocked = args.roomUnlocked }))
 
 
-movePlayer : ( Int, Int ) -> Game -> Maybe GameAndEvents
-movePlayer position game =
+movePlayer : { hasKey : Bool } -> ( Int, Int ) -> Game -> Maybe GameAndEvents
+movePlayer args position game =
     let
         newLocation : ( Int, Int )
         newLocation =
@@ -134,6 +151,26 @@ movePlayer position game =
             }
                 |> Just
 
+        Just Key ->
+            { game =
+                game
+                    |> Game.remove newLocation
+                    |> Game.move { from = position, to = newLocation }
+                    |> Maybe.withDefault game
+            , kill = [ AddKey ]
+            }
+                |> Just
+
+        Just LockedDoor ->
+            if args.hasKey then
+                { game = game
+                , kill = [ UnlockDoor ]
+                }
+                    |> Just
+
+            else
+                game |> Game.Event.none |> Just
+
         Just Diamant ->
             Just { game = game, kill = [ WinGame ] }
 
@@ -215,11 +252,11 @@ applyBomb position game =
             )
 
 
-placeBombeAndUpdateGame : ( Int, Int ) -> Game -> Maybe GameAndEvents
-placeBombeAndUpdateGame playerCell game =
+placeBombeAndUpdateGame : { roomUnlocked : Bool } -> ( Int, Int ) -> Game -> Maybe GameAndEvents
+placeBombeAndUpdateGame args playerCell game =
     applyBomb playerCell game
         |> Maybe.map Game.removeItem
-        |> Maybe.map updateGame
+        |> Maybe.map (updateGame args)
 
 
 pushCrate : ( Int, Int ) -> Direction -> Game -> Maybe GameAndEvents

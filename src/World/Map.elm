@@ -2,18 +2,21 @@ module World.Map exposing (..)
 
 import Config
 import Dict exposing (Dict)
+import Entity exposing (Entity(..))
 import Game exposing (Game)
-import Game.Build
+import Game.Build exposing (BuildingBlock(..))
 
 
 get : ( Int, Int ) -> Game
 get pos =
-    Game.Build.constant
-        (dict
-            |> Dict.get pos
-            |> Maybe.withDefault []
-        )
-        (getDoors pos)
+    dict
+        |> Dict.get pos
+        |> Maybe.withDefault Dict.empty
+        |> Dict.toList
+        |> Game.Build.fromBlocks
+            { doors =
+                getDoors pos
+            }
 
 
 getDoors : ( Int, Int ) -> List ( ( Int, Int ), { room : ( Int, Int ) } )
@@ -33,7 +36,7 @@ getDoors ( x, y ) =
             )
 
 
-dict : Dict ( Int, Int ) (List String)
+dict : Dict ( Int, Int ) (Dict ( Int, Int ) BuildingBlock)
 dict =
     sokoBombLevels ( 0, 0 )
         ++ [ ( ( -1, -12 )
@@ -43,6 +46,7 @@ dict =
                , "⬜❌⬜❌❌"
                , "⬜⬜⬜❌❌"
                ]
+                |> Game.Build.fromEmojis
              )
            , ( ( -2, -12 )
              , [ "❌❌❌❌❌"
@@ -51,6 +55,7 @@ dict =
                , "❌❌❌❌❌"
                , "❌⬜⬜⬜❌"
                ]
+                |> Game.Build.fromEmojis
              )
            , ( ( -2, -11 )
              , [ "⬜⬜⬜⬜⬜"
@@ -59,6 +64,7 @@ dict =
                , "❌❌❌❌❌"
                , "⬜⬜📦⬜⬜"
                ]
+                |> Game.Build.fromEmojis
              )
            , ( ( -2, -10 )
              , [ "⬜⬜⬜⬜⬜"
@@ -67,6 +73,7 @@ dict =
                , "❌❌❌❌❌"
                , "❌❌📦❌❌"
                ]
+                |> Game.Build.fromEmojis
              )
            , ( ( -2, -9 )
              , [ "⬜⬜⬜⬜⬜"
@@ -75,6 +82,7 @@ dict =
                , "❌❌🧱❌❌"
                , "❌❌❌❌❌"
                ]
+                |> Game.Build.fromEmojis
              )
            , ( ( -2, -8 )
              , [ "⬜⬜⬜⬜⬜"
@@ -83,6 +91,7 @@ dict =
                , "❌❌❌❌❌"
                , "🧱🧱🧱🧱🧱"
                ]
+                |> Game.Build.fromEmojis
              )
            , ( ( -1, -8 )
              , [ "🧱🧱🧱🧱🧱"
@@ -91,6 +100,7 @@ dict =
                , "⬜⬜❌⬜⬜"
                , "🧱🧱🧱🧱🧱"
                ]
+                |> Game.Build.fromEmojis
              )
            , ( ( -2, -7 )
              , [ "⬜⬜⬜⬜⬜"
@@ -99,6 +109,7 @@ dict =
                , "❌🧱🧱🧱❌"
                , "❌❌❌❌❌"
                ]
+                |> Game.Build.fromEmojis
              )
            , ( ( -2, -6 )
              , [ "❌🧨⬜🧨❌"
@@ -107,12 +118,13 @@ dict =
                , "❌❌🧱❌❌"
                , "❌❌⬜❌❌"
                ]
+                |> Game.Build.fromEmojis
              )
            ]
         |> Dict.fromList
 
 
-sokoBombLevels : ( Int, Int ) -> List ( ( Int, Int ), List String )
+sokoBombLevels : ( Int, Int ) -> List ( ( Int, Int ), Dict ( Int, Int ) BuildingBlock )
 sokoBombLevels ( x, y ) =
     [ ( ( x, y )
       , [ "🧱📦⬜📦🧱"
@@ -121,6 +133,7 @@ sokoBombLevels ( x, y ) =
         , "🧱⬜⬜⬜🧱"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     , ( ( x, y - 1 )
       , [ "🧱📦⬜📦🧱"
@@ -129,6 +142,7 @@ sokoBombLevels ( x, y ) =
         , "🧱⬜⬜⬜🧱"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     , ( ( x, y - 2 )
       , [ "🧱⬜📦⬜🧱"
@@ -137,6 +151,7 @@ sokoBombLevels ( x, y ) =
         , "🧱⬜📦⬜🧱"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     , ( ( x, y - 3 )
       , [ "🧱📦📦📦🧱"
@@ -145,6 +160,7 @@ sokoBombLevels ( x, y ) =
         , "🧱⬜⬜⬜🧱"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     , ( ( x, y - 4 )
       , [ "🧱⬜📦⬜🧱"
@@ -153,6 +169,7 @@ sokoBombLevels ( x, y ) =
         , "🧱⬜⬜⬜🧱"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     , ( ( x, y - 5 )
       , [ "🧱📦📦📦🧱"
@@ -161,6 +178,7 @@ sokoBombLevels ( x, y ) =
         , "🧱⬜⬜⬜🧱"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     , ( ( x, y - 6 )
       , [ "🧱🧱🧱🧱🧱"
@@ -169,6 +187,7 @@ sokoBombLevels ( x, y ) =
         , "🧱⬜⬜⬜🧱"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     , ( ( x, y - 7 )
       , [ "🧱🧱🧱🧱🧱"
@@ -177,6 +196,7 @@ sokoBombLevels ( x, y ) =
         , "🧱⬜⬜⬜🧱"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     , ( ( x, y - 8 )
       , [ "🧱🧱🧱🧱🧱"
@@ -185,6 +205,7 @@ sokoBombLevels ( x, y ) =
         , "🧱⬜⬜⬜🧱"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     , ( ( x, y - 9 )
       , [ "🧱⬜📦⬜🧱"
@@ -193,6 +214,7 @@ sokoBombLevels ( x, y ) =
         , "🧱⬜⬜⬜🧱"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     , ( ( x, y - 10 )
       , [ "🧱⬜📦⬜🧱"
@@ -201,6 +223,7 @@ sokoBombLevels ( x, y ) =
         , "🧨📦📦📦🧨"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     , ( ( x, y - 11 )
       , [ "🧱⬜🧱⬜🧱"
@@ -209,6 +232,7 @@ sokoBombLevels ( x, y ) =
         , "🧨⬜🧨⬜🧨"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     , ( ( x, y - 12 )
       , [ "🧱🧱🧱🧱🧱"
@@ -217,13 +241,16 @@ sokoBombLevels ( x, y ) =
         , "🧱⬜⬜⬜🧱"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
+            |> Dict.insert ( -1, 2 ) (EntityBlock LockedDoor)
       )
     , ( ( x, y - 13 )
       , [ "🧱🧱🧱🧱🧱"
         , "🧱🧱🧱🧱🧱"
-        , "🧱⬜💎⬜🧱"
+        , "🧱⬜🗝⬜🧱"
         , "🧱⬜⬜⬜🧱"
         , "🧱⬜😊⬜🧱"
         ]
+            |> Game.Build.fromEmojis
       )
     ]
