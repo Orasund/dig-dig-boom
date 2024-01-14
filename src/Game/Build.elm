@@ -113,7 +113,7 @@ parseEmoji string =
         '💎' ->
             EntityBlock Diamant |> Just
 
-        '🗝' ->
+        '🔑' ->
             EntityBlock Key |> Just
 
         '⬜' ->

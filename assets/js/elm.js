@@ -7079,7 +7079,7 @@ var $author$project$Game$Build$parseEmoji = function (string) {
 		case '💎':
 			return $elm$core$Maybe$Just(
 				$author$project$Game$Build$EntityBlock($author$project$Entity$Diamant));
-		case '🗝':
+		case '🔑':
 			return $elm$core$Maybe$Just(
 				$author$project$Game$Build$EntityBlock($author$project$Entity$Key));
 		case '⬜':
@@ -7155,9 +7155,13 @@ var $author$project$World$Map$sokoBombLevels = function (_v0) {
 					['🧱⬜📦⬜🧱', '🧱📦📦📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']))),
 			_Utils_Tuple2(
 			_Utils_Tuple2(x, y - 5),
-			$author$project$Game$Build$fromEmojis(
-				_List_fromArray(
-					['🧱📦📦📦🧱', '🧱📦🧨📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']))),
+			A3(
+				$elm$core$Dict$insert,
+				_Utils_Tuple2($author$project$Config$roomSize, 2),
+				$author$project$Game$Build$EntityBlock($author$project$Entity$LockedDoor),
+				$author$project$Game$Build$fromEmojis(
+					_List_fromArray(
+						['🧱📦📦📦🧱', '🧱📦🧨📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])))),
 			_Utils_Tuple2(
 			_Utils_Tuple2(x, y - 6),
 			$author$project$Game$Build$fromEmojis(
@@ -7201,7 +7205,7 @@ var $author$project$World$Map$sokoBombLevels = function (_v0) {
 			_Utils_Tuple2(x, y - 13),
 			$author$project$Game$Build$fromEmojis(
 				_List_fromArray(
-					['🧱🧱🧱🧱🧱', '🧱🧱🧱🧱🧱', '🧱⬜🗝⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])))
+					['🧱🧱🧱🧱🧱', '🧱🧱🧱🧱🧱', '🧱⬜🔑⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])))
 		]);
 };
 var $author$project$World$Map$dict = $elm$core$Dict$fromList(
@@ -7241,11 +7245,6 @@ var $author$project$World$Map$dict = $elm$core$Dict$fromList(
 					_List_fromArray(
 						['⬜⬜⬜⬜⬜', '⬜⬜📦⬜⬜', '⬜📦🧨📦⬜', '❌❌❌❌❌', '🧱🧱🧱🧱🧱']))),
 				_Utils_Tuple2(
-				_Utils_Tuple2(-1, -8),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['🧱🧱🧱🧱🧱', '⬜⬜❌⬜⬜', '⬜📦❌⬜⬜', '⬜⬜❌⬜⬜', '🧱🧱🧱🧱🧱']))),
-				_Utils_Tuple2(
 				_Utils_Tuple2(-2, -7),
 				$author$project$Game$Build$fromEmojis(
 					_List_fromArray(
@@ -7254,7 +7253,22 @@ var $author$project$World$Map$dict = $elm$core$Dict$fromList(
 				_Utils_Tuple2(-2, -6),
 				$author$project$Game$Build$fromEmojis(
 					_List_fromArray(
-						['❌🧨⬜🧨❌', '❌📦📦📦❌', '❌🧨📦🧨❌', '❌❌🧱❌❌', '❌❌⬜❌❌'])))
+						['❌🧨⬜🧨❌', '❌📦📦📦❌', '❌🧨📦🧨❌', '❌❌🧱❌❌', '❌❌⬜❌❌']))),
+				_Utils_Tuple2(
+				_Utils_Tuple2(-2, -5),
+				$author$project$Game$Build$fromEmojis(
+					_List_fromArray(
+						['⬜⬜⬜❌❌', '⬜🧨⬜❌❌', '⬜⬜⬜❌❌', '📦📦📦❌❌', '⬜⬜⬜❌❌']))),
+				_Utils_Tuple2(
+				_Utils_Tuple2(-1, -5),
+				$author$project$Game$Build$fromEmojis(
+					_List_fromArray(
+						['🧱🧱🧱🧱🧱', '⬜⬜⬜❌⬜', '⬜🔑📦❌⬜', '⬜⬜⬜❌⬜', '🧱🧱🧱🧱🧱']))),
+				_Utils_Tuple2(
+				_Utils_Tuple2(1, -5),
+				$author$project$Game$Build$fromEmojis(
+					_List_fromArray(
+						['🧱🧱🧱🧱🧱', '⬜⬜⬜⬜⬜', '⬜⬜💎⬜⬜', '⬜⬜⬜⬜⬜', '🧱🧱🧱🧱🧱'])))
 			])));
 var $author$project$Entity$Ground = {$: 'Ground'};
 var $elm$core$List$concatMap = F2(
@@ -7492,7 +7506,7 @@ var $author$project$World$new = function (seed) {
 };
 var $author$project$Main$init = function (_v0) {
 	var seed = $elm$random$Random$initialSeed(42);
-	var room = _Utils_Tuple2(0, -12);
+	var room = _Utils_Tuple2(0, 0);
 	var initialPlayerPos = _Utils_Tuple2(2, 4);
 	var game = $author$project$World$Map$get(room);
 	return _Utils_Tuple2(
@@ -10394,7 +10408,7 @@ var $author$project$View$Cell$lockedBottomDoor = function (attrs) {
 		$author$project$View$Cell$fromEmojis,
 		attrs,
 		_List_fromArray(
-			['❌❌🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨🟨❌❌', '❌❌🟨🟨🟨🟨🟨❌❌🟨🟨🟨🟨🟨❌❌', '❌❌🟨🟨🟨🟨🟨❌❌🟨🟨🟨🟨🟨❌❌', '❌❌🟨🟨🟨🟨❌❌❌❌🟨🟨🟨🟨❌❌', '❌❌🟨🟨🟨🟨❌❌❌❌🟨🟨🟨🟨❌❌', '❌❌❌❌🟨🟨🟨🟨🟨🟨🟨🟨❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌']));
+			['❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '🟨🟨🟨🟨🟨❌❌❌❌❌❌🟨🟨🟨🟨🟨', '🟨🟨🟨🟨🟨❌❌❌❌❌❌🟨🟨🟨🟨🟨', '🟨🟨🟨🟨🟨🟨❌❌❌❌🟨🟨🟨🟨🟨🟨', '🟨🟨🟨🟨🟨🟨❌❌❌❌🟨🟨🟨🟨🟨🟨', '🟨🟨🟨❌❌🟨❌❌❌❌🟨❌❌🟨🟨🟨', '🟨❌❌❌❌🟨❌❌❌❌🟨❌❌❌❌🟨', '🟨❌❌❌❌🟨❌❌❌❌🟨❌❌❌❌🟨', '🟨🟨🟨❌❌🟨❌❌❌❌🟨❌❌🟨🟨🟨', '🟨🟨🟨🟨🟨🟨❌❌❌❌🟨🟨🟨🟨🟨🟨', '🟨🟨🟨🟨🟨🟨❌❌❌❌🟨🟨🟨🟨🟨🟨', '🟨🟨🟨🟨🟨❌❌❌❌❌❌🟨🟨🟨🟨🟨', '🟨🟨🟨🟨🟨❌❌❌❌❌❌🟨🟨🟨🟨🟨', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌']));
 };
 var $author$project$View$Cell$sprite = F2(
 	function (attrs, pos) {
