@@ -7302,7 +7302,15 @@ var $author$project$World$Map$dict = $elm$core$Dict$fromList(
 				_Utils_Tuple2(
 				_Utils_Tuple2(-1, -8),
 				_List_fromArray(
-					['🧱🧱🧱🧱🧱', '⬜⬜❌⬜⬜', '⬜📦❌⬜⬜', '⬜⬜❌⬜⬜', '🧱🧱🧱🧱🧱']))
+					['🧱🧱🧱🧱🧱', '⬜⬜❌⬜⬜', '⬜📦❌⬜⬜', '⬜⬜❌⬜⬜', '🧱🧱🧱🧱🧱'])),
+				_Utils_Tuple2(
+				_Utils_Tuple2(-2, -7),
+				_List_fromArray(
+					['⬜⬜⬜⬜⬜', '⬜📦🧨📦⬜', '❌🧨📦🧨❌', '❌🧱🧱🧱❌', '❌❌❌❌❌'])),
+				_Utils_Tuple2(
+				_Utils_Tuple2(-2, -6),
+				_List_fromArray(
+					['❌🧨⬜🧨❌', '❌📦📦📦❌', '❌🧨📦🧨❌', '❌❌🧱❌❌', '❌❌⬜❌❌']))
 			])));
 var $elm$core$Dict$member = F2(
 	function (key, dict) {
@@ -7453,7 +7461,7 @@ var $author$project$World$new = function (seed) {
 };
 var $author$project$Main$init = function (_v0) {
 	var seed = $elm$random$Random$initialSeed(42);
-	var room = _Utils_Tuple2(0, 0);
+	var room = _Utils_Tuple2(-2, -8);
 	var initialPlayerPos = _Utils_Tuple2(2, 4);
 	var game = $author$project$World$Map$get(room);
 	return _Utils_Tuple2(
