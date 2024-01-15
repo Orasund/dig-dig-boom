@@ -5,7 +5,7 @@ import Browser.Events
 import Config
 import Dict
 import Direction exposing (Direction(..))
-import Entity exposing (Enemy(..), Entity(..), Item)
+import Entity exposing (Enemy(..), Entity(..), Floor(..), Item)
 import Game exposing (Game)
 import Game.Event exposing (Event(..), GameAndEvents)
 import Game.Update
@@ -243,6 +243,32 @@ applyEvent event model =
                 | hasKey = False
                 , unlockedRooms = model.unlockedRooms |> Set.insert model.room
               }
+            , Cmd.none
+            )
+
+        Drop pos ->
+            ( if Dict.member pos model.game.floor then
+                model
+
+              else
+                case Game.get pos model.game of
+                    Just Crate ->
+                        { model
+                            | game =
+                                model.game
+                                    |> Game.remove pos
+                                    |> Game.addFloor pos CrateInLava
+                        }
+
+                    Just ActiveSmallBomb ->
+                        { model
+                            | game =
+                                model.game
+                                    |> Game.remove pos
+                        }
+
+                    _ ->
+                        model
             , Cmd.none
             )
 

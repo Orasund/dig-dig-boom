@@ -2,6 +2,7 @@ module Game.Event exposing
     ( Event(..)
     , GameAndEvents
     , andThen
+    , fromGame
     , kill
     , map
     , none
@@ -20,6 +21,7 @@ type Event
     | WinGame
     | AddKey
     | UnlockDoor
+    | Drop ( Int, Int )
 
 
 type alias GameAndEvents =
@@ -29,6 +31,11 @@ type alias GameAndEvents =
 none : Game -> GameAndEvents
 none game =
     { game = game, kill = [] }
+
+
+fromGame : Event -> Game -> GameAndEvents
+fromGame event game =
+    { game = game, kill = [ event ] }
 
 
 map : (Game -> Game) -> GameAndEvents -> GameAndEvents

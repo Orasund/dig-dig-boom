@@ -8066,10 +8066,28 @@ var $elm$core$Maybe$andThen = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
+var $author$project$Entity$CrateInLava = {$: 'CrateInLava'};
 var $author$project$Main$GameWon = {$: 'GameWon'};
 var $author$project$Main$RoomEntered = function (a) {
 	return {$: 'RoomEntered', a: a};
 };
+var $author$project$Game$addFloor = F3(
+	function (pos, floor, game) {
+		return _Utils_update(
+			game,
+			{
+				floor: A3($elm$core$Dict$insert, pos, floor, game.floor)
+			});
+	});
+var $author$project$Game$get = F2(
+	function (pos, game) {
+		return A2(
+			$elm$core$Maybe$map,
+			function ($) {
+				return $.entity;
+			},
+			A2($elm$core$Dict$get, pos, game.cells));
+	});
 var $elm$core$Set$insert = F2(
 	function (key, _v0) {
 		var dict = _v0.a;
@@ -8100,15 +8118,6 @@ var $author$project$Game$Event$attackPlayer = F2(
 				}
 			},
 			A2($elm$core$Dict$get, position, game.cells));
-	});
-var $author$project$Game$get = F2(
-	function (pos, game) {
-		return A2(
-			$elm$core$Maybe$map,
-			function ($) {
-				return $.entity;
-			},
-			A2($elm$core$Dict$get, pos, game.cells));
 	});
 var $author$project$Game$remove = F2(
 	function (pos, game) {
@@ -8264,7 +8273,7 @@ var $author$project$Main$applyEvent = F2(
 						model,
 						{hasKey: true}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'UnlockDoor':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -8272,6 +8281,47 @@ var $author$project$Main$applyEvent = F2(
 							hasKey: false,
 							unlockedRooms: A2($elm$core$Set$insert, model.room, model.unlockedRooms)
 						}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var pos = event.a;
+				return _Utils_Tuple2(
+					function () {
+						if (A2($elm$core$Dict$member, pos, model.game.floor)) {
+							return model;
+						} else {
+							var _v2 = A2($author$project$Game$get, pos, model.game);
+							_v2$2:
+							while (true) {
+								if (_v2.$ === 'Just') {
+									switch (_v2.a.$) {
+										case 'Crate':
+											var _v3 = _v2.a;
+											return _Utils_update(
+												model,
+												{
+													game: A3(
+														$author$project$Game$addFloor,
+														pos,
+														$author$project$Entity$CrateInLava,
+														A2($author$project$Game$remove, pos, model.game))
+												});
+										case 'ActiveSmallBomb':
+											var _v4 = _v2.a;
+											return _Utils_update(
+												model,
+												{
+													game: A2($author$project$Game$remove, pos, model.game)
+												});
+										default:
+											break _v2$2;
+									}
+								} else {
+									break _v2$2;
+								}
+							}
+							return model;
+						}
+					}(),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -8446,16 +8496,18 @@ var $author$project$Game$move = F2(
 var $author$project$Game$Event$none = function (game) {
 	return {game: game, kill: _List_Nil};
 };
-var $author$project$Entity$CrateInLava = {$: 'CrateInLava'};
-var $author$project$Game$addFloor = F3(
-	function (pos, floor, game) {
-		return _Utils_update(
-			game,
-			{
-				floor: A3($elm$core$Dict$insert, pos, floor, game.floor)
-			});
+var $author$project$Game$Event$Drop = function (a) {
+	return {$: 'Drop', a: a};
+};
+var $author$project$Game$Event$fromGame = F2(
+	function (event, game) {
+		return {
+			game: game,
+			kill: _List_fromArray(
+				[event])
+		};
 	});
-var $author$project$Game$Update$pushCrate = F3(
+var $author$project$Game$Player$pushCrate = F3(
 	function (pos, dir, game) {
 		var newPos = A2(
 			$author$project$Position$addToVector,
@@ -8470,26 +8522,21 @@ var $author$project$Game$Update$pushCrate = F3(
 					A2(
 						$author$project$Game$move,
 						{from: pos, to: newPos},
-						game)) : $elm$core$Maybe$Just(
-					$author$project$Game$Event$none(
-						A2(
-							$author$project$Game$remove,
-							pos,
-							A3($author$project$Game$addFloor, newPos, $author$project$Entity$CrateInLava, game))));
+						game)) : A2(
+					$elm$core$Maybe$map,
+					$author$project$Game$Event$fromGame(
+						$author$project$Game$Event$Drop(newPos)),
+					A2(
+						$author$project$Game$move,
+						{from: pos, to: newPos},
+						game));
 			} else {
 				if (_v0.a.$ === 'ActiveSmallBomb') {
 					var _v1 = _v0.a;
 					return A2(
 						$elm$core$Maybe$map,
-						function (g) {
-							return {
-								game: g,
-								kill: _List_fromArray(
-									[
-										$author$project$Game$Event$Kill(newPos)
-									])
-							};
-						},
+						$author$project$Game$Event$fromGame(
+							$author$project$Game$Event$Kill(newPos)),
 						A2(
 							$author$project$Game$move,
 							{from: pos, to: newPos},
@@ -8502,7 +8549,7 @@ var $author$project$Game$Update$pushCrate = F3(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
-var $author$project$Game$Update$pushSmallBomb = F3(
+var $author$project$Game$Player$pushSmallBomb = F3(
 	function (pos, dir, game) {
 		var newPos = A2(
 			$author$project$Position$addToVector,
@@ -8517,9 +8564,14 @@ var $author$project$Game$Update$pushSmallBomb = F3(
 					A2(
 						$author$project$Game$move,
 						{from: pos, to: newPos},
-						game)) : $elm$core$Maybe$Just(
-					$author$project$Game$Event$none(
-						A2($author$project$Game$remove, pos, game)));
+						game)) : A2(
+					$elm$core$Maybe$map,
+					$author$project$Game$Event$fromGame(
+						$author$project$Game$Event$Drop(newPos)),
+					A2(
+						$author$project$Game$move,
+						{from: pos, to: newPos},
+						game));
 			} else {
 				return A2(
 					$elm$core$Maybe$map,
@@ -8574,7 +8626,7 @@ var $author$project$Game$addItem = F2(
 					item: $elm$core$Maybe$Just(item)
 				})) : $elm$core$Maybe$Nothing;
 	});
-var $author$project$Game$Update$takeItem = F2(
+var $author$project$Game$Player$takeItem = F2(
 	function (pos, game) {
 		return A2(
 			$elm$core$Maybe$withDefault,
@@ -8595,7 +8647,7 @@ var $author$project$Game$Update$takeItem = F2(
 					},
 					A2($elm$core$Dict$get, pos, game.items))));
 	});
-var $author$project$Game$Update$movePlayer = F3(
+var $author$project$Game$Player$movePlayer = F3(
 	function (args, position, game) {
 		var newLocation = A2(
 			$author$project$Position$addToVector,
@@ -8616,7 +8668,7 @@ var $author$project$Game$Update$movePlayer = F3(
 						$author$project$Game$Event$andThen(
 							function (g) {
 								return {
-									game: A2($author$project$Game$Update$takeItem, newLocation, g),
+									game: A2($author$project$Game$Player$takeItem, newLocation, g),
 									kill: _List_fromArray(
 										[
 											$author$project$Game$Event$Fx($author$project$Gen$Sound$Push)
@@ -8635,7 +8687,7 @@ var $author$project$Game$Update$movePlayer = F3(
 											{from: position, to: newLocation},
 											g));
 								}),
-							A3($author$project$Game$Update$pushSmallBomb, newLocation, game.playerDirection, game)));
+							A3($author$project$Game$Player$pushSmallBomb, newLocation, game.playerDirection, game)));
 				case 'Crate':
 					var _v2 = _v0.a;
 					return A2(
@@ -8653,7 +8705,7 @@ var $author$project$Game$Update$movePlayer = F3(
 						A2(
 							$elm$core$Maybe$map,
 							$author$project$Game$Event$map(
-								$author$project$Game$Update$takeItem(newLocation)),
+								$author$project$Game$Player$takeItem(newLocation)),
 							A2(
 								$elm$core$Maybe$map,
 								$author$project$Game$Event$map(
@@ -8666,7 +8718,7 @@ var $author$project$Game$Update$movePlayer = F3(
 												{from: position, to: newLocation},
 												g));
 									}),
-								A3($author$project$Game$Update$pushCrate, newLocation, game.playerDirection, game))));
+								A3($author$project$Game$Player$pushCrate, newLocation, game.playerDirection, game))));
 				case 'InactiveBomb':
 					var item = _v0.a.a;
 					var newPos = A3($author$project$Game$findFirstEmptyCellInDirection, newLocation, game.playerDirection, game);
@@ -8719,7 +8771,7 @@ var $author$project$Game$Update$movePlayer = F3(
 					var _v5 = _v0.a;
 					return args.hasKey ? $elm$core$Maybe$Just(
 						{
-							game: game,
+							game: A2($author$project$Game$remove, newLocation, game),
 							kill: _List_fromArray(
 								[$author$project$Game$Event$UnlockDoor])
 						}) : $elm$core$Maybe$Just(
@@ -8743,7 +8795,7 @@ var $author$project$Game$Update$movePlayer = F3(
 						game,
 						A2(
 							$elm$core$Maybe$map,
-							$author$project$Game$Update$takeItem(newLocation),
+							$author$project$Game$Player$takeItem(newLocation),
 							A2(
 								$author$project$Game$move,
 								{from: position, to: newLocation},
@@ -9187,7 +9239,7 @@ var $author$project$Game$Update$movePlayerInDirectionAndUpdateGame = F3(
 				$author$project$Game$Update$updateGame(
 					{roomUnlocked: args.roomUnlocked})),
 			A3(
-				$author$project$Game$Update$movePlayer,
+				$author$project$Game$Player$movePlayer,
 				{hasKey: args.hasKey},
 				location,
 				A2($author$project$Game$face, args.direction, game)));
