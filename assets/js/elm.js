@@ -7281,7 +7281,37 @@ var $author$project$World$Map$dict = $elm$core$Dict$fromList(
 					_Utils_Tuple2(2, -5),
 					$author$project$Game$Build$fromEmojis(
 						_List_fromArray(
-							['🧱🧱🧱🧱🧱', '⬜⬜⬜⬜⬜', '⬜⬜💎⬜⬜', '⬜⬜⬜⬜⬜', '🧱🧱🧱🧱🧱'])))
+							['🧊🧊⬜🧊🧊', '🧊🧊🧊🧊🧊', '⬜🧊🧊🧊⬜', '🧊🧊🧊🧊🧊', '🧊🧊⬜🧊🧊']))),
+					_Utils_Tuple2(
+					_Utils_Tuple2(2, -6),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧊🧱🧊🧱🧊', '🧊🧊⬜🧊🧊', '⬜🧊🧱🧊⬜', '⬜🧊⬜🧊⬜', '🧊🧊🧊🧊🧊']))),
+					_Utils_Tuple2(
+					_Utils_Tuple2(2, -7),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧊🧊🧊🧊🧊', '🧊🧊🧊🧱🧊', '🧱🧊🧊🧊🧊', '🧊🧊🧱🧊🧊', '🧊🧊🧊🧊🧱']))),
+					_Utils_Tuple2(
+					_Utils_Tuple2(2, -8),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊', '🧊🧊📦🧊🧊', '🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊']))),
+					_Utils_Tuple2(
+					_Utils_Tuple2(2, -9),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧊🧊🧊🧊🧊', '🧊🧊🧱🧊🧊', '🧊🧊📦🧊🧊', '📦🧊🧊🧊📦', '🧊🧊🧊🧊🧊']))),
+					_Utils_Tuple2(
+					_Utils_Tuple2(2, -10),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧊🧊🧊🧊🧊', '🧊🧊📦🧊🧊', '🧊🧊📦🧊🧊', '🧊📦🧊📦🧊', '🧊🧊🧊🧊🧊']))),
+					_Utils_Tuple2(
+					_Utils_Tuple2(2, -11),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧱🧱🧱🧱🧱', '⬜⬜⬜⬜⬜', '⬜⬜💎⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜'])))
 				]))));
 var $author$project$Entity$Ice = {$: 'Ice'};
 var $author$project$Game$addFloor = F3(
@@ -7530,7 +7560,7 @@ var $author$project$World$new = function (seed) {
 };
 var $author$project$Main$init = function (_v0) {
 	var seed = $elm$random$Random$initialSeed(42);
-	var room = _Utils_Tuple2(1, -5);
+	var room = _Utils_Tuple2(2, -8);
 	var initialPlayerPos = _Utils_Tuple2(2, 4);
 	var game = $author$project$World$Map$get(room);
 	return _Utils_Tuple2(
@@ -8617,35 +8647,28 @@ var $author$project$Game$Player$slide = F3(
 				$author$project$Position$addToVector,
 				pos,
 				$author$project$Direction$toVector(game.playerDirection));
-			if ($author$project$Math$posIsValid(newPos)) {
-				var _v0 = A2($author$project$Game$get, newPos, game);
+			if ($author$project$Math$posIsValid(newPos) && _Utils_eq(
+				A2($author$project$Game$get, newPos, game),
+				$elm$core$Maybe$Nothing)) {
+				var _v0 = A2($elm$core$Dict$get, newPos, game.floor);
 				if (_v0.$ === 'Just') {
-					return newPos;
-				} else {
-					var _v1 = A2($elm$core$Dict$get, newPos, game.floor);
-					if (_v1.$ === 'Just') {
-						if (_v1.a.$ === 'Ice') {
-							var _v2 = _v1.a;
-							var $temp$pos = newPos,
-								$temp$dir = dir,
-								$temp$game = game;
-							pos = $temp$pos;
-							dir = $temp$dir;
-							game = $temp$game;
-							continue slide;
-						} else {
-							return newPos;
-						}
+					if (_v0.a.$ === 'Ice') {
+						var _v1 = _v0.a;
+						var $temp$pos = newPos,
+							$temp$dir = dir,
+							$temp$game = game;
+						pos = $temp$pos;
+						dir = $temp$dir;
+						game = $temp$game;
+						continue slide;
 					} else {
 						return newPos;
 					}
+				} else {
+					return newPos;
 				}
 			} else {
-				if (A2($elm$core$Dict$member, newPos, game.doors)) {
-					return newPos;
-				} else {
-					return pos;
-				}
+				return pos;
 			}
 		}
 	});
@@ -8705,7 +8728,10 @@ var $author$project$Game$Player$takeItem = F2(
 	});
 var $author$project$Game$Player$movePlayer = F3(
 	function (args, position, game) {
-		var newLocation = A3($author$project$Game$Player$slide, position, game.playerDirection, game);
+		var newLocation = A2(
+			$author$project$Position$addToVector,
+			position,
+			$author$project$Direction$toVector(game.playerDirection));
 		var _v0 = A2(
 			$elm$core$Maybe$map,
 			function ($) {
@@ -8841,46 +8867,51 @@ var $author$project$Game$Player$movePlayer = F3(
 					return $elm$core$Maybe$Nothing;
 			}
 		} else {
-			return ($author$project$Math$posIsValid(newLocation) && A2($elm$core$Dict$member, newLocation, game.floor)) ? $elm$core$Maybe$Just(
-				$author$project$Game$Event$none(
-					A2(
-						$elm$core$Maybe$withDefault,
-						game,
+			if ($author$project$Math$posIsValid(newLocation) && A2($elm$core$Dict$member, newLocation, game.floor)) {
+				var newPos = A3($author$project$Game$Player$slide, position, game.playerDirection, game);
+				return $elm$core$Maybe$Just(
+					$author$project$Game$Event$none(
 						A2(
-							$elm$core$Maybe$map,
-							$author$project$Game$Player$takeItem(newLocation),
-							A2(
-								$author$project$Game$move,
-								{from: position, to: newLocation},
-								game))))) : A2(
-				$elm$core$Maybe$map,
-				function (door) {
-					return {
-						game: _Utils_update(
+							$elm$core$Maybe$withDefault,
 							game,
-							{
-								cells: A2(
-									$elm$core$Maybe$withDefault,
-									game.cells,
-									A2(
-										$elm$core$Maybe$map,
-										function (a) {
-											return A2(
-												$elm$core$Dict$remove,
-												position,
-												A3($elm$core$Dict$insert, newLocation, a, game.cells));
-										},
-										A2($elm$core$Dict$get, position, game.cells))),
-								playerPos: $elm$core$Maybe$Just(newLocation),
-								won: true
-							}),
-						kill: _List_fromArray(
-							[
-								$author$project$Game$Event$MoveToRoom(door.room)
-							])
-					};
-				},
-				A2($elm$core$Dict$get, newLocation, game.doors));
+							A2(
+								$elm$core$Maybe$map,
+								$author$project$Game$Player$takeItem(newPos),
+								A2(
+									$author$project$Game$move,
+									{from: position, to: newPos},
+									game)))));
+			} else {
+				return A2(
+					$elm$core$Maybe$map,
+					function (door) {
+						return {
+							game: _Utils_update(
+								game,
+								{
+									cells: A2(
+										$elm$core$Maybe$withDefault,
+										game.cells,
+										A2(
+											$elm$core$Maybe$map,
+											function (a) {
+												return A2(
+													$elm$core$Dict$remove,
+													position,
+													A3($elm$core$Dict$insert, newLocation, a, game.cells));
+											},
+											A2($elm$core$Dict$get, position, game.cells))),
+									playerPos: $elm$core$Maybe$Just(newLocation),
+									won: true
+								}),
+							kill: _List_fromArray(
+								[
+									$author$project$Game$Event$MoveToRoom(door.room)
+								])
+						};
+					},
+					A2($elm$core$Dict$get, newLocation, game.doors));
+			}
 		}
 	});
 var $author$project$Game$clearParticles = function (game) {
