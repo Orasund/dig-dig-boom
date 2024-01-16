@@ -7050,6 +7050,7 @@ var $author$project$Game$Build$EntityBlock = function (a) {
 };
 var $author$project$Entity$Goblin = {$: 'Goblin'};
 var $author$project$Game$Build$HoleBlock = {$: 'HoleBlock'};
+var $author$project$Game$Build$IceBlock = {$: 'IceBlock'};
 var $author$project$Entity$InactiveBomb = function (a) {
 	return {$: 'InactiveBomb', a: a};
 };
@@ -7082,6 +7083,8 @@ var $author$project$Game$Build$parseEmoji = function (string) {
 		case '🔑':
 			return $elm$core$Maybe$Just(
 				$author$project$Game$Build$EntityBlock($author$project$Entity$Key));
+		case '🧊':
+			return $elm$core$Maybe$Just($author$project$Game$Build$IceBlock);
 		case '⬜':
 			return $elm$core$Maybe$Nothing;
 		default:
@@ -7122,6 +7125,49 @@ var $author$project$Game$Build$fromEmojis = function (rows) {
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
+var $author$project$World$Map$lavaLevels = _List_fromArray(
+	[
+		_Utils_Tuple2(
+		_Utils_Tuple2(-2, -12),
+		$author$project$Game$Build$fromEmojis(
+			_List_fromArray(
+				['❌❌❌❌❌', '❌⬜⬜⬜⬜', '❌⬜📦⬜⬜', '❌❌❌❌❌', '❌⬜⬜⬜❌']))),
+		_Utils_Tuple2(
+		_Utils_Tuple2(-2, -11),
+		$author$project$Game$Build$fromEmojis(
+			_List_fromArray(
+				['⬜⬜⬜⬜⬜', '⬜⬜📦⬜⬜', '⬜⬜⬜⬜⬜', '❌❌❌❌❌', '⬜⬜📦⬜⬜']))),
+		_Utils_Tuple2(
+		_Utils_Tuple2(-2, -10),
+		$author$project$Game$Build$fromEmojis(
+			_List_fromArray(
+				['⬜⬜⬜⬜⬜', '⬜📦📦📦⬜', '❌❌📦❌❌', '❌❌❌❌❌', '❌❌📦❌❌']))),
+		_Utils_Tuple2(
+		_Utils_Tuple2(-2, -9),
+		$author$project$Game$Build$fromEmojis(
+			_List_fromArray(
+				['⬜⬜⬜⬜⬜', '📦📦📦📦📦', '⬜📦⬜📦⬜', '❌❌🧱❌❌', '❌❌❌❌❌']))),
+		_Utils_Tuple2(
+		_Utils_Tuple2(-2, -8),
+		$author$project$Game$Build$fromEmojis(
+			_List_fromArray(
+				['⬜⬜⬜⬜⬜', '⬜⬜📦⬜⬜', '⬜📦🧨📦⬜', '❌❌❌❌❌', '🧱🧱🧱🧱🧱']))),
+		_Utils_Tuple2(
+		_Utils_Tuple2(-2, -7),
+		$author$project$Game$Build$fromEmojis(
+			_List_fromArray(
+				['⬜⬜⬜⬜⬜', '⬜📦🧨📦⬜', '❌🧨📦🧨❌', '❌🧱🧱🧱❌', '❌❌❌❌❌']))),
+		_Utils_Tuple2(
+		_Utils_Tuple2(-2, -6),
+		$author$project$Game$Build$fromEmojis(
+			_List_fromArray(
+				['❌🧨⬜🧨❌', '❌📦📦📦❌', '❌🧨📦🧨❌', '❌❌🧱❌❌', '❌❌⬜❌❌']))),
+		_Utils_Tuple2(
+		_Utils_Tuple2(-2, -5),
+		$author$project$Game$Build$fromEmojis(
+			_List_fromArray(
+				['⬜⬜⬜❌❌', '⬜🧨⬜❌❌', '⬜⬜⬜❌❌', '📦📦📦❌❌', '⬜⬜⬜❌❌'])))
+	]);
 var $author$project$Entity$LockedDoor = {$: 'LockedDoor'};
 var $author$project$World$Map$sokoBombLevels = function (_v0) {
 	var x = _v0.a;
@@ -7212,64 +7258,40 @@ var $author$project$World$Map$dict = $elm$core$Dict$fromList(
 	_Utils_ap(
 		$author$project$World$Map$sokoBombLevels(
 			_Utils_Tuple2(0, 0)),
-		_List_fromArray(
-			[
-				_Utils_Tuple2(
-				_Utils_Tuple2(-1, -12),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['❌❌⬜⬜⬜', '❌❌⬜❌⬜', '⬜❌⬜❌⬜', '⬜❌⬜❌❌', '⬜⬜⬜❌❌']))),
-				_Utils_Tuple2(
-				_Utils_Tuple2(-2, -12),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['❌❌❌❌❌', '❌⬜⬜⬜⬜', '❌⬜📦⬜⬜', '❌❌❌❌❌', '❌⬜⬜⬜❌']))),
-				_Utils_Tuple2(
-				_Utils_Tuple2(-2, -11),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['⬜⬜⬜⬜⬜', '⬜⬜📦⬜⬜', '⬜⬜⬜⬜⬜', '❌❌❌❌❌', '⬜⬜📦⬜⬜']))),
-				_Utils_Tuple2(
-				_Utils_Tuple2(-2, -10),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['⬜⬜⬜⬜⬜', '⬜📦📦📦⬜', '❌❌📦❌❌', '❌❌❌❌❌', '❌❌📦❌❌']))),
-				_Utils_Tuple2(
-				_Utils_Tuple2(-2, -9),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['⬜⬜⬜⬜⬜', '📦📦📦📦📦', '⬜📦⬜📦⬜', '❌❌🧱❌❌', '❌❌❌❌❌']))),
-				_Utils_Tuple2(
-				_Utils_Tuple2(-2, -8),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['⬜⬜⬜⬜⬜', '⬜⬜📦⬜⬜', '⬜📦🧨📦⬜', '❌❌❌❌❌', '🧱🧱🧱🧱🧱']))),
-				_Utils_Tuple2(
-				_Utils_Tuple2(-2, -7),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['⬜⬜⬜⬜⬜', '⬜📦🧨📦⬜', '❌🧨📦🧨❌', '❌🧱🧱🧱❌', '❌❌❌❌❌']))),
-				_Utils_Tuple2(
-				_Utils_Tuple2(-2, -6),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['❌🧨⬜🧨❌', '❌📦📦📦❌', '❌🧨📦🧨❌', '❌❌🧱❌❌', '❌❌⬜❌❌']))),
-				_Utils_Tuple2(
-				_Utils_Tuple2(-2, -5),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['⬜⬜⬜❌❌', '⬜🧨⬜❌❌', '⬜⬜⬜❌❌', '📦📦📦❌❌', '⬜⬜⬜❌❌']))),
-				_Utils_Tuple2(
-				_Utils_Tuple2(-1, -5),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['🧱🧱🧱🧱🧱', '⬜⬜⬜❌⬜', '⬜🔑📦❌⬜', '⬜⬜⬜❌⬜', '🧱🧱🧱🧱🧱']))),
-				_Utils_Tuple2(
-				_Utils_Tuple2(1, -5),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['🧱🧱🧱🧱🧱', '⬜⬜⬜⬜⬜', '⬜⬜💎⬜⬜', '⬜⬜⬜⬜⬜', '🧱🧱🧱🧱🧱'])))
-			])));
+		_Utils_ap(
+			$author$project$World$Map$lavaLevels,
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					_Utils_Tuple2(-1, -12),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['❌❌⬜⬜⬜', '❌❌⬜❌⬜', '⬜❌⬜❌⬜', '⬜❌⬜❌❌', '⬜⬜⬜❌❌']))),
+					_Utils_Tuple2(
+					_Utils_Tuple2(-1, -5),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧱🧱🧱🧱🧱', '⬜⬜⬜❌⬜', '⬜🔑📦❌⬜', '⬜⬜⬜❌⬜', '🧱🧱🧱🧱🧱']))),
+					_Utils_Tuple2(
+					_Utils_Tuple2(1, -5),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧊🧊🧊🧱🧱', '🧊🧱🧊🧱⬜', '⬜🧱🧊🧱⬜', '⬜🧱🧊🧱🧊', '🧱🧱🧊🧊🧊']))),
+					_Utils_Tuple2(
+					_Utils_Tuple2(2, -5),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧱🧱🧱🧱🧱', '⬜⬜⬜⬜⬜', '⬜⬜💎⬜⬜', '⬜⬜⬜⬜⬜', '🧱🧱🧱🧱🧱'])))
+				]))));
+var $author$project$Entity$Ice = {$: 'Ice'};
+var $author$project$Game$addFloor = F3(
+	function (pos, floor, game) {
+		return _Utils_update(
+			game,
+			{
+				floor: A3($elm$core$Dict$insert, pos, floor, game.floor)
+			});
+	});
 var $author$project$Entity$Ground = {$: 'Ground'};
 var $elm$core$List$concatMap = F2(
 	function (f, list) {
@@ -7342,8 +7364,10 @@ var $author$project$Game$Build$fromBlocks = F2(
 					case 'ItemBlock':
 						var item = block.a;
 						return A2($author$project$Game$placeItem, pos, item);
-					default:
+					case 'HoleBlock':
 						return $author$project$Game$removeFloor(pos);
+					default:
+						return A2($author$project$Game$addFloor, pos, $author$project$Entity$Ice);
 				}
 			},
 			$author$project$Game$empty,
@@ -7506,7 +7530,7 @@ var $author$project$World$new = function (seed) {
 };
 var $author$project$Main$init = function (_v0) {
 	var seed = $elm$random$Random$initialSeed(42);
-	var room = _Utils_Tuple2(0, 0);
+	var room = _Utils_Tuple2(1, -5);
 	var initialPlayerPos = _Utils_Tuple2(2, 4);
 	var game = $author$project$World$Map$get(room);
 	return _Utils_Tuple2(
@@ -8071,14 +8095,6 @@ var $author$project$Main$GameWon = {$: 'GameWon'};
 var $author$project$Main$RoomEntered = function (a) {
 	return {$: 'RoomEntered', a: a};
 };
-var $author$project$Game$addFloor = F3(
-	function (pos, floor, game) {
-		return _Utils_update(
-			game,
-			{
-				floor: A3($elm$core$Dict$insert, pos, floor, game.floor)
-			});
-	});
 var $author$project$Game$get = F2(
 	function (pos, game) {
 		return A2(
@@ -8593,6 +8609,46 @@ var $author$project$Game$Player$pushSmallBomb = F3(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
+var $author$project$Game$Player$slide = F3(
+	function (pos, dir, game) {
+		slide:
+		while (true) {
+			var newPos = A2(
+				$author$project$Position$addToVector,
+				pos,
+				$author$project$Direction$toVector(game.playerDirection));
+			if ($author$project$Math$posIsValid(newPos)) {
+				var _v0 = A2($author$project$Game$get, newPos, game);
+				if (_v0.$ === 'Just') {
+					return newPos;
+				} else {
+					var _v1 = A2($elm$core$Dict$get, newPos, game.floor);
+					if (_v1.$ === 'Just') {
+						if (_v1.a.$ === 'Ice') {
+							var _v2 = _v1.a;
+							var $temp$pos = newPos,
+								$temp$dir = dir,
+								$temp$game = game;
+							pos = $temp$pos;
+							dir = $temp$dir;
+							game = $temp$game;
+							continue slide;
+						} else {
+							return newPos;
+						}
+					} else {
+						return newPos;
+					}
+				}
+			} else {
+				if (A2($elm$core$Dict$member, newPos, game.doors)) {
+					return newPos;
+				} else {
+					return pos;
+				}
+			}
+		}
+	});
 var $author$project$Entity$Orc = function (a) {
 	return {$: 'Orc', a: a};
 };
@@ -8649,10 +8705,7 @@ var $author$project$Game$Player$takeItem = F2(
 	});
 var $author$project$Game$Player$movePlayer = F3(
 	function (args, position, game) {
-		var newLocation = A2(
-			$author$project$Position$addToVector,
-			position,
-			$author$project$Direction$toVector(game.playerDirection));
+		var newLocation = A3($author$project$Game$Player$slide, position, game.playerDirection, game);
 		var _v0 = A2(
 			$elm$core$Maybe$map,
 			function ($) {
@@ -10656,6 +10709,13 @@ var $author$project$View$Cell$holeTop = function (attrs) {
 		attrs,
 		_Utils_Tuple2(0, 2));
 };
+var $author$project$View$Cell$ice = function (attrs) {
+	return A2(
+		$author$project$View$Cell$fromEmojis,
+		attrs,
+		_List_fromArray(
+			['❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌⬜❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌⬜❌❌❌❌❌❌❌❌⬜❌', '❌❌❌❌⬜❌❌❌❌❌❌❌❌⬜❌❌', '❌❌❌⬜❌❌❌❌❌❌⬜❌⬜❌❌❌', '❌❌⬜❌❌❌❌❌❌⬜❌⬜❌❌❌❌', '❌❌❌❌❌⬜❌❌⬜❌⬜❌❌❌❌❌', '❌❌❌❌⬜❌❌⬜❌❌❌❌❌❌❌❌', '❌❌❌⬜❌❌⬜❌❌❌❌❌❌❌❌❌', '❌❌⬜❌❌❌❌❌❌❌❌❌❌⬜❌❌', '❌⬜❌❌❌❌❌❌⬜❌❌❌⬜❌❌❌', '❌❌❌❌❌❌❌⬜❌❌❌⬜❌❌❌❌', '❌❌❌❌❌❌⬜❌❌❌⬜❌❌❌❌❌', '❌❌❌❌❌⬜❌❌❌⬜❌❌❌❌❌❌', '❌❌❌❌⬜❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌']));
+};
 var $author$project$View$Cell$item = F2(
 	function (attrs, i) {
 		return A2(
@@ -10708,39 +10768,83 @@ var $author$project$View$Screen$viewFloorAndItems = F2(
 						_Utils_ap(
 							_List_fromArray(
 								[
-									_Utils_eq(
-									A2(
-										$elm$core$Dict$get,
-										_Utils_Tuple2(x, y),
-										game.floor),
-									$elm$core$Maybe$Just($author$project$Entity$Ground)) ? $author$project$View$Cell$floor(
-									_List_fromArray(
-										[
-											$Orasund$elm_layout$Html$Style$positionAbsolute,
-											$Orasund$elm_layout$Html$Style$top('0')
-										])) : (_Utils_eq(
-									A2(
-										$elm$core$Dict$get,
-										_Utils_Tuple2(x, y - 1),
-										game.floor),
-									$elm$core$Maybe$Just($author$project$Entity$Ground)) ? $author$project$View$Cell$holeTop(
-									_List_fromArray(
-										[
-											$Orasund$elm_layout$Html$Style$positionAbsolute,
-											$Orasund$elm_layout$Html$Style$top('0')
-										])) : $author$project$View$Cell$hole(
-									_List_fromArray(
-										[
-											$Orasund$elm_layout$Html$Style$positionAbsolute,
-											$Orasund$elm_layout$Html$Style$top('0')
-										]))),
 									function () {
 									var _v1 = A2(
 										$elm$core$Dict$get,
 										_Utils_Tuple2(x, y),
 										game.floor);
-									if ((_v1.$ === 'Just') && (_v1.a.$ === 'CrateInLava')) {
-										var _v2 = _v1.a;
+									_v1$2:
+									while (true) {
+										if (_v1.$ === 'Just') {
+											switch (_v1.a.$) {
+												case 'Ground':
+													var _v2 = _v1.a;
+													return $author$project$View$Cell$floor(
+														_List_fromArray(
+															[
+																$Orasund$elm_layout$Html$Style$positionAbsolute,
+																$Orasund$elm_layout$Html$Style$top('0')
+															]));
+												case 'Ice':
+													var _v3 = _v1.a;
+													return $author$project$View$Cell$ice(
+														_List_fromArray(
+															[
+																$Orasund$elm_layout$Html$Style$positionAbsolute,
+																$Orasund$elm_layout$Html$Style$top('0')
+															]));
+												default:
+													break _v1$2;
+											}
+										} else {
+											break _v1$2;
+										}
+									}
+									var _v4 = A2(
+										$elm$core$Dict$get,
+										_Utils_Tuple2(x, y - 1),
+										game.floor);
+									_v4$2:
+									while (true) {
+										if (_v4.$ === 'Just') {
+											switch (_v4.a.$) {
+												case 'Ground':
+													var _v5 = _v4.a;
+													return $author$project$View$Cell$holeTop(
+														_List_fromArray(
+															[
+																$Orasund$elm_layout$Html$Style$positionAbsolute,
+																$Orasund$elm_layout$Html$Style$top('0')
+															]));
+												case 'Ice':
+													var _v6 = _v4.a;
+													return $author$project$View$Cell$holeTop(
+														_List_fromArray(
+															[
+																$Orasund$elm_layout$Html$Style$positionAbsolute,
+																$Orasund$elm_layout$Html$Style$top('0')
+															]));
+												default:
+													break _v4$2;
+											}
+										} else {
+											break _v4$2;
+										}
+									}
+									return $author$project$View$Cell$hole(
+										_List_fromArray(
+											[
+												$Orasund$elm_layout$Html$Style$positionAbsolute,
+												$Orasund$elm_layout$Html$Style$top('0')
+											]));
+								}(),
+									function () {
+									var _v7 = A2(
+										$elm$core$Dict$get,
+										_Utils_Tuple2(x, y),
+										game.floor);
+									if ((_v7.$ === 'Just') && (_v7.a.$ === 'CrateInLava')) {
+										var _v8 = _v7.a;
 										return $author$project$View$Cell$crateInLava(
 											_List_fromArray(
 												[
@@ -10790,15 +10894,33 @@ var $author$project$View$Screen$viewFloorAndItems = F2(
 											_Utils_Tuple2(x, y),
 											game.particles)))
 								]),
-							(!_Utils_eq(
-								A2(
+							function () {
+								var _v9 = A2(
 									$elm$core$Dict$get,
 									_Utils_Tuple2(x, y),
-									game.floor),
-								$elm$core$Maybe$Just($author$project$Entity$Ground))) ? A2(
-								$author$project$View$Cell$borders,
-								_Utils_Tuple2(x, y),
-								game) : _List_Nil)));
+									game.floor);
+								if (_v9.$ === 'Just') {
+									switch (_v9.a.$) {
+										case 'Ground':
+											var _v10 = _v9.a;
+											return _List_Nil;
+										case 'Ice':
+											var _v11 = _v9.a;
+											return _List_Nil;
+										default:
+											var _v12 = _v9.a;
+											return A2(
+												$author$project$View$Cell$borders,
+												_Utils_Tuple2(x, y),
+												game);
+									}
+								} else {
+									return A2(
+										$author$project$View$Cell$borders,
+										_Utils_Tuple2(x, y),
+										game);
+								}
+							}())));
 			},
 			$author$project$Position$asGrid(
 				{columns: $author$project$Config$roomSize, rows: $author$project$Config$roomSize}));

@@ -141,23 +141,38 @@ viewFloorAndItems prefix game =
         |> List.map
             (\( x, y ) ->
                 ( prefix ++ "_" ++ String.fromInt x ++ "_" ++ String.fromInt y
-                , [ if Dict.get ( x, y ) game.floor == Just Ground then
-                        View.Cell.floor
-                            [ Html.Style.positionAbsolute
-                            , Html.Style.top "0"
-                            ]
+                , [ case Dict.get ( x, y ) game.floor of
+                        Just Ground ->
+                            View.Cell.floor
+                                [ Html.Style.positionAbsolute
+                                , Html.Style.top "0"
+                                ]
 
-                    else if Dict.get ( x, y - 1 ) game.floor == Just Ground then
-                        View.Cell.holeTop
-                            [ Html.Style.positionAbsolute
-                            , Html.Style.top "0"
-                            ]
+                        Just Ice ->
+                            View.Cell.ice
+                                [ Html.Style.positionAbsolute
+                                , Html.Style.top "0"
+                                ]
 
-                    else
-                        View.Cell.hole
-                            [ Html.Style.positionAbsolute
-                            , Html.Style.top "0"
-                            ]
+                        _ ->
+                            case Dict.get ( x, y - 1 ) game.floor of
+                                Just Ground ->
+                                    View.Cell.holeTop
+                                        [ Html.Style.positionAbsolute
+                                        , Html.Style.top "0"
+                                        ]
+
+                                Just Ice ->
+                                    View.Cell.holeTop
+                                        [ Html.Style.positionAbsolute
+                                        , Html.Style.top "0"
+                                        ]
+
+                                _ ->
+                                    View.Cell.hole
+                                        [ Html.Style.positionAbsolute
+                                        , Html.Style.top "0"
+                                        ]
                   , case game.floor |> Dict.get ( x, y ) of
                         Just CrateInLava ->
                             View.Cell.crateInLava
@@ -190,11 +205,18 @@ viewFloorAndItems prefix game =
                             )
                         |> Maybe.withDefault Layout.none
                   ]
-                    ++ (if Dict.get ( x, y ) game.floor /= Just Ground then
-                            View.Cell.borders ( x, y ) game
+                    ++ (case Dict.get ( x, y ) game.floor of
+                            Just Ground ->
+                                []
 
-                        else
-                            []
+                            Just Ice ->
+                                []
+
+                            Just CrateInLava ->
+                                View.Cell.borders ( x, y ) game
+
+                            Nothing ->
+                                View.Cell.borders ( x, y ) game
                        )
                     |> Html.div
                         [ Html.Style.positionAbsolute

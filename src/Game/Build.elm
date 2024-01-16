@@ -2,7 +2,7 @@ module Game.Build exposing (BuildingBlock(..), constant, fromBlocks, fromEmojis,
 
 import Config
 import Dict exposing (Dict)
-import Entity exposing (Enemy(..), Entity(..), Item(..))
+import Entity exposing (Enemy(..), Entity(..), Floor(..), Item(..))
 import Game exposing (Game)
 import Position
 import Random exposing (Generator)
@@ -12,6 +12,7 @@ type BuildingBlock
     = EntityBlock Entity
     | ItemBlock Item
     | HoleBlock
+    | IceBlock
 
 
 constant : List String -> List ( ( Int, Int ), { room : ( Int, Int ) } ) -> Game
@@ -116,6 +117,9 @@ parseEmoji string =
         '🔑' ->
             EntityBlock Key |> Just
 
+        '🧊' ->
+            IceBlock |> Just
+
         '⬜' ->
             Nothing
 
@@ -139,6 +143,9 @@ fromBlocks args blocks =
 
                             HoleBlock ->
                                 Game.removeFloor pos
+
+                            IceBlock ->
+                                Game.addFloor pos Ice
                     )
                     Game.empty
     in

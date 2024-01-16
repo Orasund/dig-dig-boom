@@ -16,9 +16,7 @@ movePlayer args position game =
     let
         newLocation : ( Int, Int )
         newLocation =
-            game.playerDirection
-                |> Direction.toVector
-                |> Position.addToVector position
+            slide position game.playerDirection game
     in
     case game.cells |> Dict.get newLocation |> Maybe.map .entity of
         {--Just (Enemy enemy) ->
@@ -154,10 +152,38 @@ movePlayer args position game =
                         )
 
         _ ->
-            {--{ game = game |> Game.face game.playerDirection
-            , kill = []
-            }--}
             Nothing
+
+
+slide : ( Int, Int ) -> Direction -> Game -> ( Int, Int )
+slide pos dir game =
+    let
+        newPos =
+            game.playerDirection
+                |> Direction.toVector
+                |> Position.addToVector pos
+    in
+    if Math.posIsValid newPos then
+        case Game.get newPos game of
+            Just _ ->
+                newPos
+
+            Nothing ->
+                case Dict.get newPos game.floor of
+                    Just Ice ->
+                        slide newPos dir game
+
+                    Just _ ->
+                        newPos
+
+                    Nothing ->
+                        newPos
+
+    else if Dict.member newPos game.doors then
+        newPos
+
+    else
+        pos
 
 
 pushCrate : ( Int, Int ) -> Direction -> Game -> Maybe GameAndEvents

@@ -12,6 +12,7 @@ import Direction exposing (Direction)
 type Floor
     = Ground
     | CrateInLava
+    | Ice
 
 
 type Enemy
