@@ -188,9 +188,7 @@ pushCrate : ( Int, Int ) -> Direction -> Game -> Maybe GameAndEvents
 pushCrate pos dir game =
     let
         newPos =
-            dir
-                |> Direction.toVector
-                |> Position.addToVector pos
+            slide pos dir game
     in
     if Math.posIsValid newPos then
         case Game.get newPos game of
@@ -222,9 +220,7 @@ pushSmallBomb : ( Int, Int ) -> Direction -> Game -> Maybe GameAndEvents
 pushSmallBomb pos dir game =
     let
         newPos =
-            dir
-                |> Direction.toVector
-                |> Position.addToVector pos
+            slide pos dir game
     in
     if Math.posIsValid newPos then
         case Game.get newPos game of

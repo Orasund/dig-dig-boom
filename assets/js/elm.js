@@ -7301,12 +7301,12 @@ var $author$project$World$Map$dict = $elm$core$Dict$fromList(
 					_Utils_Tuple2(2, -9),
 					$author$project$Game$Build$fromEmojis(
 						_List_fromArray(
-							['🧊🧊🧊🧊🧊', '🧊🧊🧱🧊🧊', '🧊🧊📦🧊🧊', '📦🧊🧊🧊📦', '🧊🧊🧊🧊🧊']))),
+							['🧊🧊🧊🧊🧊', '🧊🧊🧱🧊🧊', '📦🧊📦🧊📦', '🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊']))),
 					_Utils_Tuple2(
 					_Utils_Tuple2(2, -10),
 					$author$project$Game$Build$fromEmojis(
 						_List_fromArray(
-							['🧊🧊🧊🧊🧊', '🧊🧊📦🧊🧊', '🧊🧊📦🧊🧊', '🧊📦🧊📦🧊', '🧊🧊🧊🧊🧊']))),
+							['📦🧊🧊🧊📦', '🧊🧊🧊🧊🧊', '🧊🧱📦🧱🧊', '🧊📦🧊📦🧊', '🧊🧊🧊🧊🧊']))),
 					_Utils_Tuple2(
 					_Utils_Tuple2(2, -11),
 					$author$project$Game$Build$fromEmojis(
@@ -8553,12 +8553,42 @@ var $author$project$Game$Event$fromGame = F2(
 				[event])
 		};
 	});
+var $author$project$Game$Player$slide = F3(
+	function (pos, dir, game) {
+		slide:
+		while (true) {
+			var newPos = A2(
+				$author$project$Position$addToVector,
+				pos,
+				$author$project$Direction$toVector(game.playerDirection));
+			if ($author$project$Math$posIsValid(newPos) && _Utils_eq(
+				A2($author$project$Game$get, newPos, game),
+				$elm$core$Maybe$Nothing)) {
+				var _v0 = A2($elm$core$Dict$get, newPos, game.floor);
+				if (_v0.$ === 'Just') {
+					if (_v0.a.$ === 'Ice') {
+						var _v1 = _v0.a;
+						var $temp$pos = newPos,
+							$temp$dir = dir,
+							$temp$game = game;
+						pos = $temp$pos;
+						dir = $temp$dir;
+						game = $temp$game;
+						continue slide;
+					} else {
+						return newPos;
+					}
+				} else {
+					return newPos;
+				}
+			} else {
+				return pos;
+			}
+		}
+	});
 var $author$project$Game$Player$pushCrate = F3(
 	function (pos, dir, game) {
-		var newPos = A2(
-			$author$project$Position$addToVector,
-			pos,
-			$author$project$Direction$toVector(dir));
+		var newPos = A3($author$project$Game$Player$slide, pos, dir, game);
 		if ($author$project$Math$posIsValid(newPos)) {
 			var _v0 = A2($author$project$Game$get, newPos, game);
 			if (_v0.$ === 'Nothing') {
@@ -8597,10 +8627,7 @@ var $author$project$Game$Player$pushCrate = F3(
 	});
 var $author$project$Game$Player$pushSmallBomb = F3(
 	function (pos, dir, game) {
-		var newPos = A2(
-			$author$project$Position$addToVector,
-			pos,
-			$author$project$Direction$toVector(dir));
+		var newPos = A3($author$project$Game$Player$slide, pos, dir, game);
 		if ($author$project$Math$posIsValid(newPos)) {
 			var _v0 = A2($author$project$Game$get, newPos, game);
 			if (_v0.$ === 'Nothing') {
@@ -8637,39 +8664,6 @@ var $author$project$Game$Player$pushSmallBomb = F3(
 			}
 		} else {
 			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $author$project$Game$Player$slide = F3(
-	function (pos, dir, game) {
-		slide:
-		while (true) {
-			var newPos = A2(
-				$author$project$Position$addToVector,
-				pos,
-				$author$project$Direction$toVector(game.playerDirection));
-			if ($author$project$Math$posIsValid(newPos) && _Utils_eq(
-				A2($author$project$Game$get, newPos, game),
-				$elm$core$Maybe$Nothing)) {
-				var _v0 = A2($elm$core$Dict$get, newPos, game.floor);
-				if (_v0.$ === 'Just') {
-					if (_v0.a.$ === 'Ice') {
-						var _v1 = _v0.a;
-						var $temp$pos = newPos,
-							$temp$dir = dir,
-							$temp$game = game;
-						pos = $temp$pos;
-						dir = $temp$dir;
-						game = $temp$game;
-						continue slide;
-					} else {
-						return newPos;
-					}
-				} else {
-					return newPos;
-				}
-			} else {
-				return pos;
-			}
 		}
 	});
 var $author$project$Entity$Orc = function (a) {
