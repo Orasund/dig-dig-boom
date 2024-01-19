@@ -125,22 +125,6 @@ startRoom game model =
     }
 
 
-solvedRoom : Model -> ( Model, Cmd Msg )
-solvedRoom model =
-    Random.step (World.solveRoom model.world) model.seed
-        |> (\( world, seed ) ->
-                ( { model
-                    | world = world
-                    , seed = seed
-                    , overlay = Just WorldMap
-                    , history = []
-                    , initialItem = model.game.item
-                  }
-                , Cmd.none
-                )
-           )
-
-
 restartRoom : Model -> ( Model, Cmd Msg )
 restartRoom model =
     ( { model

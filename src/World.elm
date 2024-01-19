@@ -136,67 +136,8 @@ insertTrail pos world =
 
 insertRandomNode : ( Int, Int ) -> World -> Generator World
 insertRandomNode ( x, y ) world =
-    let
-        neighbors =
-            [ ( x + 1, y ), ( x - 1, y ), ( x, y + 1 ), ( x, y - 1 ) ]
-                |> List.foldl
-                    (\pos out ->
-                        case Dict.get pos world.nodes of
-                            Just (Room { sort }) ->
-                                case sort of
-                                    Stage _ ->
-                                        { out | rooms = out.rooms + 1 }
-
-                                    Trial _ ->
-                                        { out | trails = out.trails + 1 }
-
-                            Just Wall ->
-                                { out | wall = out.wall + 1 }
-
-                            _ ->
-                                out
-                    )
-                    { rooms = 0
-                    , wall = 0
-                    , trails = 0
-                    }
-    in
     if x == 0 && y < 0 then
         insertTrail ( x, y ) world
 
     else
         insertWall ( x, y ) world |> Random.constant
-
-
-
-{--if
-        y >= 0 || (neighbors.rooms + neighbors.trails > 1)
-        --|| (neighbors.rooms + neighbors.trails > 1 && Dict.size world.nodes > Config.minWorldSize)
-    then
-        insertWall ( x, y ) world |> Random.constant
-
-    else if x == 0 && modBy 2 y == 0 then
-        insertTrail ( x, y ) world
-
-    else
-        Random.weighted
-            ( if Dict.size world.nodes <= Config.minWorldSize then
-                0
-
-              else
-                toFloat (abs x // 4) + 1
-            , insertWall ( x, y ) world |> Random.constant
-            )
-            [ ( 3
-              , insertStage ( x, y ) world
-              )
-            , ( if neighbors.trails == 0 then
-                    1
-
-                else
-                    0
-              , insertTrail ( x, y ) world
-              )
-            ]
-            |> Random.andThen identity
-            --}
