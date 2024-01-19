@@ -7575,7 +7575,7 @@ var $author$project$World$new = function (seed) {
 };
 var $author$project$Main$init = function (_v0) {
 	var seed = $elm$random$Random$initialSeed(42);
-	var room = _Utils_Tuple2(2, -11);
+	var room = _Utils_Tuple2(0, 0);
 	var initialPlayerPos = _Utils_Tuple2(2, 4);
 	var game = $author$project$World$Map$get(room);
 	return _Utils_Tuple2(
@@ -8603,7 +8603,16 @@ var $author$project$Game$Player$slide = F3(
 	});
 var $author$project$Game$Player$pushCrate = F3(
 	function (pos, dir, game) {
-		var newPos = A3($author$project$Game$Player$slide, pos, dir, game);
+		var nextFreePos = A3($author$project$Game$Player$slide, pos, dir, game);
+		var newPos = _Utils_eq(
+			A2($elm$core$Dict$get, nextFreePos, game.floor),
+			$elm$core$Maybe$Just($author$project$Entity$Ice)) ? A2(
+			$author$project$Position$addToVector,
+			nextFreePos,
+			$author$project$Direction$toVector(game.playerDirection)) : A2(
+			$author$project$Position$addToVector,
+			pos,
+			$author$project$Direction$toVector(game.playerDirection));
 		if ($author$project$Math$posIsValid(newPos)) {
 			var _v0 = A2($author$project$Game$get, newPos, game);
 			if (_v0.$ === 'Nothing') {
@@ -8633,11 +8642,23 @@ var $author$project$Game$Player$pushCrate = F3(
 							{from: pos, to: newPos},
 							A2($author$project$Game$remove, newPos, game)));
 				} else {
-					return $elm$core$Maybe$Nothing;
+					return A2(
+						$elm$core$Maybe$map,
+						$author$project$Game$Event$none,
+						A2(
+							$author$project$Game$move,
+							{from: pos, to: nextFreePos},
+							game));
 				}
 			}
 		} else {
-			return $elm$core$Maybe$Nothing;
+			return A2(
+				$elm$core$Maybe$map,
+				$author$project$Game$Event$none,
+				A2(
+					$author$project$Game$move,
+					{from: pos, to: nextFreePos},
+					game));
 		}
 	});
 var $author$project$Game$Player$pushSmallBomb = F3(
