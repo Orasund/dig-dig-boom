@@ -219,8 +219,19 @@ pushCrate pos dir game =
 pushSmallBomb : ( Int, Int ) -> Direction -> Game -> Maybe GameAndEvents
 pushSmallBomb pos dir game =
     let
-        newPos =
+        nextFreePos =
             slide pos dir game
+
+        newPos =
+            if Dict.get nextFreePos game.floor == Just Ice then
+                game.playerDirection
+                    |> Direction.toVector
+                    |> Position.addToVector nextFreePos
+
+            else
+                game.playerDirection
+                    |> Direction.toVector
+                    |> Position.addToVector pos
     in
     if Math.posIsValid newPos then
         case Game.get newPos game of
@@ -242,7 +253,9 @@ pushSmallBomb pos dir game =
                     |> Maybe.map (\g -> { game = g, kill = [ Kill newPos ] })
 
     else
-        Nothing
+        game
+            |> Game.move { from = pos, to = nextFreePos }
+            |> Maybe.map Game.Event.none
 
 
 takeItem : ( Int, Int ) -> Game -> Game

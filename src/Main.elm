@@ -78,9 +78,9 @@ init : flag -> ( Model, Cmd Msg )
 init _ =
     let
         room =
-            ( 2, -8 )
+            ( 2, -11 )
 
-        --( 0, 0 )
+        --( 2, -8 )
         initialPlayerPos =
             ( 2, 4 )
 

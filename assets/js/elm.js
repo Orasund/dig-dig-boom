@@ -7311,6 +7311,21 @@ var $author$project$World$Map$dict = $elm$core$Dict$fromList(
 					_Utils_Tuple2(2, -11),
 					$author$project$Game$Build$fromEmojis(
 						_List_fromArray(
+							['🧊🧊🧱🧊🧊', '🧊🧊🧊🧊🧊', '🧊🧨🧊🧨🧊', '🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊']))),
+					_Utils_Tuple2(
+					_Utils_Tuple2(2, -12),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧊🧊🧱🧊🧊', '🧊🧊📦🧊🧊', '🧊📦🧨📦🧊', '🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊']))),
+					_Utils_Tuple2(
+					_Utils_Tuple2(2, -13),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧊🧊🧱🧊🧊', '🧊📦🧊📦🧊', '🧊🧊🧨🧊🧊', '🧊📦🧨📦🧊', '🧊🧊🧊🧊🧊']))),
+					_Utils_Tuple2(
+					_Utils_Tuple2(2, -14),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
 							['🧱🧱🧱🧱🧱', '⬜⬜⬜⬜⬜', '⬜⬜💎⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜'])))
 				]))));
 var $author$project$Entity$Ice = {$: 'Ice'};
@@ -7560,7 +7575,7 @@ var $author$project$World$new = function (seed) {
 };
 var $author$project$Main$init = function (_v0) {
 	var seed = $elm$random$Random$initialSeed(42);
-	var room = _Utils_Tuple2(2, -8);
+	var room = _Utils_Tuple2(2, -11);
 	var initialPlayerPos = _Utils_Tuple2(2, 4);
 	var game = $author$project$World$Map$get(room);
 	return _Utils_Tuple2(
@@ -8627,7 +8642,16 @@ var $author$project$Game$Player$pushCrate = F3(
 	});
 var $author$project$Game$Player$pushSmallBomb = F3(
 	function (pos, dir, game) {
-		var newPos = A3($author$project$Game$Player$slide, pos, dir, game);
+		var nextFreePos = A3($author$project$Game$Player$slide, pos, dir, game);
+		var newPos = _Utils_eq(
+			A2($elm$core$Dict$get, nextFreePos, game.floor),
+			$elm$core$Maybe$Just($author$project$Entity$Ice)) ? A2(
+			$author$project$Position$addToVector,
+			nextFreePos,
+			$author$project$Direction$toVector(game.playerDirection)) : A2(
+			$author$project$Position$addToVector,
+			pos,
+			$author$project$Direction$toVector(game.playerDirection));
 		if ($author$project$Math$posIsValid(newPos)) {
 			var _v0 = A2($author$project$Game$get, newPos, game);
 			if (_v0.$ === 'Nothing') {
@@ -8663,7 +8687,13 @@ var $author$project$Game$Player$pushSmallBomb = F3(
 						A2($author$project$Game$remove, newPos, game)));
 			}
 		} else {
-			return $elm$core$Maybe$Nothing;
+			return A2(
+				$elm$core$Maybe$map,
+				$author$project$Game$Event$none,
+				A2(
+					$author$project$Game$move,
+					{from: pos, to: nextFreePos},
+					game));
 		}
 	});
 var $author$project$Entity$Orc = function (a) {
