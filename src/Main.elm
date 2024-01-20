@@ -8,6 +8,7 @@ import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Floor(..), Item)
 import Game exposing (Game)
 import Game.Event exposing (Event(..), GameAndEvents)
+import Game.Map
 import Game.Update
 import Gen.Sound as Sound exposing (Sound(..))
 import Html exposing (Html)
@@ -25,9 +26,6 @@ import Task
 import Time
 import View.Controls
 import View.Screen as Screen
-import View.World
-import World exposing (Node(..), RoomSort(..), World)
-import World.Map
 
 
 
@@ -38,7 +36,6 @@ import World.Map
 
 type Overlay
     = Menu
-    | WorldMap
     | GameWon
 
 
@@ -50,7 +47,6 @@ type alias Model =
     , frame : Int
     , history : List Game
     , room : ( Int, Int )
-    , world : World
     , initialItem : Maybe Item
     , initialPlayerPos : ( Int, Int )
     , hasKey : Bool
@@ -87,7 +83,7 @@ init _ =
             Random.initialSeed 42
 
         game =
-            World.Map.get room
+            Game.Map.get room
     in
     ( { levelSeed = seed
       , seed = seed
@@ -98,7 +94,6 @@ init _ =
       , frame = 0
       , history = []
       , room = room
-      , world = World.new seed
       , hasKey = False
       , unlockedRooms = Set.empty
       }
@@ -121,6 +116,12 @@ startRoom game model =
         | game =
             { game | item = model.game.item }
                 |> Game.addPlayer model.initialPlayerPos
+                |> (if Dict.member model.initialPlayerPos game.floor then
+                        identity
+
+                    else
+                        Game.addFloor model.initialPlayerPos Ground
+                   )
         , overlay = Nothing
     }
 
@@ -147,15 +148,17 @@ nextRoom : ( Int, Int ) -> Model -> Model
 nextRoom room model =
     let
         game =
-            World.Map.get room
+            Game.Map.get room
+
+        playerPos =
+            model.game.playerPos
+                |> Maybe.map (\( x, y ) -> ( modBy Config.roomSize x, modBy Config.roomSize y ))
+                |> Maybe.withDefault model.initialPlayerPos
     in
     { model
         | room = room
         , history = []
-        , initialPlayerPos =
-            model.game.playerPos
-                |> Maybe.map (\( x, y ) -> ( modBy Config.roomSize x, modBy Config.roomSize y ))
-                |> Maybe.withDefault model.initialPlayerPos
+        , initialPlayerPos = playerPos
     }
         |> startRoom game
 
@@ -279,9 +282,6 @@ update msg model =
                 Just GameWon ->
                     ( model, Cmd.none )
 
-                Just WorldMap ->
-                    updateWorldMap input model
-
                 Just Menu ->
                     ( { model | overlay = Nothing }
                     , Cmd.none
@@ -342,7 +342,7 @@ update msg model =
                                     |> restartRoom
 
                             InputOpenMap ->
-                                ( { model | overlay = Just WorldMap }, Cmd.none )
+                                ( model, Cmd.none )
 
         ApplyEvents events ->
             model
@@ -369,33 +369,6 @@ update msg model =
 
                 _ ->
                     ( model, Cmd.none )
-
-
-updateWorldMap : Input -> Model -> ( Model, Cmd Msg )
-updateWorldMap input model =
-    case input of
-        InputActivate ->
-            case model.world.nodes |> Dict.get model.world.player of
-                Just (Room _) ->
-                    {--seed
-                        |> Random.step (World.solveRoom model.world)
-                        |> (\( w, s ) -> ( { model | world = w, seed = s }, Cmd.none ))
-                    --}
-                    -- ( generateLevel seed model.room model, Cmd.none )
-                    ( model, Cmd.none )
-
-                _ ->
-                    ( model, Cmd.none )
-
-        InputDir dir ->
-            ( World.move dir model.world
-                |> Maybe.map (\world -> { model | world = world })
-                |> Maybe.withDefault model
-            , Cmd.none
-            )
-
-        _ ->
-            ( model, Cmd.none )
 
 
 
@@ -480,10 +453,6 @@ view model =
                     { frame = model.frame
                     }
                     model.game
-
-            Just WorldMap ->
-                View.World.toHtml []
-                    model.world
 
             Just Menu ->
                 Screen.menu []

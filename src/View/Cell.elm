@@ -1,7 +1,7 @@
 module View.Cell exposing (..)
 
 import Config
-import Dict
+import Dict exposing (Dict)
 import Direction exposing (Direction(..))
 import Entity exposing (Enemy(..), Entity(..), Floor(..), Item(..), ParticleSort(..))
 import Game exposing (Game)
@@ -64,7 +64,15 @@ particle attrs particleSort =
         |> sprite attrs
 
 
-toHtml : List (Attribute msg) -> { frame : Int, playerDirection : Direction } -> Entity -> Html msg
+toHtml :
+    List (Attribute msg)
+    ->
+        { frame : Int
+        , playerDirection : Direction
+        , neighborhood : Dict ( Int, Int ) Entity
+        }
+    -> Entity
+    -> Html msg
 toHtml attrs args cell =
     case cell of
         Player ->
@@ -84,12 +92,11 @@ toHtml attrs args cell =
             ( 1, 6 ) |> sprite attrs
 
         ActiveSmallBomb ->
-            fromEnemy
-                { frame = args.frame
-                , playerDirection = args.playerDirection
-                }
-                (ActivatedBomb Bomb)
-                |> sprite attrs
+            if args.frame == 0 then
+                bomb1 attrs
+
+            else
+                bomb2 attrs
 
         Enemy enemy ->
             fromEnemy
@@ -108,7 +115,11 @@ toHtml attrs args cell =
                 |> sprite attrs
 
         Wall ->
-            wall attrs
+            if Dict.get ( 0, 1 ) args.neighborhood /= Just Wall then
+                wallDown attrs
+
+            else
+                wall attrs
 
         Diamant ->
             diamant attrs
@@ -313,20 +324,86 @@ lockedBottomDoor attrs =
 wall : List (Attribute msg) -> Html msg
 wall attrs =
     fromEmojis attrs
-        [ "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜"
-        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜"
-        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜"
+        [ "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        ]
+
+
+wallDown : List (Attribute msg) -> Html msg
+wallDown attrs =
+    fromEmojis attrs
+        [ "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
+        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
         , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
         , "⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
         , "⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
         , "⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
-        , "⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
-        , "⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
-        , "⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
-        , "⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜"
         , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
         , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜"
         , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜"
         , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜"
-        , "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜"
+        ]
+
+
+bomb1 : List (Attribute msg) -> Html msg
+bomb1 attrs =
+    fromEmojis attrs
+        [ "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌⬛⬛❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌⬛⬜⬜⬛❌❌❌❌❌❌"
+        , "❌❌❌❌❌⬛⬛⬜⬜⬛⬛❌❌❌❌❌"
+        , "❌❌❌❌⬛⬜⬛⬛⬛⬛⬜⬛❌❌❌❌"
+        , "❌❌❌⬛⬜⬜⬜⬜⬜⬜⬜⬜⬛❌❌❌"
+        , "❌❌❌⬛⬜⬜⬜⬜⬜⬜⬛⬜⬛❌❌❌"
+        , "❌❌❌⬛⬜⬜⬜⬜⬜⬛⬛⬜⬛❌❌❌"
+        , "❌❌❌⬛⬜⬜⬛⬛⬛⬛⬛⬜⬛❌❌❌"
+        , "❌❌❌❌⬛⬜⬛⬛⬛⬛⬜⬛❌❌❌❌"
+        , "❌❌❌❌❌⬛⬜⬜⬜⬜⬛❌❌❌❌❌"
+        , "❌❌❌❌❌❌⬛⬛⬛⬛❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        ]
+
+
+bomb2 : List (Attribute msg) -> Html msg
+bomb2 attrs =
+    fromEmojis attrs
+        [ "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌⬛⬛❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌⬛⬛⬜⬜⬛⬛❌❌❌❌❌"
+        , "❌❌❌❌⬛⬜⬛⬜⬜⬛⬜⬛❌❌❌❌"
+        , "❌❌❌⬛⬜⬜⬛⬛⬛⬛⬜⬜⬛❌❌❌"
+        , "❌❌⬛⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬛❌❌"
+        , "❌❌⬛⬜⬜⬜⬜⬜⬜⬜⬜⬛⬜⬛❌❌"
+        , "❌❌⬛⬜⬜⬜⬜⬜⬜⬜⬜⬛⬜⬛❌❌"
+        , "❌❌⬛⬜⬛⬜⬜⬜⬜⬜⬛⬛⬜⬛❌❌"
+        , "❌❌⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛❌❌"
+        , "❌❌⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛❌❌"
+        , "❌❌❌⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛❌❌❌"
+        , "❌❌❌❌⬛⬜⬜⬜⬜⬜⬜⬛❌❌❌❌"
+        , "❌❌❌❌❌⬛⬛⬛⬛⬛⬛❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
+        , "❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌"
         ]

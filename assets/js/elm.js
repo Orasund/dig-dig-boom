@@ -7027,6 +7027,10 @@ var $elm$random$Random$generate = F2(
 			$elm$random$Random$Generate(
 				A2($elm$random$Random$map, tagger, generator)));
 	});
+var $author$project$Game$Build$EntityBlock = function (a) {
+	return {$: 'EntityBlock', a: a};
+};
+var $author$project$Entity$LockedDoor = {$: 'LockedDoor'};
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -7044,9 +7048,6 @@ var $author$project$Entity$Crate = {$: 'Crate'};
 var $author$project$Entity$Diamant = {$: 'Diamant'};
 var $author$project$Entity$Enemy = function (a) {
 	return {$: 'Enemy', a: a};
-};
-var $author$project$Game$Build$EntityBlock = function (a) {
-	return {$: 'EntityBlock', a: a};
 };
 var $author$project$Entity$Goblin = {$: 'Goblin'};
 var $author$project$Game$Build$HoleBlock = {$: 'HoleBlock'};
@@ -7122,54 +7123,119 @@ var $author$project$Game$Build$fromEmojis = function (rows) {
 					}),
 				rows)));
 };
+var $author$project$Game$Map$iceLevels = function (_v0) {
+	var x = _v0.a;
+	var y = _v0.b;
+	return _List_fromArray(
+		[
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['🧱🧱🧊🧊🧊', '🧱🧱🧱🧱🧊', '🧊🧊🧊🧊🧊', '🧊🧱🧱🧱🧱', '🧊🧊🧊🧱🧱']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 1),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['🧊🧊⬜🧊🧊', '🧊🧊🧊🧊🧊', '⬜🧊🧊🧊⬜', '🧊🧊🧊🧊🧊', '🧊🧊⬜🧊🧊']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 2),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['🧊🧱🧊🧱🧊', '🧊🧊⬜🧊🧊', '⬜🧊🧱🧊⬜', '⬜🧊⬜🧊⬜', '🧊🧊🧊🧊🧊']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 3),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['🧊🧊🧊🧊🧊', '🧊🧊🧊🧱🧊', '🧱🧊🧊🧊🧊', '🧊🧊🧱🧊🧊', '🧊🧱🧊🧊🧱']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 4),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊', '🧊🧊📦🧊🧊', '🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 5),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['🧊🧊🧊🧊🧊', '🧊🧊🧱🧊🧊', '📦🧊📦🧊📦', '🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 6),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['📦🧊🧊🧊📦', '🧊🧊🧊🧊🧊', '🧊🧱📦🧱🧊', '🧊📦🧊📦🧊', '🧊🧊🧊🧊🧊']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 7),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['🧊🧊🧱🧊🧊', '🧊🧊🧊🧊🧊', '🧊🧨🧊🧨🧊', '🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 8),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['🧊🧊🧱🧊🧊', '🧊🧊📦🧊🧊', '🧊📦🧨📦🧊', '🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 9),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['🧊🧊🧱🧊🧊', '🧊📦🧊📦🧊', '🧊🧊🧨🧊🧊', '🧊📦🧨📦🧊', '🧊🧊🧊🧊🧊']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 10),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['🧊🧊⬜🧊🧊', '🧊⬜🧊⬜🧊', '🧊🔑🧊🧊⬜', '🧊⬜🧊⬜🧊', '🧊🧊🧊🧊🧊'])))
+		]);
+};
+var $author$project$Game$Map$lavaLevels = function (_v0) {
+	var x = _v0.a;
+	var y = _v0.b;
+	return _List_fromArray(
+		[
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['⬜⬜⬜❌❌', '⬜⬜❌❌❌', '⬜⬜📦⬜⬜', '❌❌❌⬜⬜', '❌⬜⬜⬜⬜']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 1),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['❌⬜⬜⬜❌', '❌⬜📦⬜❌', '❌❌❌❌❌', '❌⬜📦⬜❌', '❌⬜⬜⬜❌']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 2),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['⬜⬜⬜⬜⬜', '❌📦❌📦❌', '❌❌❌❌❌', '⬜📦📦📦⬜', '⬜⬜⬜⬜⬜']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 3),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['❌⬜❌⬜❌', '❌⬜❌⬜❌', '📦📦🧱📦📦', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 4),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['❌📦❌📦❌', '🧨🧱🧱🧱🧨', '🧱❌📦❌🧱', '⬜📦🧨📦⬜', '⬜⬜⬜⬜⬜']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 5),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['⬜⬜❌⬜⬜', '📦🧱🧱🧱📦', '❌🧨📦🧨❌', '❌📦🧨📦❌', '❌⬜⬜⬜❌']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 6),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['❌❌❌📦❌', '❌❌❌❌📦', '⬜📦⬜⬜❌', '⬜📦⬜🧨⬜', '⬜📦⬜⬜⬜']))),
+			_Utils_Tuple2(
+			_Utils_Tuple2(x, y - 7),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['⬜⬜⬜⬜⬜', '⬜❌⬜❌⬜', '⬜❌🔑❌⬜', '⬜❌❌❌⬜', '⬜⬜⬜⬜⬜'])))
+		]);
+};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
-var $author$project$World$Map$lavaLevels = _List_fromArray(
-	[
-		_Utils_Tuple2(
-		_Utils_Tuple2(-2, -12),
-		$author$project$Game$Build$fromEmojis(
-			_List_fromArray(
-				['❌❌❌❌❌', '❌⬜⬜⬜⬜', '❌⬜📦⬜⬜', '❌❌❌❌❌', '❌⬜⬜⬜❌']))),
-		_Utils_Tuple2(
-		_Utils_Tuple2(-2, -11),
-		$author$project$Game$Build$fromEmojis(
-			_List_fromArray(
-				['⬜⬜⬜⬜⬜', '⬜⬜📦⬜⬜', '⬜⬜⬜⬜⬜', '❌❌❌❌❌', '⬜⬜📦⬜⬜']))),
-		_Utils_Tuple2(
-		_Utils_Tuple2(-2, -10),
-		$author$project$Game$Build$fromEmojis(
-			_List_fromArray(
-				['⬜⬜⬜⬜⬜', '⬜📦📦📦⬜', '❌❌📦❌❌', '❌❌❌❌❌', '❌❌📦❌❌']))),
-		_Utils_Tuple2(
-		_Utils_Tuple2(-2, -9),
-		$author$project$Game$Build$fromEmojis(
-			_List_fromArray(
-				['⬜⬜⬜⬜⬜', '📦📦📦📦📦', '⬜📦⬜📦⬜', '❌❌🧱❌❌', '❌❌❌❌❌']))),
-		_Utils_Tuple2(
-		_Utils_Tuple2(-2, -8),
-		$author$project$Game$Build$fromEmojis(
-			_List_fromArray(
-				['⬜⬜⬜⬜⬜', '⬜⬜📦⬜⬜', '⬜📦🧨📦⬜', '❌❌❌❌❌', '🧱🧱🧱🧱🧱']))),
-		_Utils_Tuple2(
-		_Utils_Tuple2(-2, -7),
-		$author$project$Game$Build$fromEmojis(
-			_List_fromArray(
-				['⬜⬜⬜⬜⬜', '⬜📦🧨📦⬜', '❌🧨📦🧨❌', '❌🧱🧱🧱❌', '❌❌❌❌❌']))),
-		_Utils_Tuple2(
-		_Utils_Tuple2(-2, -6),
-		$author$project$Game$Build$fromEmojis(
-			_List_fromArray(
-				['❌🧨⬜🧨❌', '❌📦📦📦❌', '❌🧨📦🧨❌', '❌❌🧱❌❌', '❌❌⬜❌❌']))),
-		_Utils_Tuple2(
-		_Utils_Tuple2(-2, -5),
-		$author$project$Game$Build$fromEmojis(
-			_List_fromArray(
-				['⬜⬜⬜❌❌', '⬜🧨⬜❌❌', '⬜⬜⬜❌❌', '📦📦📦❌❌', '⬜⬜⬜❌❌'])))
-	]);
-var $author$project$Entity$LockedDoor = {$: 'LockedDoor'};
-var $author$project$World$Map$sokoBombLevels = function (_v0) {
+var $author$project$Game$Map$sokoBombLevels = function (_v0) {
 	var x = _v0.a;
 	var y = _v0.b;
 	return _List_fromArray(
@@ -7201,13 +7267,9 @@ var $author$project$World$Map$sokoBombLevels = function (_v0) {
 					['🧱⬜📦⬜🧱', '🧱📦📦📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']))),
 			_Utils_Tuple2(
 			_Utils_Tuple2(x, y - 5),
-			A3(
-				$elm$core$Dict$insert,
-				_Utils_Tuple2($author$project$Config$roomSize, 2),
-				$author$project$Game$Build$EntityBlock($author$project$Entity$LockedDoor),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['🧱📦📦📦🧱', '🧱📦🧨📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])))),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['🧱📦📦📦🧱', '🧱📦🧨📦🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']))),
 			_Utils_Tuple2(
 			_Utils_Tuple2(x, y - 6),
 			$author$project$Game$Build$fromEmojis(
@@ -7232,7 +7294,7 @@ var $author$project$World$Map$sokoBombLevels = function (_v0) {
 			_Utils_Tuple2(x, y - 10),
 			$author$project$Game$Build$fromEmojis(
 				_List_fromArray(
-					['🧱⬜📦⬜🧱', '🧱📦⬜📦🧱', '🧨⬜📦⬜🧨', '🧨📦📦📦🧨', '🧱⬜😊⬜🧱']))),
+					['🧱⬜📦⬜🧱', '🧨📦⬜📦🧨', '🧨⬜📦⬜🧨', '🧨📦📦📦🧨', '🧱⬜😊⬜🧱']))),
 			_Utils_Tuple2(
 			_Utils_Tuple2(x, y - 11),
 			$author$project$Game$Build$fromEmojis(
@@ -7240,94 +7302,71 @@ var $author$project$World$Map$sokoBombLevels = function (_v0) {
 					['🧱⬜🧱⬜🧱', '🧨🧱📦🧱🧨', '🧨📦🧨📦🧨', '🧨⬜🧨⬜🧨', '🧱⬜😊⬜🧱']))),
 			_Utils_Tuple2(
 			_Utils_Tuple2(x, y - 12),
-			A3(
-				$elm$core$Dict$insert,
-				_Utils_Tuple2(-1, 2),
-				$author$project$Game$Build$EntityBlock($author$project$Entity$LockedDoor),
-				$author$project$Game$Build$fromEmojis(
-					_List_fromArray(
-						['🧱🧱🧱🧱🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])))),
+			$author$project$Game$Build$fromEmojis(
+				_List_fromArray(
+					['🧱🧱🧱🧱🧱', '🧱⬜🧨⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱']))),
 			_Utils_Tuple2(
 			_Utils_Tuple2(x, y - 13),
 			$author$project$Game$Build$fromEmojis(
 				_List_fromArray(
-					['🧱🧱🧱🧱🧱', '🧱🧱🧱🧱🧱', '🧱⬜🔑⬜🧱', '🧱⬜⬜⬜🧱', '🧱⬜😊⬜🧱'])))
+					['⬜⬜⬜⬜⬜', '⬜🧱⬜🧱⬜', '⬜🧱🔑🧱⬜', '⬜🧱🧱🧱⬜', '⬜⬜⬜⬜⬜'])))
 		]);
 };
-var $author$project$World$Map$dict = $elm$core$Dict$fromList(
+var $author$project$Game$Map$dict = $elm$core$Dict$fromList(
 	_Utils_ap(
-		$author$project$World$Map$sokoBombLevels(
-			_Utils_Tuple2(0, 0)),
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				_Utils_Tuple2(0, 0),
+				A3(
+					$elm$core$Dict$insert,
+					_Utils_Tuple2($author$project$Config$roomSize, 2),
+					$author$project$Game$Build$EntityBlock($author$project$Entity$LockedDoor),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧱🧱⬜🧱🧱', '🧱🧱⬜⬜🧱', '🧱⬜⬜⬜⬜', '🧱⬜⬜⬜⬜', '⬜⬜⬜⬜⬜'])))),
+				_Utils_Tuple2(
+				_Utils_Tuple2(1, 0),
+				$author$project$Game$Build$fromEmojis(
+					_List_fromArray(
+						['🧱🧱🧱🧱🧱', '🧱🧱⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜❌❌', '❌❌❌❌❌']))),
+				_Utils_Tuple2(
+				_Utils_Tuple2(2, 0),
+				A3(
+					$elm$core$Dict$insert,
+					_Utils_Tuple2($author$project$Config$roomSize, 2),
+					$author$project$Game$Build$EntityBlock($author$project$Entity$LockedDoor),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧱⬜⬜❌❌', '⬜⬜⬜❌❌', '⬜⬜⬜⬜⬜', '❌⬜⬜❌❌', '❌❌❌❌❌'])))),
+				_Utils_Tuple2(
+				_Utils_Tuple2(3, 0),
+				$author$project$Game$Build$fromEmojis(
+					_List_fromArray(
+						['❌❌⬜🧊🧊', '❌❌⬜⬜🧊', '⬜⬜⬜⬜⬜', '❌❌🧊⬜⬜', '❌❌❌🧊🧊']))),
+				_Utils_Tuple2(
+				_Utils_Tuple2(4, 0),
+				A3(
+					$elm$core$Dict$insert,
+					_Utils_Tuple2($author$project$Config$roomSize, 2),
+					$author$project$Game$Build$EntityBlock($author$project$Entity$LockedDoor),
+					$author$project$Game$Build$fromEmojis(
+						_List_fromArray(
+							['🧊🧊⬜⬜🧊', '🧊🧊⬜⬜🧊', '⬜⬜⬜🧊🧊', '⬜⬜🧊🧊🧊', '🧊🧊🧊🧊🧊'])))),
+				_Utils_Tuple2(
+				_Utils_Tuple2(5, 0),
+				$author$project$Game$Build$fromEmojis(
+					_List_fromArray(
+						['⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜💎⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜'])))
+			]),
 		_Utils_ap(
-			$author$project$World$Map$lavaLevels,
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					_Utils_Tuple2(-1, -12),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['❌❌⬜⬜⬜', '❌❌⬜❌⬜', '⬜❌⬜❌⬜', '⬜❌⬜❌❌', '⬜⬜⬜❌❌']))),
-					_Utils_Tuple2(
-					_Utils_Tuple2(-1, -5),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['🧱🧱🧱🧱🧱', '⬜⬜⬜❌⬜', '⬜🔑📦❌⬜', '⬜⬜⬜❌⬜', '🧱🧱🧱🧱🧱']))),
-					_Utils_Tuple2(
-					_Utils_Tuple2(1, -5),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['🧊🧊🧊🧱🧱', '🧊🧱🧊🧱⬜', '⬜🧱🧊🧱⬜', '⬜🧱🧊🧱🧊', '🧱🧱🧊🧊🧊']))),
-					_Utils_Tuple2(
-					_Utils_Tuple2(2, -5),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['🧊🧊⬜🧊🧊', '🧊🧊🧊🧊🧊', '⬜🧊🧊🧊⬜', '🧊🧊🧊🧊🧊', '🧊🧊⬜🧊🧊']))),
-					_Utils_Tuple2(
-					_Utils_Tuple2(2, -6),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['🧊🧱🧊🧱🧊', '🧊🧊⬜🧊🧊', '⬜🧊🧱🧊⬜', '⬜🧊⬜🧊⬜', '🧊🧊🧊🧊🧊']))),
-					_Utils_Tuple2(
-					_Utils_Tuple2(2, -7),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['🧊🧊🧊🧊🧊', '🧊🧊🧊🧱🧊', '🧱🧊🧊🧊🧊', '🧊🧊🧱🧊🧊', '🧊🧊🧊🧊🧱']))),
-					_Utils_Tuple2(
-					_Utils_Tuple2(2, -8),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊', '🧊🧊📦🧊🧊', '🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊']))),
-					_Utils_Tuple2(
-					_Utils_Tuple2(2, -9),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['🧊🧊🧊🧊🧊', '🧊🧊🧱🧊🧊', '📦🧊📦🧊📦', '🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊']))),
-					_Utils_Tuple2(
-					_Utils_Tuple2(2, -10),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['📦🧊🧊🧊📦', '🧊🧊🧊🧊🧊', '🧊🧱📦🧱🧊', '🧊📦🧊📦🧊', '🧊🧊🧊🧊🧊']))),
-					_Utils_Tuple2(
-					_Utils_Tuple2(2, -11),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['🧊🧊🧱🧊🧊', '🧊🧊🧊🧊🧊', '🧊🧨🧊🧨🧊', '🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊']))),
-					_Utils_Tuple2(
-					_Utils_Tuple2(2, -12),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['🧊🧊🧱🧊🧊', '🧊🧊📦🧊🧊', '🧊📦🧨📦🧊', '🧊🧊🧊🧊🧊', '🧊🧊🧊🧊🧊']))),
-					_Utils_Tuple2(
-					_Utils_Tuple2(2, -13),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['🧊🧊🧱🧊🧊', '🧊📦🧊📦🧊', '🧊🧊🧨🧊🧊', '🧊📦🧨📦🧊', '🧊🧊🧊🧊🧊']))),
-					_Utils_Tuple2(
-					_Utils_Tuple2(2, -14),
-					$author$project$Game$Build$fromEmojis(
-						_List_fromArray(
-							['🧱🧱🧱🧱🧱', '⬜⬜⬜⬜⬜', '⬜⬜💎⬜⬜', '⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜'])))
-				]))));
+			$author$project$Game$Map$sokoBombLevels(
+				_Utils_Tuple2(0, -1)),
+			_Utils_ap(
+				$author$project$Game$Map$lavaLevels(
+					_Utils_Tuple2(2, -1)),
+				$author$project$Game$Map$iceLevels(
+					_Utils_Tuple2(4, -1))))));
 var $author$project$Entity$Ice = {$: 'Ice'};
 var $author$project$Game$addFloor = F3(
 	function (pos, floor, game) {
@@ -7432,7 +7471,7 @@ var $elm$core$Dict$member = F2(
 			return false;
 		}
 	});
-var $author$project$World$Map$getDoors = function (_v0) {
+var $author$project$Game$Map$getDoors = function (_v0) {
 	var x = _v0.a;
 	var y = _v0.b;
 	return A2(
@@ -7440,7 +7479,7 @@ var $author$project$World$Map$getDoors = function (_v0) {
 		function (_v1) {
 			var room = _v1.a;
 			var pos = _v1.b;
-			return A2($elm$core$Dict$member, room, $author$project$World$Map$dict) ? $elm$core$Maybe$Just(
+			return A2($elm$core$Dict$member, room, $author$project$Game$Map$dict) ? $elm$core$Maybe$Just(
 				_Utils_Tuple2(
 					pos,
 					{room: room})) : $elm$core$Maybe$Nothing;
@@ -7461,17 +7500,17 @@ var $author$project$World$Map$getDoors = function (_v0) {
 				_Utils_Tuple2(2, $author$project$Config$roomSize))
 			]));
 };
-var $author$project$World$Map$get = function (pos) {
+var $author$project$Game$Map$get = function (pos) {
 	return A2(
 		$author$project$Game$Build$fromBlocks,
 		{
-			doors: $author$project$World$Map$getDoors(pos)
+			doors: $author$project$Game$Map$getDoors(pos)
 		},
 		$elm$core$Dict$toList(
 			A2(
 				$elm$core$Maybe$withDefault,
 				$elm$core$Dict$empty,
-				A2($elm$core$Dict$get, pos, $author$project$World$Map$dict))));
+				A2($elm$core$Dict$get, pos, $author$project$Game$Map$dict))));
 };
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $elm$core$Bitwise$xor = _Bitwise_xor;
@@ -7547,37 +7586,11 @@ var $elm$random$Random$independentSeed = $elm$random$Random$Generator(
 			A4($elm$random$Random$map3, makeIndependentSeed, gen, gen, gen),
 			seed0);
 	});
-var $author$project$World$Room = function (a) {
-	return {$: 'Room', a: a};
-};
-var $author$project$World$Trial = function (a) {
-	return {$: 'Trial', a: a};
-};
-var $author$project$World$new = function (seed) {
-	return {
-		difficulty: 0,
-		nodes: $elm$core$Dict$fromList(
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					_Utils_Tuple2(0, 0),
-					$author$project$World$Room(
-						{
-							seed: seed,
-							solved: false,
-							sort: $author$project$World$Trial(0)
-						}))
-				])),
-		player: _Utils_Tuple2(0, 0),
-		stages: $elm$core$Dict$empty,
-		trials: 1
-	};
-};
 var $author$project$Main$init = function (_v0) {
 	var seed = $elm$random$Random$initialSeed(42);
 	var room = _Utils_Tuple2(0, 0);
 	var initialPlayerPos = _Utils_Tuple2(2, 4);
-	var game = $author$project$World$Map$get(room);
+	var game = $author$project$Game$Map$get(room);
 	return _Utils_Tuple2(
 		{
 			frame: 0,
@@ -7590,8 +7603,7 @@ var $author$project$Main$init = function (_v0) {
 			overlay: $elm$core$Maybe$Just($author$project$Main$Menu),
 			room: room,
 			seed: seed,
-			unlockedRooms: $elm$core$Set$empty,
-			world: $author$project$World$new(seed)
+			unlockedRooms: $elm$core$Set$empty
 		},
 		$elm$core$Platform$Cmd$batch(
 			_List_fromArray(
@@ -8115,7 +8127,6 @@ var $author$project$Game$Event$Fx = function (a) {
 var $author$project$PortDefinition$PlaySound = function (a) {
 	return {$: 'PlaySound', a: a};
 };
-var $author$project$Main$WorldMap = {$: 'WorldMap'};
 var $author$project$Game$Event$andThen = F2(
 	function (fun, output) {
 		var newOutput = fun(output.game);
@@ -9386,40 +9397,38 @@ var $author$project$Main$startRoom = F2(
 		return _Utils_update(
 			model,
 			{
-				game: A2(
-					$author$project$Game$addPlayer,
-					model.initialPlayerPos,
-					_Utils_update(
-						game,
-						{item: model.game.item})),
+				game: (A2($elm$core$Dict$member, model.initialPlayerPos, game.floor) ? $elm$core$Basics$identity : A2($author$project$Game$addFloor, model.initialPlayerPos, $author$project$Entity$Ground))(
+					A2(
+						$author$project$Game$addPlayer,
+						model.initialPlayerPos,
+						_Utils_update(
+							game,
+							{item: model.game.item}))),
 				overlay: $elm$core$Maybe$Nothing
 			});
 	});
 var $author$project$Main$nextRoom = F2(
 	function (room, model) {
-		var game = $author$project$World$Map$get(room);
+		var playerPos = A2(
+			$elm$core$Maybe$withDefault,
+			model.initialPlayerPos,
+			A2(
+				$elm$core$Maybe$map,
+				function (_v0) {
+					var x = _v0.a;
+					var y = _v0.b;
+					return _Utils_Tuple2(
+						A2($elm$core$Basics$modBy, $author$project$Config$roomSize, x),
+						A2($elm$core$Basics$modBy, $author$project$Config$roomSize, y));
+				},
+				model.game.playerPos));
+		var game = $author$project$Game$Map$get(room);
 		return A2(
 			$author$project$Main$startRoom,
 			game,
 			_Utils_update(
 				model,
-				{
-					history: _List_Nil,
-					initialPlayerPos: A2(
-						$elm$core$Maybe$withDefault,
-						model.initialPlayerPos,
-						A2(
-							$elm$core$Maybe$map,
-							function (_v0) {
-								var x = _v0.a;
-								var y = _v0.b;
-								return _Utils_Tuple2(
-									A2($elm$core$Basics$modBy, $author$project$Config$roomSize, x),
-									A2($elm$core$Basics$modBy, $author$project$Config$roomSize, y));
-							},
-							model.game.playerPos)),
-					room: room
-				}));
+				{history: _List_Nil, initialPlayerPos: playerPos, room: room}));
 	});
 var $author$project$Game$Update$applyBomb = F2(
 	function (position, game) {
@@ -9491,51 +9500,6 @@ var $author$project$Main$restartRoom = function (model) {
 			$author$project$PortDefinition$PlaySound(
 				{looping: false, sound: $author$project$Gen$Sound$Retry})));
 };
-var $author$project$World$move = F2(
-	function (dir, world) {
-		var newPos = A2(
-			$author$project$Position$addToVector,
-			world.player,
-			$author$project$Direction$toVector(dir));
-		var _v0 = A2($elm$core$Dict$get, newPos, world.nodes);
-		if ((_v0.$ === 'Just') && (_v0.a.$ === 'Room')) {
-			return $elm$core$Maybe$Just(
-				_Utils_update(
-					world,
-					{player: newPos}));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $author$project$Main$updateWorldMap = F2(
-	function (input, model) {
-		switch (input.$) {
-			case 'InputActivate':
-				var _v1 = A2($elm$core$Dict$get, model.world.player, model.world.nodes);
-				if ((_v1.$ === 'Just') && (_v1.a.$ === 'Room')) {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				}
-			case 'InputDir':
-				var dir = input.a;
-				return _Utils_Tuple2(
-					A2(
-						$elm$core$Maybe$withDefault,
-						model,
-						A2(
-							$elm$core$Maybe$map,
-							function (world) {
-								return _Utils_update(
-									model,
-									{world: world});
-							},
-							A2($author$project$World$move, dir, model.world))),
-					$elm$core$Platform$Cmd$none);
-			default:
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-		}
-	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -9543,20 +9507,16 @@ var $author$project$Main$update = F2(
 				var input = msg.a;
 				var _v1 = model.overlay;
 				if (_v1.$ === 'Just') {
-					switch (_v1.a.$) {
-						case 'GameWon':
-							var _v2 = _v1.a;
-							return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-						case 'WorldMap':
-							var _v3 = _v1.a;
-							return A2($author$project$Main$updateWorldMap, input, model);
-						default:
-							var _v4 = _v1.a;
-							return _Utils_Tuple2(
-								_Utils_update(
-									model,
-									{overlay: $elm$core$Maybe$Nothing}),
-								$elm$core$Platform$Cmd$none);
+					if (_v1.a.$ === 'GameWon') {
+						var _v2 = _v1.a;
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					} else {
+						var _v3 = _v1.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{overlay: $elm$core$Maybe$Nothing}),
+							$elm$core$Platform$Cmd$none);
 					}
 				} else {
 					if ($author$project$Game$isWon(model.game)) {
@@ -9617,10 +9577,10 @@ var $author$project$Main$update = F2(
 										},
 										$author$project$Game$getPlayerPosition(model.game)));
 							case 'InputUndo':
-								var _v6 = model.history;
-								if (_v6.b) {
-									var head = _v6.a;
-									var tail = _v6.b;
+								var _v5 = model.history;
+								if (_v5.b) {
+									var head = _v5.a;
+									var tail = _v5.b;
 									return _Utils_Tuple2(
 										_Utils_update(
 											model,
@@ -9634,13 +9594,7 @@ var $author$project$Main$update = F2(
 							case 'InputReset':
 								return $author$project$Main$restartRoom(model);
 							default:
-								return _Utils_Tuple2(
-									_Utils_update(
-										model,
-										{
-											overlay: $elm$core$Maybe$Just($author$project$Main$WorldMap)
-										}),
-									$elm$core$Platform$Cmd$none);
+								return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 						}
 					}
 				}
@@ -10305,133 +10259,11 @@ var $author$project$View$Controls$toHtml = function (args) {
 					]))
 			]));
 };
-var $author$project$View$World$nodeSize = ($author$project$Config$cellSize / 2) | 0;
-var $author$project$Image$sprite = F2(
-	function (attrs, args) {
-		var _v0 = args.pos;
-		var x = _v0.a;
-		var y = _v0.b;
-		return A2(
-			$elm$html$Html$div,
-			_Utils_ap(
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$Attributes$style,
-						'width',
-						$elm$core$String$fromFloat(args.width) + 'px'),
-						A2(
-						$elm$html$Html$Attributes$style,
-						'height',
-						$elm$core$String$fromFloat(args.height) + 'px'),
-						A2($elm$html$Html$Attributes$style, 'background-image', 'url(' + (args.url + ') ')),
-						A2(
-						$elm$html$Html$Attributes$style,
-						'background-position',
-						$elm$core$String$fromFloat((-args.width) * x) + ('px ' + ($elm$core$String$fromFloat((-args.height) * y) + 'px'))),
-						A2(
-						$elm$html$Html$Attributes$style,
-						'background-size',
-						$elm$core$String$fromFloat(args.width * args.sheetColumns) + ('px ' + ($elm$core$String$fromFloat(args.height * args.sheetRows) + 'px'))),
-						A2($elm$html$Html$Attributes$style, 'background-repeat', 'no-repeat')
-					]),
-				attrs),
-			_List_Nil);
-	});
-var $author$project$View$World$image = F2(
-	function (attrs, pos) {
-		return A2(
-			$author$project$Image$sprite,
-			A2($elm$core$List$cons, $author$project$Image$pixelated, attrs),
-			{height: $author$project$View$World$nodeSize, pos: pos, sheetColumns: 4, sheetRows: 4, url: 'overworld.png', width: $author$project$View$World$nodeSize});
-	});
 var $elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
 	return _VirtualDom_keyedNode(
 		_VirtualDom_noScript(tag));
 };
 var $elm$html$Html$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNode;
-var $author$project$View$World$toHtml = F2(
-	function (attrs, world) {
-		var scale = 5;
-		var _v0 = _Utils_Tuple2(((-$author$project$View$World$nodeSize) / 2) | 0, -$author$project$View$World$nodeSize);
-		var offsetX = _v0.a;
-		var offsetY = _v0.b;
-		var _v1 = world.player;
-		var centerX = _v1.a;
-		var centerY = _v1.b;
-		return A3(
-			$elm$html$Html$Keyed$node,
-			'div',
-			A2($elm$core$List$cons, $Orasund$elm_layout$Html$Style$positionRelative, attrs),
-			A2(
-				$elm$core$List$sortBy,
-				$elm$core$Tuple$first,
-				A2(
-					$elm$core$List$map,
-					function (_v2) {
-						var _v3 = _v2.a;
-						var x = _v3.a;
-						var y = _v3.b;
-						var node = _v2.b;
-						return _Utils_Tuple2(
-							'node_' + ($elm$core$String$fromInt(x) + ('_' + $elm$core$String$fromInt(y))),
-							A2(
-								$author$project$View$World$image,
-								_List_fromArray(
-									[
-										$Orasund$elm_layout$Html$Style$width(
-										$elm$core$String$fromInt($author$project$View$World$nodeSize) + 'px'),
-										$Orasund$elm_layout$Html$Style$height(
-										$elm$core$String$fromInt($author$project$View$World$nodeSize) + 'px'),
-										$Orasund$elm_layout$Html$Style$top(
-										$elm$core$String$fromInt(((y - centerY) * $author$project$View$World$nodeSize) + offsetY) + 'px'),
-										$Orasund$elm_layout$Html$Style$left(
-										$elm$core$String$fromInt(((x - centerX) * $author$project$View$World$nodeSize) + offsetX) + 'px'),
-										$Orasund$elm_layout$Html$Style$positionAbsolute
-									]),
-								function () {
-									if (node.$ === 'Wall') {
-										return _Utils_Tuple2(3, 0);
-									} else {
-										var solved = node.a.solved;
-										var sort = node.a.sort;
-										return _Utils_Tuple2(
-											function () {
-												if (solved) {
-													return 0;
-												} else {
-													if (sort.$ === 'Trial') {
-														return 2;
-													} else {
-														return 1;
-													}
-												}
-											}(),
-											_Utils_eq(
-												world.player,
-												_Utils_Tuple2(x, y)) ? 1 : 0);
-									}
-								}()));
-					},
-					A2(
-						$elm$core$List$concatMap,
-						function (y) {
-							return A2(
-								$elm$core$List$filterMap,
-								function (x) {
-									return A2(
-										$elm$core$Maybe$map,
-										$elm$core$Tuple$pair(
-											_Utils_Tuple2(x, y)),
-										A2(
-											$elm$core$Dict$get,
-											_Utils_Tuple2(x, y),
-											world.nodes));
-								},
-								A2($elm$core$List$range, centerX - scale, centerX + scale));
-						},
-						A2($elm$core$List$range, centerY - scale, centerY + scale)))));
-	});
 var $author$project$View$Cell$fromEmojis = function (attrs) {
 	return A2(
 		$author$project$View$Bitmap$fromEmojis,
@@ -10481,13 +10313,6 @@ var $author$project$View$Door$bottom = function (attrs) {
 		_List_fromArray(
 			['⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬛⬜❌❌❌❌❌❌❌❌❌❌❌❌⬜⬛', '⬛⬛⬜⬜❌❌❌❌❌❌❌❌⬜⬜⬛⬛', '⬛⬛⬛⬛⬜⬜⬜⬜⬜⬜⬜⬜⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛', '⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛']));
 };
-var $author$project$View$Door$top = function (attrs) {
-	return A2(
-		$author$project$View$Cell$fromEmojis,
-		attrs,
-		_List_fromArray(
-			['⬛⬛⬛⬛⬜⬜⬜⬜⬜⬜⬜⬜⬛⬛⬛⬛', '⬛⬛⬜⬜❌❌❌❌❌❌❌❌⬜⬜⬛⬛', '⬛⬜❌❌❌❌❌❌❌❌❌❌❌❌⬜⬛', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜', '⬜❌❌❌❌❌❌❌❌❌❌❌❌❌❌⬜']));
-};
 var $author$project$View$Screen$viewDoors = F2(
 	function (prefix, game) {
 		var attrs = F2(
@@ -10512,8 +10337,11 @@ var $author$project$View$Screen$viewDoors = F2(
 				var y = _v0.b;
 				return _Utils_Tuple2(
 					prefix + ('_' + ($elm$core$String$fromInt(x) + $elm$core$String$fromInt(y))),
-					_Utils_eq(y, -1) ? $author$project$View$Door$top(
-						A2(attrs, x, y)) : (_Utils_eq(x, $author$project$Config$roomSize) ? $author$project$View$Door$bottom(
+					_Utils_eq(y, -1) ? $author$project$View$Door$bottom(
+						A2(
+							$elm$core$List$cons,
+							A2($elm$html$Html$Attributes$style, 'transform', 'rotate(-180deg)'),
+							A2(attrs, x, y))) : (_Utils_eq(x, $author$project$Config$roomSize) ? $author$project$View$Door$bottom(
 						A2(
 							$elm$core$List$cons,
 							A2($elm$html$Html$Attributes$style, 'transform', 'rotate(-90deg)'),
@@ -10526,6 +10354,20 @@ var $author$project$View$Screen$viewDoors = F2(
 			},
 			$elm$core$Dict$keys(game.doors));
 	});
+var $author$project$View$Cell$bomb1 = function (attrs) {
+	return A2(
+		$author$project$View$Cell$fromEmojis,
+		attrs,
+		_List_fromArray(
+			['❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌⬛⬛❌❌❌❌❌❌❌', '❌❌❌❌❌❌⬛⬜⬜⬛❌❌❌❌❌❌', '❌❌❌❌❌⬛⬛⬜⬜⬛⬛❌❌❌❌❌', '❌❌❌❌⬛⬜⬛⬛⬛⬛⬜⬛❌❌❌❌', '❌❌❌⬛⬜⬜⬜⬜⬜⬜⬜⬜⬛❌❌❌', '❌❌❌⬛⬜⬜⬜⬜⬜⬜⬛⬜⬛❌❌❌', '❌❌❌⬛⬜⬜⬜⬜⬜⬛⬛⬜⬛❌❌❌', '❌❌❌⬛⬜⬜⬛⬛⬛⬛⬛⬜⬛❌❌❌', '❌❌❌❌⬛⬜⬛⬛⬛⬛⬜⬛❌❌❌❌', '❌❌❌❌❌⬛⬜⬜⬜⬜⬛❌❌❌❌❌', '❌❌❌❌❌❌⬛⬛⬛⬛❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌']));
+};
+var $author$project$View$Cell$bomb2 = function (attrs) {
+	return A2(
+		$author$project$View$Cell$fromEmojis,
+		attrs,
+		_List_fromArray(
+			['❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌⬛⬛❌❌❌❌❌❌❌', '❌❌❌❌❌⬛⬛⬜⬜⬛⬛❌❌❌❌❌', '❌❌❌❌⬛⬜⬛⬜⬜⬛⬜⬛❌❌❌❌', '❌❌❌⬛⬜⬜⬛⬛⬛⬛⬜⬜⬛❌❌❌', '❌❌⬛⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬛❌❌', '❌❌⬛⬜⬜⬜⬜⬜⬜⬜⬜⬛⬜⬛❌❌', '❌❌⬛⬜⬜⬜⬜⬜⬜⬜⬜⬛⬜⬛❌❌', '❌❌⬛⬜⬛⬜⬜⬜⬜⬜⬛⬛⬜⬛❌❌', '❌❌⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛❌❌', '❌❌⬛⬜⬛⬛⬛⬛⬛⬛⬛⬛⬜⬛❌❌', '❌❌❌⬛⬜⬛⬛⬛⬛⬛⬛⬜⬛❌❌❌', '❌❌❌❌⬛⬜⬜⬜⬜⬜⬜⬛❌❌❌❌', '❌❌❌❌❌⬛⬛⬛⬛⬛⬛❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌']));
+};
 var $author$project$View$Cell$diamant = function (attrs) {
 	return A2(
 		$author$project$View$Cell$fromEmojis,
@@ -10591,6 +10433,38 @@ var $author$project$View$Cell$lockedBottomDoor = function (attrs) {
 		_List_fromArray(
 			['❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '🟨🟨🟨🟨🟨❌❌❌❌❌❌🟨🟨🟨🟨🟨', '🟨🟨🟨🟨🟨❌❌❌❌❌❌🟨🟨🟨🟨🟨', '🟨🟨🟨🟨🟨🟨❌❌❌❌🟨🟨🟨🟨🟨🟨', '🟨🟨🟨🟨🟨🟨❌❌❌❌🟨🟨🟨🟨🟨🟨', '🟨🟨🟨❌❌🟨❌❌❌❌🟨❌❌🟨🟨🟨', '🟨❌❌❌❌🟨❌❌❌❌🟨❌❌❌❌🟨', '🟨❌❌❌❌🟨❌❌❌❌🟨❌❌❌❌🟨', '🟨🟨🟨❌❌🟨❌❌❌❌🟨❌❌🟨🟨🟨', '🟨🟨🟨🟨🟨🟨❌❌❌❌🟨🟨🟨🟨🟨🟨', '🟨🟨🟨🟨🟨🟨❌❌❌❌🟨🟨🟨🟨🟨🟨', '🟨🟨🟨🟨🟨❌❌❌❌❌❌🟨🟨🟨🟨🟨', '🟨🟨🟨🟨🟨❌❌❌❌❌❌🟨🟨🟨🟨🟨', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌']));
 };
+var $author$project$Image$sprite = F2(
+	function (attrs, args) {
+		var _v0 = args.pos;
+		var x = _v0.a;
+		var y = _v0.b;
+		return A2(
+			$elm$html$Html$div,
+			_Utils_ap(
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$Attributes$style,
+						'width',
+						$elm$core$String$fromFloat(args.width) + 'px'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'height',
+						$elm$core$String$fromFloat(args.height) + 'px'),
+						A2($elm$html$Html$Attributes$style, 'background-image', 'url(' + (args.url + ') ')),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'background-position',
+						$elm$core$String$fromFloat((-args.width) * x) + ('px ' + ($elm$core$String$fromFloat((-args.height) * y) + 'px'))),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'background-size',
+						$elm$core$String$fromFloat(args.width * args.sheetColumns) + ('px ' + ($elm$core$String$fromFloat(args.height * args.sheetRows) + 'px'))),
+						A2($elm$html$Html$Attributes$style, 'background-repeat', 'no-repeat')
+					]),
+				attrs),
+			_List_Nil);
+	});
 var $author$project$View$Cell$sprite = F2(
 	function (attrs, pos) {
 		return A2(
@@ -10603,7 +10477,14 @@ var $author$project$View$Cell$wall = function (attrs) {
 		$author$project$View$Cell$fromEmojis,
 		attrs,
 		_List_fromArray(
-			['⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜']));
+			['⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜']));
+};
+var $author$project$View$Cell$wallDown = function (attrs) {
+	return A2(
+		$author$project$View$Cell$fromEmojis,
+		attrs,
+		_List_fromArray(
+			['⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '⬜⬜⬜⬜❌⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜', '❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌❌', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜', '⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜❌⬜⬜⬜⬜']));
 };
 var $author$project$View$Cell$toHtml = F3(
 	function (attrs, args, cell) {
@@ -10632,13 +10513,7 @@ var $author$project$View$Cell$toHtml = F3(
 					attrs,
 					_Utils_Tuple2(1, 6));
 			case 'ActiveSmallBomb':
-				return A2(
-					$author$project$View$Cell$sprite,
-					attrs,
-					A2(
-						$author$project$View$Cell$fromEnemy,
-						{frame: args.frame, playerDirection: args.playerDirection},
-						$author$project$Entity$ActivatedBomb($author$project$Entity$Bomb)));
+				return (!args.frame) ? $author$project$View$Cell$bomb1(attrs) : $author$project$View$Cell$bomb2(attrs);
 			case 'Enemy':
 				var enemy = cell.a;
 				return A2(
@@ -10658,7 +10533,12 @@ var $author$project$View$Cell$toHtml = F3(
 						{frame: args.frame, playerDirection: args.playerDirection},
 						enemy));
 			case 'Wall':
-				return $author$project$View$Cell$wall(attrs);
+				return (!_Utils_eq(
+					A2(
+						$elm$core$Dict$get,
+						_Utils_Tuple2(0, 1),
+						args.neighborhood),
+					$elm$core$Maybe$Just($author$project$Entity$Wall))) ? $author$project$View$Cell$wallDown(attrs) : $author$project$View$Cell$wall(attrs);
 			case 'Diamant':
 				return $author$project$View$Cell$diamant(attrs);
 			case 'Key':
@@ -10693,7 +10573,30 @@ var $author$project$View$Screen$viewEntity = F3(
 								$elm$core$String$fromFloat($author$project$Config$cellSize * y) + 'px'),
 								A2($elm$html$Html$Attributes$style, 'transition', 'left 0.2s,top 0.2s')
 							]),
-						{frame: args.frame, playerDirection: game.playerDirection},
+						{
+							frame: args.frame,
+							neighborhood: $elm$core$Dict$fromList(
+								A2(
+									$elm$core$List$filterMap,
+									function (dir) {
+										return A2(
+											$elm$core$Maybe$map,
+											$elm$core$Tuple$pair(
+												A2(
+													$author$project$Position$addToVector,
+													_Utils_Tuple2(0, 0),
+													$author$project$Direction$toVector(dir))),
+											A2(
+												$author$project$Game$get,
+												A2(
+													$author$project$Position$addToVector,
+													_Utils_Tuple2(x, y),
+													$author$project$Direction$toVector(dir)),
+												game));
+									},
+									$author$project$Direction$asList)),
+							playerDirection: game.playerDirection
+						},
 						cell.entity));
 			},
 			$elm$core$Dict$toList(game.cells));
@@ -11068,22 +10971,18 @@ var $author$project$Main$view = function (model) {
 									{frame: model.frame},
 									model.game);
 							} else {
-								switch (_v0.a.$) {
-									case 'WorldMap':
-										var _v1 = _v0.a;
-										return A2($author$project$View$World$toHtml, _List_Nil, model.world);
-									case 'Menu':
-										var _v2 = _v0.a;
-										return A2(
-											$author$project$View$Screen$menu,
-											_List_Nil,
-											{
-												frame: model.frame,
-												onClick: $author$project$Main$Input($author$project$Input$InputActivate)
-											});
-									default:
-										var _v3 = _v0.a;
-										return $author$project$View$Screen$gameWon;
+								if (_v0.a.$ === 'Menu') {
+									var _v1 = _v0.a;
+									return A2(
+										$author$project$View$Screen$menu,
+										_List_Nil,
+										{
+											frame: model.frame,
+											onClick: $author$project$Main$Input($author$project$Input$InputActivate)
+										});
+								} else {
+									var _v2 = _v0.a;
+									return $author$project$View$Screen$gameWon;
 								}
 							}
 						}()),

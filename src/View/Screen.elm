@@ -2,6 +2,7 @@ module View.Screen exposing (gameWon, menu, world)
 
 import Config
 import Dict
+import Direction
 import Entity exposing (Enemy(..), Entity(..), Floor(..))
 import Game exposing (Game)
 import Html exposing (Attribute, Html)
@@ -112,7 +113,10 @@ viewDoors prefix game =
             (\( x, y ) ->
                 ( prefix ++ "_" ++ String.fromInt x ++ String.fromInt y
                 , if y == -1 then
-                    View.Door.top (attrs x y)
+                    View.Door.bottom
+                        (Html.Attributes.style "transform" "rotate(-180deg)"
+                            :: attrs x y
+                        )
 
                   else if x == Config.roomSize then
                     View.Door.bottom
@@ -246,6 +250,24 @@ viewEntity prefix args game =
                     ]
                     { frame = args.frame
                     , playerDirection = game.playerDirection
+                    , neighborhood =
+                        Direction.asList
+                            |> List.filterMap
+                                (\dir ->
+                                    game
+                                        |> Game.get
+                                            (Direction.toVector dir
+                                                |> Position.addToVector ( x, y )
+                                            )
+                                        |> Maybe.map
+                                            (Tuple.pair
+                                                (dir
+                                                    |> Direction.toVector
+                                                    |> Position.addToVector ( 0, 0 )
+                                                )
+                                            )
+                                )
+                            |> Dict.fromList
                     }
                     cell.entity
                 )
